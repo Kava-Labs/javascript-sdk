@@ -116,7 +116,7 @@ const txHash = await client.createSwap(
 
 ## Claim swap
 
-Only active swaps can be claimed. Anyone can send the claim request, but funds will only be released to the intended recipient if the secret random number matches the random number hash. A successful claim send funds exclusively to the intended recipient's address.
+Only active swaps can be claimed. Anyone can send the claim request, but funds will only be released to the intended recipient if the secret random number matches the random number hash. A successful claim sends funds exclusively to the intended recipient's address.
 
 ```javascript
 // Use the secret random number from swap creation
