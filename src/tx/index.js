@@ -1,6 +1,7 @@
 const sig = require("@tendermint/sig");
 const _ = require("lodash");
 const axios = require("axios");
+const URL = require("url").URL;
 
 const api = {
   getAccount: "/auth/accounts",
