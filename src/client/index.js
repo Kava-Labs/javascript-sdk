@@ -44,7 +44,7 @@ class KavaClient {
   }
 
   /**
-   * Manually the chain's ID
+   * Manually set the chain's ID
    * @param {String} chainID Kava chain ID
    */
   setChainID(chainID) {
