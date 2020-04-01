@@ -1,8 +1,10 @@
 const SHA256 = require("crypto-js/sha256");
 const hexEncoding = require("crypto-js/enc-hex");
 const Big = require("big.js");
+const cryptoRand = require("crypto");
 const crypto = require("../crypto").crypto;
 
+const RandomNumberLength = 64;
 const precision = {
   kava: Math.pow(10, 6),
   ukava: Math.pow(10, 6),
@@ -21,6 +23,17 @@ const sha256 = hex => {
     throw new Error(`invalid hex string length: ${hex}`);
   const hexEncoded = hexEncoding.parse(hex);
   return SHA256(hexEncoded).toString();
+};
+
+/**
+ * Generates a hex-encoded 256-bit random number
+ * @returns {string} the hex-encoded number
+ */
+const generateRandomNumber = () => {
+  return cryptoRand
+    .randomBytes(Math.ceil(RandomNumberLength / 2))
+    .toString("hex")
+    .slice(0, RandomNumberLength);
 };
 
 /**
@@ -103,6 +116,7 @@ const loadCoins = (denom, amount) => {
 };
 
 module.exports.utils = {
+  generateRandomNumber,
   calculateRandomNumberHash,
   calculateSwapID,
   loadCoins

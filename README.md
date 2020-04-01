@@ -81,8 +81,7 @@ const heightSpan = "500";
 const crossChain = true;
 
 // Generate random number hash from timestamp and hex-encoded random number
-const randomNumber =
-  "e8eae926261ab77d018202434791a335249b470246a7b02e28c3b2fb6ffad8f3";
+const randomNumber = utils.generateRandomNumber();
 const timestamp = Math.floor(Date.now() / 1000);
 const randomNumberHash = utils.calculateRandomNumberHash(
   randomNumber,
