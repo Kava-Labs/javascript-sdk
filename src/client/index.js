@@ -44,6 +44,30 @@ class KavaClient {
   }
 
   /**
+   * Manually the chain's ID
+   * @param {String} chainID Kava chain ID
+   */
+  setChainID(chainID) {
+    if (!chainID) {
+      throw new Error("chainID cannot be undefined");
+    }
+    this.chainID = chainID;
+    return this;
+  }
+
+  /**
+   * Manually set the wallet's account number
+   * @param {String} accNum Account number of the Kava address
+   */
+  setAccountNumber(accNum) {
+    if (!accNum) {
+      throw new Error("account number cannot be undefined");
+    }
+    this.accNum = String(accNum);
+    return this;
+  }
+
+  /**
    * Set the client's wallet which is used for signature generation
    * @param {String} mnemonic Kava address mnemonic
    * @return {Promise}
@@ -61,82 +85,129 @@ class KavaClient {
     return this;
   }
 
-  async transfer(recipient, coins) {
-    const msgSend = msg.newMsgSend(this.wallet.address, recipient, coins);
-    let rawTx = msg.newStdTx([msgSend]);
-    return tx.postTx(this.chainID, this.baseURI, this.wallet, rawTx);
+  /**
+   * Load account number, sequence, and package with chain ID for signature
+   * @param {String} sequence Kava address sequence
+   * @return {Promise}
+   */
+  async prepareSignInfo(sequence) {
+    let signInfo;
+    if (sequence && this.accNum != null) {
+      // Prepare signing info from manually set values
+      signInfo = {
+        chain_id: this.chainID,
+        account_number: this.accNum,
+        sequence: String(sequence)
+      };
+    } else {
+      // Load meta data from the account's chain state
+      const meta = await tx.loadMetaData(this.wallet.address, this.baseURI);
+      // Select manually set values over automatically pulled values
+      signInfo = {
+        chain_id: this.chainID,
+        account_number: this.accNum != null ? this.accNum : meta.account_number,
+        sequence: sequence ? String(sequence) : meta.sequence
+      };
+    }
+    return signInfo;
   }
 
-  async postPrice(marketID, price, expiry) {
+  /************************
+   *      Tx methods
+   ************************/
+
+  async transfer(recipient, coins, sequence = null) {
+    const msgSend = msg.newMsgSend(this.wallet.address, recipient, coins);
+    const rawTx = msg.newStdTx([msgSend]);
+    const signInfo = await this.prepareSignInfo(sequence);
+    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
+    return await tx.broadcastTx(signedTx, this.baseURI);
+  }
+
+  async postPrice(marketID, price, expiry, sequence = null) {
     const msgPostPrice = msg.newMsgPostPrice(
       this.wallet.address,
       marketID,
       price,
       expiry
     );
-    let rawTx = msg.newStdTx([msgPostPrice]);
-    return tx.postTx(this.chainID, this.baseURI, this.wallet, rawTx);
+    const rawTx = msg.newStdTx([msgPostPrice]);
+    const signInfo = await this.prepareSignInfo(sequence);
+    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
+    return await tx.broadcastTx(signedTx, this.baseURI);
   }
 
-  async createCDP(principal, collateral) {
+  async createCDP(principal, collateral, sequence = null) {
     const msgCreateCDP = msg.newMsgCreateCDP(
       this.wallet.address,
       principal,
       collateral
     );
     const fee = { amount: [], gas: "250000" };
-    let rawTx = msg.newStdTx([msgCreateCDP], fee);
-    return tx.postTx(this.chainID, this.baseURI, this.wallet, rawTx);
+    const rawTx = msg.newStdTx([msgCreateCDP], fee);
+    const signInfo = await this.prepareSignInfo(sequence);
+    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
+    return await tx.broadcastTx(signedTx, this.baseURI);
   }
 
-  async deposit(owner, collateral) {
+  async deposit(owner, collateral, sequence = null) {
     const msgDeposit = msg.newMsgDeposit(
       owner,
       this.wallet.address,
       collateral
     );
-    let rawTx = msg.newStdTx([msgDeposit]);
-    return tx.postTx(this.chainID, this.baseURI, this.wallet, rawTx);
+    const rawTx = msg.newStdTx([msgDeposit]);
+    const signInfo = await this.prepareSignInfo(sequence);
+    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
+    return await tx.broadcastTx(signedTx, this.baseURI);
   }
 
-  async withdraw(owner, collateral) {
+  async withdraw(owner, collateral, sequence = null) {
     const msgWithdraw = msg.newMsgWithdraw(
       owner,
       this.wallet.address,
       collateral
     );
-    let rawTx = msg.newStdTx([msgWithdraw]);
-    return tx.postTx(this.chainID, this.baseURI, this.wallet, rawTx);
+    const rawTx = msg.newStdTx([msgWithdraw]);
+    const signInfo = await this.prepareSignInfo(sequence);
+    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
+    return await tx.broadcastTx(signedTx, this.baseURI);
   }
 
-  async drawDebt(cdpDenom, principal) {
+  async drawDebt(cdpDenom, principal, sequence = null) {
     const msgDrawDebt = msg.newMsgDrawDebt(
       this.wallet.address,
       cdpDenom,
       principal
     );
-    let rawTx = msg.newStdTx([msgDrawDebt]);
-    return tx.postTx(this.chainID, this.baseURI, this.wallet, rawTx);
+    const rawTx = msg.newStdTx([msgDrawDebt]);
+    const signInfo = await this.prepareSignInfo(sequence);
+    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
+    return await tx.broadcastTx(signedTx, this.baseURI);
   }
 
-  async repayDebt(payment, cdpDenom) {
+  async repayDebt(payment, cdpDenom, sequence = null) {
     const msgRepayDebt = msg.newMsgRepayDebt(
       this.wallet.address,
       payment,
       cdpDenom
     );
-    let rawTx = msg.newStdTx([msgRepayDebt]);
-    return tx.postTx(this.chainID, this.baseURI, this.wallet, rawTx);
+    const rawTx = msg.newStdTx([msgRepayDebt]);
+    const signInfo = await this.prepareSignInfo(sequence);
+    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
+    return await tx.broadcastTx(signedTx, this.baseURI);
   }
 
-  async placeBid(auctionID, amount) {
+  async placeBid(auctionID, amount, sequence = null) {
     const msgPlaceBid = msg.newMsgPlaceBid(
       auctionID,
       this.wallet.address,
       amount
     );
-    let rawTx = msg.newStdTx([msgPlaceBid]);
-    return tx.postTx(this.chainID, this.baseURI, this.wallet, rawTx);
+    const rawTx = msg.newStdTx([msgPlaceBid]);
+    const signInfo = await this.prepareSignInfo(sequence);
+    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
+    return await tx.broadcastTx(signedTx, this.baseURI);
   }
 
   async createSwap(
@@ -148,7 +219,8 @@ class KavaClient {
     amount,
     expectedIncome,
     heightSpan,
-    crossChain
+    crossChain,
+    sequence = null
   ) {
     const msgCreateAtomicSwap = msg.newMsgCreateAtomicSwap(
       this.wallet.address,
@@ -162,27 +234,33 @@ class KavaClient {
       heightSpan,
       crossChain
     );
-    let rawTx = msg.newStdTx([msgCreateAtomicSwap]);
-    return tx.postTx(this.chainID, this.baseURI, this.wallet, rawTx);
+    const rawTx = msg.newStdTx([msgCreateAtomicSwap]);
+    const signInfo = await this.prepareSignInfo(sequence);
+    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
+    return await tx.broadcastTx(signedTx, this.baseURI);
   }
 
-  async claimSwap(swapID, randomNumber) {
+  async claimSwap(swapID, randomNumber, sequence = null) {
     const msgClaimAtomicSwap = msg.newMsgClaimAtomicSwap(
       this.wallet.address,
       swapID.toUpperCase(),
       randomNumber.toUpperCase()
     );
-    let rawTx = msg.newStdTx([msgClaimAtomicSwap]);
-    return tx.postTx(this.chainID, this.baseURI, this.wallet, rawTx);
+    const rawTx = msg.newStdTx([msgClaimAtomicSwap]);
+    const signInfo = await this.prepareSignInfo(sequence);
+    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
+    return await tx.broadcastTx(signedTx, this.baseURI);
   }
 
-  async refundSwap(swapID) {
+  async refundSwap(swapID, sequence = null) {
     const msgRefundAtomicSwap = msg.newMsgRefundAtomicSwap(
       this.wallet.address,
       swapID.toUpperCase()
     );
-    let rawTx = msg.newStdTx([msgRefundAtomicSwap]);
-    return tx.postTx(this.chainID, this.baseURI, this.wallet, rawTx);
+    const rawTx = msg.newStdTx([msgRefundAtomicSwap]);
+    const signInfo = await this.prepareSignInfo(sequence);
+    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
+    return await tx.broadcastTx(signedTx, this.baseURI);
   }
 }
 

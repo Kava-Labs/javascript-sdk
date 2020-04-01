@@ -11,13 +11,7 @@ async function getTx(path, base) {
   return await axios.get(new URL(path, base).toString());
 }
 
-async function postTx(chainID, base, wallet, tx) {
-  const metaData = await loadMetaData(chainID, wallet.address, base);
-  tx = signTx(tx, metaData, wallet);
-  return await broadcastTx(tx, base);
-}
-
-async function loadMetaData(chainID, address, base) {
+async function loadMetaData(address, base) {
   const path = api.getAccount + "/" + address;
   const res = await getTx(path, base);
 
@@ -30,7 +24,6 @@ async function loadMetaData(chainID, address, base) {
   }
 
   const signMetaData = {
-    chain_id: chainID,
     account_number: accNum,
     sequence: seqNum
   };
@@ -47,8 +40,8 @@ function signTx(tx, signMetaData, wallet) {
 }
 
 async function broadcastTx(tx, base) {
-  let txRes;
   // Send transaction to Kava
+  let txRes;
   try {
     const url = new URL(api.postTx, base).toString();
     txRes = await axios.post(url, sig.createBroadcastTx(tx, "block"));
@@ -72,5 +65,7 @@ async function broadcastTx(tx, base) {
 
 module.exports.tx = {
   getTx,
-  postTx
+  loadMetaData,
+  signTx,
+  broadcastTx
 };
