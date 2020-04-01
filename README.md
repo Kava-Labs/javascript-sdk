@@ -16,11 +16,9 @@ Install dependencies via npm.
 npm install
 ```
 
-# Examples
+# Client setup
 
-The following examples demonstrate client initialization and usage.
-
-## Client setup
+The client requires an address mnemonic and the url of a Kava api endpoint.
 
 ```javascript
 const KavaClient = require("./client").KavaClient;
@@ -41,6 +39,10 @@ var main = async () => {
 };
 ```
 
+# Examples
+
+The following examples demonstrate client usage.
+
 ## Transfer coins
 
 ```javascript
@@ -56,11 +58,17 @@ const txHash = await client.transfer(recipient, coins);
 console.log("Tx hash:", txHash);
 ```
 
+## Swaps
+
+Kava's testnet-5000 supports secure transfers of BNB from Binance Chain to Kava and back via swaps. The [bep3-deputy](https://github.com/binance-chain/bep3-deputy) process sits between the two blockchains and services swaps by relaying information back and forth.
+
+In order for an address to submit a swap on Kava it must hold pegged bnb tokens. The Binance Chain [docs](https://docs.binance.org/atomic-swap.html) describe how to send BNB from Binance Chain to Kava and receive pegged bnb tokens. Make sure to use the correct deputy address or the deputy will not relay the swap.
+
+Swaps use a simple secret sharing scheme. A secret random number is generated on the client and hashed with a timestamp in order to create a random number hash that's stored with the swap. The swap can be securely claimed on the opposite chain using the secret random number. Swaps expire after n blocks, a duration that can be modified via the height span parameter. Once expired, the swap can be refunded.
+
 ## Create swap
 
-Kava's testnet-5000 supports secure transfers of BNB from bnbchain to kava and back via swaps. The bep3-deputy process sits between the two blockchains and services swaps by relaying information back and forth. Swaps use a simple secret sharing scheme. A secret random number is generated on the client and hashed with a timestamp in order to create a random number hash that's stored with the swap.
-
-Once created, a swap can be securely claimed on the opposite chain using the secret random number. Swaps expire after n blocks, a duration that can be modified via the height span parameter. Once expired, a swap can only be refunded.
+Currently, only pegged bnb swaps are supported.
 
 ```javascript
 // Import utils
