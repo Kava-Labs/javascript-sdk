@@ -12,6 +12,10 @@ function newStdTx(msgs, fee = defaultFee, memo = "", signatures = []) {
   };
 }
 
+/***************************************************
+ *                Cosmos-SDK msgs
+ ***************************************************/
+
 // newMsgSend creates a new MsgSend
 function newMsgSend(address, to, coins) {
   return {
@@ -23,6 +27,10 @@ function newMsgSend(address, to, coins) {
     }
   };
 }
+
+/***************************************************
+ *                   Kava msgs
+ ***************************************************/
 
 function newMsgPostPrice(from, marketID, price, expiry) {
   return {

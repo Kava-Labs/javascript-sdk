@@ -8,10 +8,22 @@ const api = {
   postTx: "/txs"
 };
 
+/**
+ * Sends an HTTP GET request to Kava
+ * @param {String} path the request's url extension
+ * @param {String} base the request's base url
+ * @return {Promise}
+ */
 async function getTx(path, base) {
   return await axios.get(new URL(path, base).toString());
 }
 
+/**
+ * Loads an account's account number and sequence from Kava
+ * @param {String} address the address to be fetched
+ * @param {String} base the request's base url
+ * @return {Promise}
+ */
 async function loadMetaData(address, base) {
   const path = api.getAccount + "/" + address;
   const res = await getTx(path, base);
@@ -32,6 +44,13 @@ async function loadMetaData(address, base) {
   return signMetaData;
 }
 
+/**
+ * Packages, signs, and verifies a transaction
+ * @param {Object} tx an unsigned tx object
+ * @param {Object} signMetaData contains account number, sequence, and chain ID
+ * @param {Object} wallet the wallet that will be used to sign the tx
+ * @return {Promise}
+ */
 function signTx(tx, signMetaData, wallet) {
   tx = sig.signTx(tx, signMetaData, wallet);
   if (!sig.verifyTx(tx, signMetaData)) {
@@ -40,8 +59,13 @@ function signTx(tx, signMetaData, wallet) {
   return tx;
 }
 
+/**
+ * Sends an HTTP POST request containing a signed transaction to Kava
+ * @param {Object} tx a signed tx
+ * @param {String} base the request's base url
+ * @return {Promise}
+ */
 async function broadcastTx(tx, base) {
-  // Send transaction to Kava
   let txRes;
   try {
     const url = new URL(api.postTx, base).toString();

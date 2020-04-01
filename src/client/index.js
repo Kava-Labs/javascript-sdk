@@ -69,6 +69,9 @@ class KavaClient {
   /**
    * Set the client's wallet which is used for signature generation
    * @param {String} mnemonic Kava address mnemonic
+   * @param {String} password optional param for wallet password
+   * @param {String} prefix optional param for custom address prefix
+   * @param {String} derivationPath optional param for custom derivation path
    * @return {Promise}
    */
   setWallet(
@@ -120,6 +123,13 @@ class KavaClient {
    *                  Tx methods
    ***************************************************/
 
+  /**
+   * Sends coins to an address
+   * @param {String} recipient address that will receive coins
+   * @param {String} coins amount of coins to send
+   * @param {String} sequence optional account sequence
+   * @return {Promise}
+   */
   async transfer(recipient, coins, sequence = null) {
     const msgSend = msg.newMsgSend(this.wallet.address, recipient, coins);
     const rawTx = msg.newStdTx([msgSend]);
@@ -128,6 +138,14 @@ class KavaClient {
     return await tx.broadcastTx(signedTx, this.baseURI);
   }
 
+  /**
+   * Allows oracles to post an asset's price to the pricefeed
+   * @param {String} marketID the asset's on chain market ID, such as 'btc:usd'
+   * @param {String} price the asset's price
+   * @param {String} expiry time duration that this price is valid for
+   * @param {String} sequence optional account sequence
+   * @return {Promise}
+   */
   async postPrice(marketID, price, expiry, sequence = null) {
     const msgPostPrice = msg.newMsgPostPrice(
       this.wallet.address,
@@ -141,6 +159,13 @@ class KavaClient {
     return await tx.broadcastTx(signedTx, this.baseURI);
   }
 
+  /**
+   * Create a collateralized debt position
+   * @param {String} principal the coins that will be drawn as debt
+   * @param {String} collateral the coins that will be held as collateral
+   * @param {String} sequence optional account sequence
+   * @return {Promise}
+   */
   async createCDP(principal, collateral, sequence = null) {
     const msgCreateCDP = msg.newMsgCreateCDP(
       this.wallet.address,
@@ -154,6 +179,13 @@ class KavaClient {
     return await tx.broadcastTx(signedTx, this.baseURI);
   }
 
+  /**
+   * Deposit collateral into a collateralized debt position
+   * @param {String} owner the owner of the CDP
+   * @param {String} collateral the coins that will deposited as additional collateral
+   * @param {String} sequence optional account sequence
+   * @return {Promise}
+   */
   async deposit(owner, collateral, sequence = null) {
     const msgDeposit = msg.newMsgDeposit(
       owner,
@@ -166,6 +198,13 @@ class KavaClient {
     return await tx.broadcastTx(signedTx, this.baseURI);
   }
 
+  /**
+   * Withdraw collateral from a collateralized debt position
+   * @param {String} owner the owner of the CDP
+   * @param {String} collateral the coins that will withdrawn from existing collateral
+   * @param {String} sequence optional account sequence
+   * @return {Promise}
+   */
   async withdraw(owner, collateral, sequence = null) {
     const msgWithdraw = msg.newMsgWithdraw(
       owner,
@@ -178,6 +217,13 @@ class KavaClient {
     return await tx.broadcastTx(signedTx, this.baseURI);
   }
 
+  /**
+   * Draw additional debt from a collateralized debt position
+   * @param {String} cdpDenom the denom of this CDP's collateral asset
+   * @param {String} principal the coins that will be drawn as additional principal
+   * @param {String} sequence optional account sequence
+   * @return {Promise}
+   */
   async drawDebt(cdpDenom, principal, sequence = null) {
     const msgDrawDebt = msg.newMsgDrawDebt(
       this.wallet.address,
@@ -190,6 +236,13 @@ class KavaClient {
     return await tx.broadcastTx(signedTx, this.baseURI);
   }
 
+  /**
+   * Repay debt by returning principal to a collateralized debt position
+   * @param {String} payment the amount of pricipal to be repaid
+   * @param {String} cdpDenom the denom of this CDP's collateral asset
+   * @param {String} sequence optional account sequence
+   * @return {Promise}
+   */
   async repayDebt(payment, cdpDenom, sequence = null) {
     const msgRepayDebt = msg.newMsgRepayDebt(
       this.wallet.address,
@@ -202,6 +255,13 @@ class KavaClient {
     return await tx.broadcastTx(signedTx, this.baseURI);
   }
 
+  /**
+   * Place a bid on an auction
+   * @param {String} auctionID the unique ID of the auction
+   * @param {String} amount the coins amount to bid
+   * @param {String} sequence optional account sequence
+   * @return {Promise}
+   */
   async placeBid(auctionID, amount, sequence = null) {
     const msgPlaceBid = msg.newMsgPlaceBid(
       auctionID,
@@ -214,6 +274,20 @@ class KavaClient {
     return await tx.broadcastTx(signedTx, this.baseURI);
   }
 
+  /**
+   * Create an atomic swap
+   * @param {String} recipient the receiver's address on kava
+   * @param {String} recipientOtherChain the receiver's address on the other chain
+   * @param {String} senderOtherChain the sender's address on the other chain
+   * @param {String} randomNumberHash resulting hex-encoded hash from sha256(timestamp, random number)
+   * @param {String} timestamp the timestamp in unix, must be within 15-30 minutes of current time
+   * @param {String} amount the amount in coins to be transferred
+   * @param {String} expectedIncome the amount of coins expected to be received by the recipient
+   * @param {String} heightSpan the number of blocks that this swap will be active/claimable
+   * @param {String} crossChain denotes if this swap is a cross-chain swap or a same-chain swap
+   * @param {String} sequence optional account sequence
+   * @return {Promise}
+   */
   async createSwap(
     recipient,
     recipientOtherChain,
@@ -244,6 +318,12 @@ class KavaClient {
     return await tx.broadcastTx(signedTx, this.baseURI);
   }
 
+  /**
+   * Claim an atomic swap
+   * @param {String} swapID the swap's unique identifier
+   * @param {String} randomNumber the secret random number used to generate this swap's random number hash
+   * @return {Promise}
+   */
   async claimSwap(swapID, randomNumber, sequence = null) {
     const msgClaimAtomicSwap = msg.newMsgClaimAtomicSwap(
       this.wallet.address,
@@ -256,6 +336,11 @@ class KavaClient {
     return await tx.broadcastTx(signedTx, this.baseURI);
   }
 
+  /**
+   * Refund an atomic swap
+   * @param {String} swapID the swap's unique identifier
+   * @return {Promise}
+   */
   async refundSwap(swapID, sequence = null) {
     const msgRefundAtomicSwap = msg.newMsgRefundAtomicSwap(
       this.wallet.address,

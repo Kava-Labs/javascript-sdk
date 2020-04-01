@@ -65,6 +65,12 @@ const calculateSwapID = (randomNumberHash, sender, senderOtherChain) => {
   return sha256(newBuffer.toString("hex"));
 };
 
+/**
+ * Loads a Cosmos-SDK compatible sdk.Coins object
+ * @param {String} denom name of the asset
+ * @param {String} amount value of the asset
+ * @return {object} coins result
+ */
 const loadCoins = (denom, amount) => {
   amount = new Big(amount);
   let decimals;
@@ -83,7 +89,8 @@ const loadCoins = (denom, amount) => {
       break;
   }
   amount = amount.mul(decimals).toString();
-  // TODO: validate.checkNumber(amount, "amount");
+  // TODO: validate that the number is within reasonable bounds
+  // validate.checkNumber(amount, "amount");
 
   const coins = [
     {
@@ -91,6 +98,7 @@ const loadCoins = (denom, amount) => {
       amount: String(amount)
     }
   ];
+
   return coins;
 };
 
