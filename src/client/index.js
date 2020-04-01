@@ -2,10 +2,9 @@ const sig = require("@tendermint/sig");
 const _ = require("lodash");
 const tx = require("../tx").tx;
 const msg = require("../msg").msg;
-const utils = require("../utils").utils;
 
-const prefix = "kava";
-const derivationPath = "m/44'/459'/0'/0/0";
+const defaultPrefix = "kava";
+const defaultDerivationPath = "m/44'/459'/0'/0/0";
 
 const api = {
   nodeInfo: "/node_info",
@@ -72,13 +71,18 @@ class KavaClient {
    * @param {String} mnemonic Kava address mnemonic
    * @return {Promise}
    */
-  setWallet(mnemonic) {
+  setWallet(
+    mnemonic,
+    password = "",
+    prefix = defaultPrefix,
+    derivationPath = defaultDerivationPath
+  ) {
     if (!mnemonic) {
       throw new Error("mnemonic cannot be undefined");
     }
     this.wallet = sig.createWalletFromMnemonic(
       mnemonic,
-      "",
+      password,
       prefix,
       derivationPath
     );
@@ -112,9 +116,9 @@ class KavaClient {
     return signInfo;
   }
 
-  /************************
-   *      Tx methods
-   ************************/
+  /***************************************************
+   *                  Tx methods
+   ***************************************************/
 
   async transfer(recipient, coins, sequence = null) {
     const msgSend = msg.newMsgSend(this.wallet.address, recipient, coins);
