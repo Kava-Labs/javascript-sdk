@@ -24,11 +24,11 @@ class KavaClient {
   /**
    * @param {String} server Kava public url
    */
-  constructor(baseURI) {
-    if (!baseURI) {
-      throw new Error("Kava base URI should not be null");
+  constructor(server) {
+    if (!server) {
+      throw new Error("Kava server should not be null");
     }
-    this.baseURI = baseURI;
+    this.baseURI = server;
   }
 
   /**
@@ -43,6 +43,11 @@ class KavaClient {
     return this;
   }
 
+  /**
+   * Set the client's wallet which is used for signature generation
+   * @param {String} mnemonic Kava address mnemonic
+   * @return {Promise}
+   */
   setWallet(mnemonic) {
     if (!mnemonic) {
       throw new Error("mnemonic cannot be undefined");
@@ -56,8 +61,7 @@ class KavaClient {
     return this;
   }
 
-  async transfer(recipient, denom, amount) {
-    const coins = utils.loadCoins(denom, amount);
+  async transfer(recipient, coins) {
     const msgSend = msg.newMsgSend(this.wallet.address, recipient, coins);
     let rawTx = msg.newStdTx([msgSend]);
     return tx.postTx(this.chainID, this.baseURI, this.wallet, rawTx);
@@ -151,7 +155,7 @@ class KavaClient {
       recipient,
       recipientOtherChain,
       senderOtherChain,
-      randomNumberHash,
+      randomNumberHash.toUpperCase(),
       timestamp,
       amount,
       expectedIncome,
@@ -165,8 +169,8 @@ class KavaClient {
   async claimSwap(swapID, randomNumber) {
     const msgClaimAtomicSwap = msg.newMsgClaimAtomicSwap(
       this.wallet.address,
-      swapID,
-      randomNumber
+      swapID.toUpperCase(),
+      randomNumber.toUpperCase()
     );
     let rawTx = msg.newStdTx([msgClaimAtomicSwap]);
     return tx.postTx(this.chainID, this.baseURI, this.wallet, rawTx);
@@ -175,7 +179,7 @@ class KavaClient {
   async refundSwap(swapID) {
     const msgRefundAtomicSwap = msg.newMsgRefundAtomicSwap(
       this.wallet.address,
-      swapID
+      swapID.toUpperCase()
     );
     let rawTx = msg.newStdTx([msgRefundAtomicSwap]);
     return tx.postTx(this.chainID, this.baseURI, this.wallet, rawTx);

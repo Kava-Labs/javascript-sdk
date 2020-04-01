@@ -3,7 +3,7 @@ const hexEncoding = require("crypto-js/enc-hex");
 const Big = require("big.js");
 const crypto = require("../crypto").crypto;
 
-const percision = {
+const precision = {
   kava: Math.pow(10, 6),
   ukava: Math.pow(10, 6),
   usdx: Math.pow(10, 6),
@@ -70,16 +70,16 @@ const loadCoins = (denom, amount) => {
   let decimals;
   switch (denom) {
     case "kava":
-      decimals = percision.kava;
+      decimals = precision.kava;
       break;
     case "ukava":
-      decimals = percision.ukava;
+      decimals = precision.ukava;
       break;
     case "usdx":
-      decimals = percision.usdx;
+      decimals = precision.usdx;
       break;
     case "bnb":
-      decimals = percision.bnb;
+      decimals = precision.bnb;
       break;
   }
   amount = amount.mul(decimals).toString();
@@ -87,7 +87,7 @@ const loadCoins = (denom, amount) => {
 
   const coins = [
     {
-      denom: denom,
+      denom: String(denom),
       amount: String(amount)
     }
   ];
