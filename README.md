@@ -6,14 +6,14 @@ The Kava JavaScript SDK allows browsers and node.js clients to interact with Kav
 - tx - Kava transaction types.
 - msg - Kava message types.
 - crypto - core cryptographic functions.
-- utils - utility functions such as client-side secret generation
+- utils - utility functions such as client-side secret generation.
 
 # Installation
 
-Install dependencies via npm.
+Install the package via npm.
 
 ```bash
-npm install
+npm install @kava-labs/javascript-sdk
 ```
 
 # Client setup
@@ -21,13 +21,12 @@ npm install
 The client requires an address mnemonic and the url of a Kava api endpoint.
 
 ```javascript
-const KavaClient = require("./client").KavaClient;
+const kava = require("@kava-labs/javascript-sdk");
+const KavaClient = kava.KavaClient;
 
 var main = async () => {
-  // Set up wallet mnemonic
   const mnemonic = "secret words that unlock a kava address";
-  // Set up rest endpoint
-  const testnetURL = "http://54.196.2.124:1317"; // kava-testnet-5000 endpoint
+  const testnetURL = "http://3.216.191.96:1317"; // kava-testnet-5000 endpoint
   const localURL = "http://localhost:1317"; // local testing endpoint
 
   // Declare a new Kava client, set wallet, and initialize chain
@@ -39,6 +38,14 @@ var main = async () => {
 };
 ```
 
+## Testnet-5000 key information
+
+Testnet-5000 introduces support for cross-chain transfers between Binance Chain and Kava.
+
+- Kava's official testnet-5000 api endpoint is http://3.216.191.96:1317.
+- The deputy's address on Kava is **kava1aphsdnz5hu2t5ty2au6znprug5kx3zpy6zwq29**.
+- The deputy's address on the Binance Chain testnet is **tbnb1et8vmd0dgvswjnyaf73ez8ye0jehc8a7t7fljv**.
+
 # Examples
 
 The following examples demonstrate client usage.
@@ -46,8 +53,7 @@ The following examples demonstrate client usage.
 ## Transfer coins
 
 ```javascript
-// Import utils
-const utils = require("./utils").utils;
+const utils = kava.utils;
 
 // Load coins and transfer to recipient's address
 const coins = utils.loadCoins("kava", 1);
@@ -62,21 +68,21 @@ console.log("Tx hash:", txHash);
 
 Kava's testnet-5000 supports secure transfers of BNB from Binance Chain to Kava and back via swaps. The [bep3-deputy](https://github.com/binance-chain/bep3-deputy) process sits between the two blockchains and services swaps by relaying information back and forth.
 
-In order for an address to submit a swap on Kava it must hold pegged bnb tokens. The Binance Chain [docs](https://docs.binance.org/atomic-swap.html) describe how to send BNB from Binance Chain to Kava and receive pegged bnb tokens. Make sure to use the correct deputy address or the deputy will not relay the swap.
-
 Swaps use a simple secret sharing scheme. A secret random number is generated on the client and hashed with a timestamp in order to create a random number hash that's stored with the swap. The swap can be securely claimed on the opposite chain using the secret random number. Swaps expire after n blocks, a duration that can be modified via the height span parameter. Once expired, the swap can be refunded.
 
 ## Create swap
 
-Currently, only pegged bnb swaps are supported.
+In order for an address to submit a swap on Kava it must hold pegged bnb tokens. The Binance Chain [docs](https://docs.binance.org/atomic-swap.html) describe how to create a swap on Binance Chain with BNB. Make sure to use the deputy's address as the swap's the deputy will not relay the swap.
+
+Users create outgoing swaps on Kava by entering the deputy's Kava address in the recipient field. The deputy's address on kava-testnet-5000 is **kava1aphsdnz5hu2t5ty2au6znprug5kx3zpy6zwq29**.
 
 ```javascript
 // Import utils
-const utils = require("./utils").utils;
+const utils = kava.utils;
 
-const recipient = "kava1vry5lhegzlulehuutcr7nmdlmktw88awp0a39p"; // user's address on kava
+const recipient = "kava1aphsdnz5hu2t5ty2au6znprug5kx3zpy6zwq29"; // deputy's address on kava
 const recipientOtherChain = "tbnb17vwyu8npjj5pywh3keq2lm7d4v76n434pwd8av"; // user's address on bnbchain
-const senderOtherChain = "tbnb10uypsspvl6jlxcx5xse02pag39l8xpe7a3468h"; // deputy's address on bnbchain
+const senderOtherChain = "tbnb1et8vmd0dgvswjnyaf73ez8ye0jehc8a7t7fljv"; // deputy's address on bnbchain
 
 // Load coins and expected income
 const asset = "bnb";
