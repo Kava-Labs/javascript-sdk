@@ -26,7 +26,7 @@ const KavaClient = kava.KavaClient;
 
 var main = async () => {
   const mnemonic = "secret words that unlock a kava address";
-  const testnetURL = "http://3.216.191.96:1317"; // kava-testnet-5000 endpoint
+  const testnetURL = "http://kava-testnet-5000.kava.io:1317"; // kava-testnet-5000 endpoint
   const localURL = "http://localhost:1317"; // local testing endpoint
 
   // Declare a new Kava client, set wallet, and initialize chain
