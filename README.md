@@ -42,9 +42,10 @@ var main = async () => {
 
 Testnet-5000 introduces support for cross-chain transfers between Binance Chain and Kava.
 
-- Kava's official testnet-5000 api endpoint is http://3.216.191.96:1317.
 - The deputy's address on Kava is **kava1aphsdnz5hu2t5ty2au6znprug5kx3zpy6zwq29**.
 - The deputy's address on the Binance Chain testnet is **tbnb1et8vmd0dgvswjnyaf73ez8ye0jehc8a7t7fljv**.
+- Kava's official testnet-5000 api endpoint is http://kava-testnet-5000.kava.io:1317.
+- We recommend using Binance Chain api endpoint testnet-5000 api endpoint https://testnet-dex.binance.org/.
 
 # Examples
 
@@ -138,7 +139,7 @@ const randomNumber =
 const swapID =
   "e897e4ee12b4d6ec4776a5d30300a7e3bb1f62b0c49c3e05ad2e6aae1279c940";
 
-const txHash = await client.claimSwap(randomNumber, swapID);
+const txHash = await client.claimSwap(swapID, randomNumber);
 ```
 
 ## Refund swap
