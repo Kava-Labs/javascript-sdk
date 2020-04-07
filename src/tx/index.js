@@ -15,7 +15,19 @@ const api = {
  * @return {Promise}
  */
 async function getTx(path, base) {
-  return await axios.get(new URL(path, base).toString());
+  try {
+    return await axios.get(new URL(path, base).toString());
+  } catch (error) {
+    if (error.response) {
+      console.log("Status:", error.response.status);
+      console.log("Status text:", error.response.statusText);
+      if (error.response.data && error.response.data.error) {
+        console.log("Error:", error.response.data.error);
+      }
+    } else {
+      console.log("network error:", error);
+    }
+  }
 }
 
 /**

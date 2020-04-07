@@ -8,11 +8,17 @@ const defaultDerivationPath = "m/44'/459'/0'/0/0";
 
 const api = {
   nodeInfo: "/node_info",
+  getParamsPricefeed: "/pricefeed/parameters",
+  getParamsAuction: "/auction/parameters",
+  getParamsCDP: "/cdp/parameters",
+  getParamsBEP3: "/bep3/parameters",
+  getAccount: "/auth/accounts",
+  getPrice: "/pricefeed/price",
   getSwap: "bep3/swap",
   getSwaps: "/bep3/swaps",
-  getCDP: "cdp/cdp",
-  getCDPs: "/cdp/cdps",
-  getAuction: "/auction/auction",
+  getCDP: "cdp/cdps/cdp",
+  getCDPs: "/cdp/cdps/denom",
+  getAuction: "/auction/auctions",
   getAuctions: "/auction/auctions"
 };
 
@@ -120,7 +126,156 @@ class KavaClient {
   }
 
   /***************************************************
-   *                  Tx methods
+   *                 GET tx methods
+   ***************************************************/
+
+  /**
+   * Get information about an account
+   * @param {String} address account to query
+   * @return {Promise}
+   */
+  async getAccount(address) {
+    const path = api.getAccount + "/" + address;
+    const res = await tx.getTx(path, this.baseURI);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Get the params of the pricefeed module
+   * @return {Promise}
+   */
+  async getParamsPricefeed() {
+    const res = await tx.getTx(api.getParamsPricefeed, this.baseURI);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Get the params of the auction module
+   * @return {Promise}
+   */
+  async getParamsAuction() {
+    const res = await tx.getTx(api.getParamsAuction, this.baseURI);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Get the params of the cdp module
+   * @return {Promise}
+   */
+  async getParamsCDP() {
+    const res = await tx.getTx(api.getParamsCDP, this.baseURI);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Get the params of the bep3 module
+   * @return {Promise}
+   */
+  async getParamsBEP3() {
+    const res = await tx.getTx(api.getParamsBEP3, this.baseURI);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Get the current system price of an asset
+   * @param {String} market asset's market identifier
+   * @return {Promise}
+   */
+  async getPrice(market) {
+    const path = api.getPrice + "/" + market;
+    const res = await tx.getTx(path, this.baseURI);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Get CDP if one exists for an owner and asset type
+   * @param {String} owner address of the CDP's owner
+   * @param {String} collateralDenom denom of the CDP's collateral asset
+   * @return {Promise}
+   */
+  async getCDP(owner, collateralDenom) {
+    const path = api.getCDP + "/" + owner + "/" + collateralDenom;
+    const res = await tx.getTx(path, this.baseURI);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Get all CDPs for an asset
+   * @param {String} collateralDenom denom of the CDP's collateral asset
+   * @return {Promise}
+   */
+  async getCDPs(collateralDenom) {
+    const path = api.getCDPs + "/" + collateralDenom;
+    const res = await tx.getTx(path, this.baseURI);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Get auction by ID
+   * @param {String} id auctions unique identifier
+   * @return {Promise}
+   */
+  async getAuction(id) {
+    const path = api.getAuction + "/" + id;
+    const res = await tx.getTx(path, this.baseURI);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Get all active auctions
+   * @return {Promise}
+   */
+  async getAuctions() {
+    const res = await tx.getTx(api.getAuctions, this.baseURI);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Get a swap by its ID
+   * @param {String} swapID the swap's unique identifier
+   * @return {Promise}
+   */
+  async getSwap(swapID) {
+    const path = api.getSwap + "/" + swapID;
+    const res = await tx.getTx(path, this.baseURI);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Get all swaps
+   * @return {Promise}
+   */
+  async getSwaps() {
+    const res = await tx.getTx(api.getSwaps, this.baseURI);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /***************************************************
+   *                 POST tx methods
    ***************************************************/
 
   /**
