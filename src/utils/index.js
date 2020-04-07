@@ -101,9 +101,10 @@ const loadCoins = (denom, amount) => {
       decimals = precision.bnb;
       break;
   }
-  amount = amount.mul(decimals).toString();
-  // TODO: validate that the number is within reasonable bounds
-  // validate.checkNumber(amount, "amount");
+  amount = amount
+    .mul(decimals)
+    .toFixed(0)
+    .toString();
 
   const coins = [
     {
