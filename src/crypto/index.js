@@ -1,7 +1,13 @@
 const bech32 = require("bech32");
+const bip39 = require("bip39");
 
-// secp256k1 privkey is 32 bytes
 const DECODED_ADDRESS_LEN = 20;
+const MNEMONIC_LEN = 256;
+
+/**
+ * Generates mnemonic phrase words using random entropy.
+ */
+const generateMnemonic = () => bip39.generateMnemonic(MNEMONIC_LEN);
 
 /**
  * Decodes an address in bech32 format.
@@ -40,6 +46,7 @@ const checkAddress = (address, hrp) => {
 };
 
 module.exports.crypto = {
+  generateMnemonic,
   decodeAddress,
   checkAddress
 };
