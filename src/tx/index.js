@@ -83,7 +83,15 @@ async function broadcastTx(tx, base) {
     const url = new URL(api.postTx, base).toString();
     txRes = await axios.post(url, sig.createBroadcastTx(tx, "block"));
   } catch (err) {
-    throw new Error("tx broadcast:", err);
+    if (error.response) {
+      console.log("Status:", error.response.status);
+      console.log("Status text:", error.response.statusText);
+      if (error.response.data && error.response.data.error) {
+        console.log("Error:", error.response.data.error);
+      }
+    } else {
+      console.log("network error:", error);
+    }
   }
 
   // Check for and handle any tendermint errors
