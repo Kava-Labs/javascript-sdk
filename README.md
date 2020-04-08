@@ -57,7 +57,7 @@ The following examples demonstrate client usage.
 const utils = kava.utils;
 
 // Load coins and transfer to recipient's address
-const coins = utils.loadCoins("kava", 1);
+const coins = utils.formatCoins(1, "kava");
 const recipient = "kava1c84ezutjcgrsxarjq5mzsxxz2k9znn94zxmqjz";
 const txHash = await client.transfer(recipient, coins);
 
@@ -86,10 +86,10 @@ const recipientOtherChain = "tbnb17vwyu8npjj5pywh3keq2lm7d4v76n434pwd8av"; // us
 const senderOtherChain = "tbnb1et8vmd0dgvswjnyaf73ez8ye0jehc8a7t7fljv"; // deputy's address on bnbchain
 
 // Load coins and expected income
-const asset = "bnb";
 const amount = 1.75;
-const coins = utils.loadCoins(asset, amount);
-const expectedIncome = String(coins[0].amount).concat(coins[0].denom);
+const asset = "bnb";
+const coins = utils.formatCoins(amount, asset);
+const expectedIncome = String(amount).concat(asset);
 
 // Set up additional required params
 const heightSpan = "500";
