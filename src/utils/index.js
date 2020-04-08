@@ -5,11 +5,11 @@ const cryptoRand = require("crypto");
 const crypto = require("../crypto").crypto;
 
 const RandomNumberLength = 64;
+
+// Precision is relative to KAVA or 10**6
 const precision = {
-  kava: Math.pow(10, 6),
-  ukava: Math.pow(10, 6),
-  usdx: Math.pow(10, 6),
-  bnb: Math.pow(10, 8)
+  kava: 1,
+  ukava: Math.pow(10, 6)
 };
 
 /**
@@ -79,46 +79,51 @@ const calculateSwapID = (randomNumberHash, sender, senderOtherChain) => {
 };
 
 /**
- * Loads a Cosmos-SDK compatible sdk.Coins object
- * @param {String} denom name of the asset
- * @param {String} amount value of the asset
+ * Converts coin decimals between kava and ukava
+ * @param {String} inputAmount value of the input asset
+ * @param {String} inputDenom denom of the input asset
+ * @param {String} outputDenom denom of the output asset
  * @return {object} coins result
  */
-const loadCoins = (denom, amount) => {
-  amount = new Big(amount);
-  let decimals;
-  switch (denom) {
-    case "kava":
-      decimals = precision.kava;
-      break;
-    case "ukava":
-      decimals = precision.ukava;
-      break;
-    case "usdx":
-      decimals = precision.usdx;
-      break;
-    case "bnb":
-      decimals = precision.bnb;
-      break;
+const convertCoinDecimals = (inputAmount, inputDenom, outputDenom) => {
+  let amount = new Big(inputAmount);
+
+  try {
+    if (!precision[inputDenom] || !precision[outputDenom]) {
+      throw new Error("Invalid asset pairing for decimal conversion.");
+    }
+  } catch (err) {
+    console.log("Error:", err.message);
+    return;
   }
+
   amount = amount
-    .mul(decimals)
-    .toFixed(0)
+    .mul(precision[outputDenom])
+    .div(precision[inputDenom])
     .toString();
 
-  const coins = [
+  return formatCoins(outputDenom, amount);
+};
+
+/**
+ * Formats a denom and amount into Cosmos-SDK compatible sdk.Coins object
+ * @param {String} amount value of the asset
+ * @param {String} denom name of the asset
+ * @return {object} resulting formatted coins
+ */
+const formatCoins = (amount, denom) => {
+  return [
     {
       denom: String(denom),
       amount: String(amount)
     }
   ];
-
-  return coins;
 };
 
 module.exports.utils = {
   generateRandomNumber,
   calculateRandomNumberHash,
   calculateSwapID,
-  loadCoins
+  convertCoinDecimals,
+  formatCoins
 };
