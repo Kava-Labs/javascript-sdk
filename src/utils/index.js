@@ -102,7 +102,7 @@ const convertCoinDecimals = (inputAmount, inputDenom, outputDenom) => {
     .div(precision[inputDenom])
     .toString();
 
-  return formatCoins(outputDenom, amount);
+  return formatCoins(amount, outputDenom);
 };
 
 /**
