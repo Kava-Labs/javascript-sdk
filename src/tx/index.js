@@ -17,15 +17,16 @@ const api = {
 async function getTx(path, base) {
   try {
     return await axios.get(new URL(path, base).toString());
-  } catch (error) {
-    if (error.response) {
-      console.log("Status:", error.response.status);
-      console.log("Status text:", error.response.statusText);
-      if (error.response.data && error.response.data.error) {
-        console.log("Error:", error.response.data.error);
-      }
-    } else {
-      console.log("network error:", error);
+  } catch (err) {
+    // Log status and error or network error
+    const status = _.get(err, "response.status");
+    const statusText = _.get(err, "response.statusText");
+    const error = _.get(err, "response.data.error");
+    status ? console.log("Status:", status) : null;
+    statusText ? console.log("Status text:", statusText) : null;
+    error ? console.log("Error:", error) : null;
+    if (!status && !statusText && !error) {
+      console.log("Network error:", err);
     }
   }
 }
@@ -83,14 +84,15 @@ async function broadcastTx(tx, base) {
     const url = new URL(api.postTx, base).toString();
     txRes = await axios.post(url, sig.createBroadcastTx(tx, "block"));
   } catch (err) {
-    if (error.response) {
-      console.log("Status:", error.response.status);
-      console.log("Status text:", error.response.statusText);
-      if (error.response.data && error.response.data.error) {
-        console.log("Error:", error.response.data.error);
-      }
-    } else {
-      console.log("network error:", error);
+    // Log status and error or network error
+    const status = _.get(err, "response.status");
+    const statusText = _.get(err, "response.statusText");
+    const error = _.get(err, "response.data.error");
+    status ? console.log("Status:", status) : null;
+    statusText ? console.log("Status text:", statusText) : null;
+    error ? console.log("Error:", error) : null;
+    if (!status && !statusText && !error) {
+      console.log("Network error:", err);
     }
   }
 
