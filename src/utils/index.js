@@ -9,9 +9,7 @@ const RandomNumberLength = 64;
 // Precision is relative to KAVA or 10**6
 const precision = {
   kava: 1,
-  ukava: Math.pow(10, 6),
-  usdx: 1,
-  bnb: Math.pow(10, 2)
+  ukava: Math.pow(10, 6)
 };
 
 /**
@@ -81,7 +79,7 @@ const calculateSwapID = (randomNumberHash, sender, senderOtherChain) => {
 };
 
 /**
- *
+ * Converts coin decimals between kava and ukava
  * @param {String} inputAmount value of the input asset
  * @param {String} inputDenom denom of the input asset
  * @param {String} outputDenom denom of the output asset
