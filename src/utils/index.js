@@ -106,6 +106,19 @@ const convertCoinDecimals = (inputAmount, inputDenom, outputDenom) => {
 };
 
 /**
+ * Formats a denom and amount into Cosmos-SDK compatible sdk.Coin object
+ * @param {String} amount value of the asset
+ * @param {String} denom name of the asset
+ * @return {object} resulting formatted coin
+ */
+const formatCoin = (amount, denom) => {
+  return {
+      denom: String(denom),
+      amount: String(amount)
+    };
+};
+
+/**
  * Formats a denom and amount into Cosmos-SDK compatible sdk.Coins object
  * @param {String} amount value of the asset
  * @param {String} denom name of the asset
@@ -120,10 +133,36 @@ const formatCoins = (amount, denom) => {
   ];
 };
 
+/**
+ * Formats an array of denoms and amounts into Cosmos-SDK compatible sdk.Coins object
+ * @param {String} amounts an array of asset amounts
+ * @param {String} denoms an array of asset denoms
+ * @return {object} resulting formatted coins
+ */
+const formatMultiCoins = (amounts, denoms) => {
+  try {
+    if (amounts.length != denoms.lenth) {
+      throw new Error("Every amount must have exactly 1 corresponding denom.");
+    }
+  } catch (err) {
+    console.log("Error:", err.message);
+    return;
+  }
+
+  var coins = [];
+  for(var i = 0; i < amounts.length; i++) {
+    let coin = formatCoin(amounts[i], denoms[i])
+    coins.push(coin)
+  }
+  return coins;
+};
+
 module.exports.utils = {
   generateRandomNumber,
   calculateRandomNumberHash,
   calculateSwapID,
   convertCoinDecimals,
-  formatCoins
+  formatCoin,
+  formatCoins,
+  formatMultiCoins
 };
