@@ -4,6 +4,7 @@
   "description": "Supports interaction with the Kava blockchain via a REST api",
   "main": "index.js",
   "dependencies": {
+    "@kava-labs/sig": "^0.1.0",
     "@tendermint/sig": "^0.4.1",
     "axios": "^0.19.2",
     "bech32": "^1.1.3",

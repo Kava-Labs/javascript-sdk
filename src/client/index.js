@@ -1,4 +1,4 @@
-const sig = require("@tendermint/sig");
+const sig = require("@kava-labs/sig");
 const _ = require("lodash");
 const tx = require("../tx").tx;
 const msg = require("../msg").msg;
@@ -437,7 +437,6 @@ class KavaClient {
    * @param {String} randomNumberHash resulting hex-encoded hash from sha256(timestamp, random number)
    * @param {String} timestamp the timestamp in unix, must be within 15-30 minutes of current time
    * @param {String} amount the amount in coins to be transferred
-   * @param {String} expectedIncome the amount of coins expected to be received by the recipient
    * @param {String} heightSpan the number of blocks that this swap will be active/claimable
    * @param {String} crossChain denotes if this swap is a cross-chain swap or a same-chain swap
    * @param {String} sequence optional account sequence
@@ -450,7 +449,6 @@ class KavaClient {
     randomNumberHash,
     timestamp,
     amount,
-    expectedIncome,
     heightSpan,
     crossChain,
     sequence = null
@@ -463,7 +461,6 @@ class KavaClient {
       randomNumberHash.toUpperCase(),
       timestamp,
       amount,
-      expectedIncome,
       heightSpan,
       crossChain
     );

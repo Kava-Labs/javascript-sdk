@@ -1,4 +1,4 @@
-const sig = require("@tendermint/sig");
+const sig = require("@kava-labs/sig");
 const _ = require("lodash");
 const axios = require("axios");
 const URL = require("url").URL;
@@ -65,6 +65,8 @@ async function loadMetaData(address, base) {
  * @return {Promise}
  */
 function signTx(tx, signMetaData, wallet) {
+  console.log(tx)
+  console.log(tx.value.msg)
   tx = sig.signTx(tx, signMetaData, wallet);
   if (!sig.verifyTx(tx, signMetaData)) {
     throw new Error("problem signing tx, generated signature is invalid");

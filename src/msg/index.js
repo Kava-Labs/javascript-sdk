@@ -5,10 +5,13 @@ const defaultFee = { amount: [], gas: "200000" };
 // newStdTx creates a new StdTx from some messages, with default values for fees, memo and sigs
 function newStdTx(msgs, fee = defaultFee, memo = "", signatures = []) {
   return {
+    // type: "cosmos-sdk/StdTx", // TODO: Required?
+    value: {
     msg: msgs,
     fee: fee,
     signatures: signatures,
     memo: memo
+    }
   };
 }
 
@@ -119,7 +122,6 @@ function newMsgCreateAtomicSwap(
   randomNumberHash,
   timestamp,
   amount,
-  expectedIncome,
   heightSpan,
   crossChain
 ) {
@@ -133,7 +135,6 @@ function newMsgCreateAtomicSwap(
       random_number_hash: randomNumberHash,
       timestamp: String(timestamp),
       amount: amount,
-      expected_income: String(expectedIncome),
       height_span: String(heightSpan),
       cross_chain: crossChain
     }
