@@ -8,6 +8,9 @@ const kavaAddress = "kava1g0qywkx6mt5jmvefv6hs7c7h333qas5ks63a6t";
 const kavaMnemonic =
   "lecture draw addict sea prefer erupt army someone album liquid sadness manual fence vintage obey shrimp figure retreat kick refuse verify alien east brand";
 
+const BNB_CONVERSION_FACTOR = 10 ** 8;
+const USDX_CONVERSION_FACTOR = 10 ** 6;
+
 var main = async () => {
     // Start new Kava client
     kavaClient = new KavaClient(KAVA_API_TESTNET_6000_INTERNAL);
