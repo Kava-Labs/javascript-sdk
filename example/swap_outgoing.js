@@ -71,8 +71,10 @@ var outgoingSwap = async () => {
   console.log("Tx hash (Create swap on Kava):", txHash);
 
   printSwapIDs(randomNumberHash, kavaAddress, senderOtherChain)
-  await sleep(30000); // 30 seconds
 
+  // Wait for deputy to see the new swap on Kava and relay it to Binance Chain
+  await sleep(30000); // 30 seconds
+  
   // -------------------------------------------------------------------------------
   //                       Binance Chain blockchain interaction
   // -------------------------------------------------------------------------------
