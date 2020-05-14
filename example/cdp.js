@@ -60,7 +60,6 @@ var main = async () => {
     account = await kavaClient.getAccount(kavaClient.wallet.address);
     console.log("Address:", _.get(account, "value.address"));
     console.log("Balances:", _.get(account, "value.coins"), "\n");
-
 };
 
-  main()
+main()
