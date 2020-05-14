@@ -52,8 +52,8 @@ var main = async () => {
     }
 
     // Load principal, collateral as formatted coins
-    const principal = kavaUtils.formatCoins(principalAmount, "usdx");
-    const collateral = kavaUtils.formatCoins(collateralAmount, "bnb");
+    const principal = kavaUtils.formatCoin(principalAmount, "usdx");
+    const collateral = kavaUtils.formatCoin(collateralAmount, "bnb");
 
     // Send create CDP tx using Kava client
     const txHashCDP = await kavaClient.createCDP(principal, collateral);
