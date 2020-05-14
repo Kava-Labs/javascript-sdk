@@ -14,6 +14,7 @@ const api = {
   getParamsBEP3: "/bep3/parameters",
   getAccount: "/auth/accounts",
   getPrice: "/pricefeed/price",
+  getRawPrices: "/pricefeed/rawprices",
   getSwap: "bep3/swap",
   getSwaps: "/bep3/swaps",
   getCDP: "cdp/cdps/cdp",
@@ -193,6 +194,14 @@ class KavaClient {
    */
   async getPrice(market) {
     const path = api.getPrice + "/" + market;
+    const res = await tx.getTx(path, this.baseURI);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  async getRawPrices(market) {
+    const path = api.getRawPrices + "/" + market;
     const res = await tx.getTx(path, this.baseURI);
     if (res && res.data) {
       return res.data.result;
