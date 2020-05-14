@@ -18,7 +18,7 @@ var main = async () => {
     const paramsCDP = await kavaClient.getParamsCDP();
     const debtParam = _.get(paramsCDP, "debt_param");
     const principalAmount = Number(
-    debtParam.find(coin => coin.denom == "usdx").debt_floor
+    debtParam.debt_floor
     );
     console.log("Minimum principal:", principalAmount + "usdx");
 
