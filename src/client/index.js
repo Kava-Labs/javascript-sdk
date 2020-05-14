@@ -438,7 +438,6 @@ class KavaClient {
    * @param {String} timestamp the timestamp in unix, must be within 15-30 minutes of current time
    * @param {String} amount the amount in coins to be transferred
    * @param {String} heightSpan the number of blocks that this swap will be active/claimable
-   * @param {String} crossChain denotes if this swap is a cross-chain swap or a same-chain swap
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
@@ -450,7 +449,6 @@ class KavaClient {
     timestamp,
     amount,
     heightSpan,
-    crossChain,
     sequence = null
   ) {
     const msgCreateAtomicSwap = msg.newMsgCreateAtomicSwap(
@@ -461,8 +459,7 @@ class KavaClient {
       randomNumberHash.toUpperCase(),
       timestamp,
       amount,
-      heightSpan,
-      crossChain
+      heightSpan
     );
     const rawTx = msg.newStdTx([msgCreateAtomicSwap]);
     const signInfo = await this.prepareSignInfo(sequence);
