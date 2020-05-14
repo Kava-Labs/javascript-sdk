@@ -109,7 +109,7 @@ class KavaClient {
       // Prepare signing info from manually set values
       signInfo = {
         chain_id: this.chainID,
-        account_number: this.accNum,
+        account_number: String(this.accNum),
         sequence: String(sequence)
       };
     } else {
@@ -118,8 +118,8 @@ class KavaClient {
       // Select manually set values over automatically pulled values
       signInfo = {
         chain_id: this.chainID,
-        account_number: this.accNum != null ? this.accNum : meta.account_number,
-        sequence: sequence ? String(sequence) : meta.sequence
+        account_number: this.accNum != null ? String(this.accNum) : String(meta.account_number),
+        sequence: sequence ? String(sequence) : String(meta.sequence)
       };
     }
     return signInfo;

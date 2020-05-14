@@ -3,15 +3,15 @@ const _ = require("lodash");
 const defaultFee = { amount: [], gas: "200000" };
 
 // newStdTx creates a new StdTx from some messages, with default values for fees, memo and sigs
-function newStdTx(msgs, fee = defaultFee, memo = "", signatures = []) {
+function newStdTx(msgs, fee = defaultFee, memo = "", signatures = null) {
   return {
-    // type: "cosmos-sdk/StdTx", // TODO: Required?
+    type: "cosmos-sdk/StdTx",
     value: {
     msg: msgs,
     fee: fee,
     signatures: signatures,
     memo: memo
-    }
+    },
   };
 }
 
@@ -21,7 +21,7 @@ function newStdTx(msgs, fee = defaultFee, memo = "", signatures = []) {
 
 // newMsgSend creates a new MsgSend
 function newMsgSend(address, to, coins) {
-  return {
+  const sendTx = {
     type: "cosmos-sdk/MsgSend",
     value: {
       from_address: address,
@@ -29,6 +29,7 @@ function newMsgSend(address, to, coins) {
       amount: _.sortBy(coins, "denom")
     }
   };
+  return sendTx
 }
 
 /***************************************************

@@ -65,8 +65,6 @@ async function loadMetaData(address, base) {
  * @return {Promise}
  */
 function signTx(tx, signMetaData, wallet) {
-  console.log(tx)
-  console.log(tx.value.msg)
   tx = sig.signTx(tx, signMetaData, wallet);
   if (!sig.verifyTx(tx, signMetaData)) {
     throw new Error("problem signing tx, generated signature is invalid");
@@ -84,7 +82,7 @@ async function broadcastTx(tx, base) {
   let txRes;
   try {
     const url = new URL(api.postTx, base).toString();
-    txRes = await axios.post(url, sig.createBroadcastTx(tx, "block"));
+    txRes = await axios.post(url, sig.createBroadcastTx(tx.value, "async"));
   } catch (err) {
     // Log status and error or network error
     const status = _.get(err, "response.status");
