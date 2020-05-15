@@ -1,4 +1,4 @@
-const sig = require("@tendermint/sig");
+const sig = require("@kava-labs/sig");
 const bech32 = require("bech32");
 const bip39 = require("bip39");
 

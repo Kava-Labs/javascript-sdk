@@ -1,4 +1,4 @@
-const sig = require("@tendermint/sig");
+const sig = require("@kava-labs/sig");
 const _ = require("lodash");
 const axios = require("axios");
 const URL = require("url").URL;
@@ -82,7 +82,7 @@ async function broadcastTx(tx, base) {
   let txRes;
   try {
     const url = new URL(api.postTx, base).toString();
-    txRes = await axios.post(url, sig.createBroadcastTx(tx, "block"));
+    txRes = await axios.post(url, sig.createBroadcastTx(tx.value, "async"));
   } catch (err) {
     // Log status and error or network error
     const status = _.get(err, "response.status");
