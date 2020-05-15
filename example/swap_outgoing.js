@@ -11,8 +11,8 @@ var main = async () => {
 
 var outgoingSwap = async () => {
   // Start new Kava client
-  kavaClient = new KavaClient(Env.KavaEndpoints.Testnet5000);
-  kavaClient.setWallet(Env.KavaAccount.Testnet5000.Mnemonic);
+  kavaClient = new KavaClient(Env.KavaEndpoints.Testnet6000Internal);
+  kavaClient.setWallet(Env.KavaAccount.Testnet6000Internal.Mnemonic);
   await kavaClient.initChain();
 
   // Start Binance Chain client
@@ -25,9 +25,9 @@ var outgoingSwap = async () => {
   // -------------------------------------------------------------------------------
   //                           Kava blockchain interaction
   // -------------------------------------------------------------------------------
-  const sender = Env.KavaAccount.Testnet5000.Address; // user's address on Binance Chain
-  const recipient = Env.KavaDeputy.Testnet5000; // deputy's address on kava
-  const recipientOtherChain = Env.KavaDeputy.Testnet5000; // user's address on bnbchain
+  const sender = Env.KavaAccount.Testnet6000Internal.Address; // user's address on Binance Chain
+  const recipient = Env.KavaDeputy.Testnet6000Internal; // deputy's address on kava
+  const recipientOtherChain = Env.BinanceAccount.Testnet.Address; // user's address on bnbchain
   const senderOtherChain = Env.BinanceDeputy.Testnet; // deputy's address on bnbchain
 
   // Set up params
@@ -73,7 +73,7 @@ var outgoingSwap = async () => {
     sender
   );
 
-  const res = await bnbClient.swap.claimHTLT(bnbAddress, expectedBnbchainSwapID, randomNumber); // Binance-chain
+  const res = await bnbClient.swap.claimHTLT(Env.BinanceAccount.Testnet.Address, expectedBnbchainSwapID, randomNumber); // Binance-chain
   if (res && res.status == 200) {
     console.log(
       "Claim swap tx hash (Binance Chain): ",

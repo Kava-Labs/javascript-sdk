@@ -6,13 +6,17 @@ const KavaAccount = {
     Testnet5000: {
         Address: "kava1g0qywkx6mt5jmvefv6hs7c7h333qas5ks63a6t",
         Mnemonic: "lecture draw addict sea prefer erupt army someone album liquid sadness manual fence vintage obey shrimp figure retreat kick refuse verify alien east brand",  
+    },
+    Testnet6000Internal: {
+        Address: "kava1g0qywkx6mt5jmvefv6hs7c7h333qas5ks63a6t",
+        Mnemonic: "lecture draw addict sea prefer erupt army someone album liquid sadness manual fence vintage obey shrimp figure retreat kick refuse verify alien east brand",  
     }
 }
 
 const KavaEndpoints = {
     Local: "http://localhost:1317",
     Testnet5000: "http://kava-testnet-5000.kava.io:1317",
-    InternalTestnet6000: "http://54.196.2.124:1317",
+    Testnet6000Internal: "http://54.196.2.124:1317",
     Mainnet: "",
 }
 
