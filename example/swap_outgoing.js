@@ -1,26 +1,9 @@
 const _ = require("lodash");
-const BnbApiClient = require("@binance-chain/javascript-sdk");
-const bnbCrypto = BnbApiClient.crypto;
-
+const Env = require("./static/env").env
 const kavaUtils = require("../src/utils").utils;
 const KavaClient = require("../src/client").KavaClient;
-
-const BINANCE_CHAIN_API_TESTNET = "https://testnet-dex.binance.org";
-const BINANCE_CHAIN_DEPUTY = "tbnb10uypsspvl6jlxcx5xse02pag39l8xpe7a3468h";
-const bnbAddress = "tbnb17vwyu8npjj5pywh3keq2lm7d4v76n434pwd8av";
-const bnbMnemonic =
-  "lawsuit margin siege phrase fabric matrix like picnic day thrive correct velvet stool type broom upon flee fee ten senior install wrestle soap sick";
-
-  const KAVA_API_TESTNET_5000 = "http://kava-testnet-5000.kava.io:1317"
-  // const KAVA_API_TESTNET_6000_INTERNAL = "http://54.196.2.124:1317";
-  // const KAVA_API_LOCAL = "http://localhost:1317";
-  
-  const KAVA_DEPUTY_TESTNET = "kava1aphsdnz5hu2t5ty2au6znprug5kx3zpy6zwq29";
-  // const KAVA_DEPUTY_LOCAL = "kava1l0xsq2z7gqd7yly0g40y5836g0appumark77ny";
-
-const kavaAddress = "kava1g0qywkx6mt5jmvefv6hs7c7h333qas5ks63a6t";
-const kavaMnemonic =
-  "lecture draw addict sea prefer erupt army someone album liquid sadness manual fence vintage obey shrimp figure retreat kick refuse verify alien east brand";
+const BnbApiClient = require("@binance-chain/javascript-sdk");
+const bnbCrypto = BnbApiClient.crypto;
 
 var main = async () => {
   await outgoingSwap();
@@ -28,23 +11,24 @@ var main = async () => {
 
 var outgoingSwap = async () => {
   // Start new Kava client
-  kavaClient = new KavaClient(KAVA_API_TESTNET_5000);
-  kavaClient.setWallet(kavaMnemonic);
+  kavaClient = new KavaClient(Env.KavaEndpoints.Testnet5000);
+  kavaClient.setWallet(Env.KavaAccount.Testnet5000.Mnemonic);
   await kavaClient.initChain();
 
   // Start Binance Chain client
-  const bnbClient = await new BnbApiClient(BINANCE_CHAIN_API_TESTNET);
+  const bnbClient = await new BnbApiClient(Env.BinanceEndpoints.Testnet);
   bnbClient.chooseNetwork("testnet");
-  const privateKey = bnbCrypto.getPrivateKeyFromMnemonic(bnbMnemonic);
+  const privateKey = bnbCrypto.getPrivateKeyFromMnemonic(Env.BinanceAccount.Testnet.Mnemonic);
   bnbClient.setPrivateKey(privateKey);
   await bnbClient.initChain();
 
   // -------------------------------------------------------------------------------
   //                           Kava blockchain interaction
   // -------------------------------------------------------------------------------
-  const recipient = KAVA_DEPUTY_TESTNET; // deputy's address on kava
-  const recipientOtherChain = bnbAddress; // user's address on bnbchain
-  const senderOtherChain = BINANCE_CHAIN_DEPUTY; // deputy's address on bnbchain
+  const sender = Env.KavaAccount.Testnet5000.Address; // user's address on Binance Chain
+  const recipient = Env.KavaDeputy.Testnet5000; // deputy's address on kava
+  const recipientOtherChain = Env.KavaDeputy.Testnet5000; // user's address on bnbchain
+  const senderOtherChain = Env.BinanceDeputy.Testnet; // deputy's address on bnbchain
 
   // Set up params
   const asset = "bnb";
@@ -61,7 +45,7 @@ var outgoingSwap = async () => {
   );
   console.log("\nSecret random number:", randomNumber);
 
-  printSwapIDs(randomNumberHash, kavaAddress, senderOtherChain)
+  printSwapIDs(randomNumberHash, sender, senderOtherChain)
 
   const txHash = await kavaClient.createSwap(
     recipient,
@@ -86,7 +70,7 @@ var outgoingSwap = async () => {
    const expectedBnbchainSwapID = kavaUtils.calculateSwapID(
     randomNumberHash,
     senderOtherChain,
-    kavaAddress
+    sender
   );
 
   const res = await bnbClient.swap.claimHTLT(bnbAddress, expectedBnbchainSwapID, randomNumber); // Binance-chain
