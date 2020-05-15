@@ -11,20 +11,24 @@ const bnbAddress = "tbnb17vwyu8npjj5pywh3keq2lm7d4v76n434pwd8av";
 const bnbMnemonic =
   "lawsuit margin siege phrase fabric matrix like picnic day thrive correct velvet stool type broom upon flee fee ten senior install wrestle soap sick";
 
-const KAVA_API_TESTNET_6000_INTERNAL = "http://54.196.2.124:1317";
-const KAVA_DEPUTY = "kava1aphsdnz5hu2t5ty2au6znprug5kx3zpy6zwq29";
+  const KAVA_API_TESTNET_5000 = "http://kava-testnet-5000.kava.io:1317"
+  // const KAVA_API_TESTNET_6000_INTERNAL = "http://54.196.2.124:1317";
+  // const KAVA_API_LOCAL = "http://localhost:1317";
+  
+  const KAVA_DEPUTY_TESTNET = "kava1aphsdnz5hu2t5ty2au6znprug5kx3zpy6zwq29";
+  // const KAVA_DEPUTY_LOCAL = "kava1l0xsq2z7gqd7yly0g40y5836g0appumark77ny";
+
 const kavaAddress = "kava1g0qywkx6mt5jmvefv6hs7c7h333qas5ks63a6t";
 const kavaMnemonic =
   "lecture draw addict sea prefer erupt army someone album liquid sadness manual fence vintage obey shrimp figure retreat kick refuse verify alien east brand";
 
 var main = async () => {
-  console.log("\nSending from Kava -> Bnbchain...")
   await outgoingSwap();
 }
 
 var outgoingSwap = async () => {
   // Start new Kava client
-  kavaClient = new KavaClient(KAVA_API_TESTNET_6000_INTERNAL);
+  kavaClient = new KavaClient(KAVA_API_TESTNET_5000);
   kavaClient.setWallet(kavaMnemonic);
   await kavaClient.initChain();
 
@@ -38,10 +42,15 @@ var outgoingSwap = async () => {
   // -------------------------------------------------------------------------------
   //                           Kava blockchain interaction
   // -------------------------------------------------------------------------------
-
-  const recipient = KAVA_DEPUTY; // deputy's address on kava
+  const recipient = KAVA_DEPUTY_TESTNET; // deputy's address on kava
   const recipientOtherChain = bnbAddress; // user's address on bnbchain
   const senderOtherChain = BINANCE_CHAIN_DEPUTY; // deputy's address on bnbchain
+
+  // Set up params
+  const asset = "bnb";
+  const amount = 1000000;
+  const coins = kavaUtils.formatCoins(amount, asset);
+  const heightSpan = "500";
 
   // Generate random number hash from timestamp and hex-encoded random number
   const randomNumber = kavaUtils.generateRandomNumber();
@@ -50,13 +59,9 @@ var outgoingSwap = async () => {
     randomNumber,
     timestamp
   );
-  console.log("Random number:", randomNumber);
+  console.log("\nSecret random number:", randomNumber);
 
-  // Set up params
-  const asset = "bnb";
-  const amount = 10000000;
-  const coins = kavaUtils.formatCoins(amount, asset);
-  const heightSpan = "500";
+  printSwapIDs(randomNumberHash, kavaAddress, senderOtherChain)
 
   const txHash = await kavaClient.createSwap(
     recipient,
@@ -68,13 +73,12 @@ var outgoingSwap = async () => {
     heightSpan
   );
 
-  console.log("Tx hash (Create swap on Kava):", txHash);
-
-  printSwapIDs(randomNumberHash, kavaAddress, senderOtherChain)
+  console.log("\nTx hash (Create swap on Kava):", txHash);
 
   // Wait for deputy to see the new swap on Kava and relay it to Binance Chain
+  console.log("Waiting for deputy to witness and relay the swap...")
   await sleep(30000); // 30 seconds
-  
+
   // -------------------------------------------------------------------------------
   //                       Binance Chain blockchain interaction
   // -------------------------------------------------------------------------------
@@ -89,8 +93,7 @@ var outgoingSwap = async () => {
   if (res && res.status == 200) {
     console.log(
       "Claim swap tx hash (Binance Chain): ",
-      res.result[0].hash,
-      "\n"
+      res.result[0].hash
     );
   } else {
     console.log("Tx error:", res);
@@ -114,8 +117,8 @@ var printSwapIDs = (randomNumberHash, sender, senderOtherChain) => {
     sender
   );
 
-  console.log("Expected origin chain swap ID:", originChainSwapID);
-  console.log("Expected destination chain swap ID:", destChainSwapID);
+  console.log("Expected Bnbchain swap ID:", originChainSwapID);
+  console.log("Expected Kava swap ID:", destChainSwapID);
 };
 
 // Sleep is a wait function
