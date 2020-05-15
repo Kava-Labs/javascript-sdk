@@ -13,7 +13,9 @@
     "lodash": "^4.17.15",
     "url": "^0.11.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "@binance-chain/javascript-sdk": "^3.0.2"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Kava-Labs/javascript-sdk.git"
