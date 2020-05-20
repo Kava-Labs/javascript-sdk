@@ -86,7 +86,7 @@ var incomingSwap = async () => {
 
   // Wait for deputy to see the new swap on Binance Chain and relay it to Kava
   console.log("Waiting for deputy to witness and relay the swap...")
-  await sleep(30000); // 30 seconds
+  await sleep(45000); // 45 seconds
 
   // -------------------------------------------------------------------------------
   //                           Kava blockchain interaction
