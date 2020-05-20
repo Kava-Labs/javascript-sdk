@@ -18,16 +18,7 @@ async function getTx(path, base) {
   try {
     return await axios.get(new URL(path, base).toString());
   } catch (err) {
-    // Log status and error or network error
-    const status = _.get(err, "response.status");
-    const statusText = _.get(err, "response.statusText");
-    const error = _.get(err, "response.data.error");
-    status ? console.log("Status:", status) : null;
-    statusText ? console.log("Status text:", statusText) : null;
-    error ? console.log("Error:", error) : null;
-    if (!status && !statusText && !error) {
-      console.log("Network error:", err);
-    }
+    logErr(err)   
   }
 }
 
@@ -38,9 +29,8 @@ async function getTx(path, base) {
  * @return {Promise}
  */
 async function loadMetaData(address, base) {
-  const path = api.getAccount + "/" + address;
+  const path = api.getAccount + "/" + address;  
   const res = await getTx(path, base);
-
   accNum = _.get(res, "data.result.value.account_number");
   seqNum = _.get(res, "data.result.value.sequence");
   if (!(accNum || seqNum)) {
@@ -84,16 +74,7 @@ async function broadcastTx(tx, base) {
     const url = new URL(api.postTx, base).toString();
     txRes = await axios.post(url, sig.createBroadcastTx(tx.value, "async"));
   } catch (err) {
-    // Log status and error or network error
-    const status = _.get(err, "response.status");
-    const statusText = _.get(err, "response.statusText");
-    const error = _.get(err, "response.data.error");
-    status ? console.log("Status:", status) : null;
-    statusText ? console.log("Status text:", statusText) : null;
-    error ? console.log("Error:", error) : null;
-    if (!status && !statusText && !error) {
-      console.log("Network error:", err);
-    }
+    logErr(err)
   }
 
   // Check for and handle any tendermint errors
@@ -110,9 +91,29 @@ async function broadcastTx(tx, base) {
   return _.get(txRes, "data.txhash");
 }
 
+/**
+ * Parses and logs tx-related errors
+ * @param {object} err an error resulting from a tx-related action
+ */
+const logErr = (err) => {
+  // Load status, status text, and error
+  const status = _.get(err, "response.status");
+  const statusText = _.get(err, "response.statusText");
+  const error = _.get(err, "response.data.error");
+
+  // Log status, status text, and error, or if unidentified, log network error
+  status ? console.log("Status:", status) : null;
+  statusText ? console.log("Status text:", statusText) : null;
+  error ? console.log("Error:", error) : null;
+  if (!status && !statusText && !error) {
+    console.log("Network error:", err);
+  }
+};
+
 module.exports.tx = {
   getTx,
   loadMetaData,
   signTx,
-  broadcastTx
+  broadcastTx,
+  logErr
 };

@@ -1,20 +1,15 @@
 const _ = require("lodash");
-
+const Env = require("./static/env").env
 const kavaUtils = require("../src/utils").utils;
 const KavaClient = require("../src/client").KavaClient;
-
-const KAVA_API_TESTNET_6000_INTERNAL = "http://54.196.2.124:1317";
-const kavaAddress = "kava1g0qywkx6mt5jmvefv6hs7c7h333qas5ks63a6t";
-const kavaMnemonic =
-  "lecture draw addict sea prefer erupt army someone album liquid sadness manual fence vintage obey shrimp figure retreat kick refuse verify alien east brand";
 
 const BNB_CONVERSION_FACTOR = 10 ** 8;
 const USDX_CONVERSION_FACTOR = 10 ** 6;
 
 var main = async () => {
     // Start new Kava client
-    kavaClient = new KavaClient(KAVA_API_TESTNET_6000_INTERNAL);
-    kavaClient.setWallet(kavaMnemonic);
+    kavaClient = new KavaClient(Env.KavaEndpoints.Testnet6000);
+    kavaClient.setWallet(Env.KavaAccount.Testnet6000.Mnemonic);
     await kavaClient.initChain();
 
     // Get minimum principal amount required for CDP creation

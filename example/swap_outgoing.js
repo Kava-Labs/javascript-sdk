@@ -11,8 +11,8 @@ var main = async () => {
 
 var outgoingSwap = async () => {
   // Start new Kava client
-  kavaClient = new KavaClient(Env.KavaEndpoints.Testnet6000Internal);
-  kavaClient.setWallet(Env.KavaAccount.Testnet6000Internal.Mnemonic);
+  kavaClient = new KavaClient(Env.KavaEndpoints.Testnet6000);
+  kavaClient.setWallet(Env.KavaAccount.Testnet6000.Mnemonic);
   await kavaClient.initChain();
 
   // Start Binance Chain client
@@ -25,8 +25,8 @@ var outgoingSwap = async () => {
   // -------------------------------------------------------------------------------
   //                           Kava blockchain interaction
   // -------------------------------------------------------------------------------
-  const sender = Env.KavaAccount.Testnet6000Internal.Address; // user's address on Binance Chain
-  const recipient = Env.KavaDeputy.Testnet6000Internal; // deputy's address on kava
+  const sender = Env.KavaAccount.Testnet6000.Address; // user's address on Binance Chain
+  const recipient = Env.KavaDeputy.Testnet6000; // deputy's address on kava
   const recipientOtherChain = Env.BinanceAccount.Testnet.Address; // user's address on bnbchain
   const senderOtherChain = Env.BinanceDeputy.Testnet; // deputy's address on bnbchain
 
