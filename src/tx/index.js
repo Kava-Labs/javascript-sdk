@@ -66,13 +66,14 @@ function signTx(tx, signMetaData, wallet) {
  * Sends an HTTP POST request containing a signed transaction to Kava
  * @param {Object} tx a signed tx
  * @param {String} base the request's base url
+ * @param {String} mode transaction broadcast mode
  * @return {Promise}
  */
-async function broadcastTx(tx, base) {
+async function broadcastTx(tx, base, mode) {
   let txRes;
   try {
     const url = new URL(api.postTx, base).toString();
-    txRes = await axios.post(url, sig.createBroadcastTx(tx.value, "async"));
+    txRes = await axios.post(url, sig.createBroadcastTx(tx.value, mode));
   } catch (err) {
     logErr(err)
   }

@@ -104,6 +104,12 @@ var incomingSwap = async () => {
     randomNumber
   );
   console.log("Claim swap tx hash (Kava): ".concat(txHashClaim));
+
+  await sleep(10000); // 10 seconds
+
+  // Check the claim tx hash
+  const txRes = await kavaClient.checkTxHash(txHashClaim)
+  console.log("\nTx result:", txRes.raw_log);
 }
 
 // Print swap IDs

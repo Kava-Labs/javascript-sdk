@@ -8,6 +8,7 @@ const defaultDerivationPath = "m/44'/459'/0'/0/0";
 
 const api = {
   nodeInfo: "/node_info",
+  txs: "/txs",
   getParamsPricefeed: "/pricefeed/parameters",
   getParamsAuction: "/auction/parameters",
   getParamsCDP: "/cdp/parameters",
@@ -35,6 +36,7 @@ class KavaClient {
       throw new Error("Kava server should not be null");
     }
     this.baseURI = server;
+    this.broadcastMode = "sync"; // default broadcast mode
   }
 
   /**
@@ -70,6 +72,21 @@ class KavaClient {
       throw new Error("account number cannot be undefined");
     }
     this.accNum = String(accNum);
+    return this;
+  }
+
+  /**
+   * Set broadcast mode
+   * @param {String} mode transaction broadcast mode
+   */
+  setBroadcastMode(mode) {
+    if (!mode) {
+      throw new Error("broadcast mode cannot be undefined");
+    }
+    if(mode != "async" && mode != "sync" && mode != "block") {
+      throw new Error("invalid broadcast mode ",  mode, " - must be async, sync, or block");
+    }
+    this.broadcastMode = String(mode);
     return this;
   }
 
@@ -283,6 +300,19 @@ class KavaClient {
     }
   }
 
+  /**
+   * Checks a transaction hash for on-chain results
+   * @param {String} txHash the transaction's hash
+   * @return {Promise}
+   */
+  async checkTxHash(txHash) {
+    const path = api.txs + "/" + txHash;
+    const res = await tx.getTx(path, this.baseURI);
+    if (res) {
+      return res.data
+    }
+  }
+
   /***************************************************
    *                 POST tx methods
    ***************************************************/
@@ -299,7 +329,7 @@ class KavaClient {
     const rawTx = msg.newStdTx([msgSend]);
     const signInfo = await this.prepareSignInfo(sequence);
     const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI);
+    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
   }
 
   /**
@@ -320,7 +350,7 @@ class KavaClient {
     const rawTx = msg.newStdTx([msgPostPrice]);
     const signInfo = await this.prepareSignInfo(sequence);
     const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI);
+    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
   }
 
   /**
@@ -340,7 +370,7 @@ class KavaClient {
     const rawTx = msg.newStdTx([msgCreateCDP], fee);
     const signInfo = await this.prepareSignInfo(sequence);
     const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI);
+    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
   }
 
   /**
@@ -359,7 +389,7 @@ class KavaClient {
     const rawTx = msg.newStdTx([msgDeposit]);
     const signInfo = await this.prepareSignInfo(sequence);
     const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI);
+    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
   }
 
   /**
@@ -378,7 +408,7 @@ class KavaClient {
     const rawTx = msg.newStdTx([msgWithdraw]);
     const signInfo = await this.prepareSignInfo(sequence);
     const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI);
+    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
   }
 
   /**
@@ -397,7 +427,7 @@ class KavaClient {
     const rawTx = msg.newStdTx([msgDrawDebt]);
     const signInfo = await this.prepareSignInfo(sequence);
     const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI);
+    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
   }
 
   /**
@@ -416,7 +446,7 @@ class KavaClient {
     const rawTx = msg.newStdTx([msgRepayDebt]);
     const signInfo = await this.prepareSignInfo(sequence);
     const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI);
+    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
   }
 
   /**
@@ -435,7 +465,7 @@ class KavaClient {
     const rawTx = msg.newStdTx([msgPlaceBid]);
     const signInfo = await this.prepareSignInfo(sequence);
     const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI);
+    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
   }
 
   /**
@@ -473,7 +503,7 @@ class KavaClient {
     const rawTx = msg.newStdTx([msgCreateAtomicSwap]);
     const signInfo = await this.prepareSignInfo(sequence);
     const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI);
+    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
   }
 
   /**
@@ -491,7 +521,7 @@ class KavaClient {
     const rawTx = msg.newStdTx([msgClaimAtomicSwap]);
     const signInfo = await this.prepareSignInfo(sequence);
     const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI);
+    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
   }
 
   /**
@@ -507,7 +537,7 @@ class KavaClient {
     const rawTx = msg.newStdTx([msgRefundAtomicSwap]);
     const signInfo = await this.prepareSignInfo(sequence);
     const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI);
+    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
   }
 }
 
