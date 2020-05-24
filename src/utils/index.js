@@ -1,15 +1,15 @@
-const SHA256 = require("crypto-js/sha256");
-const hexEncoding = require("crypto-js/enc-hex");
-const Big = require("big.js");
-const cryptoRand = require("crypto");
-const crypto = require("../crypto").crypto;
+const SHA256 = require('crypto-js/sha256');
+const hexEncoding = require('crypto-js/enc-hex');
+const Big = require('big.js');
+const cryptoRand = require('crypto');
+const crypto = require('../crypto').crypto;
 
 const RandomNumberLength = 64;
 
 // Precision is relative to KAVA or 10**6
 const precision = {
   kava: 1,
-  ukava: Math.pow(10, 6)
+  ukava: Math.pow(10, 6),
 };
 
 /**
@@ -17,8 +17,8 @@ const precision = {
  * @param {string} hex message to hash
  * @returns {string} hash output
  */
-const sha256 = hex => {
-  if (typeof hex !== "string") throw new Error("sha256 expects a hex string");
+const sha256 = (hex) => {
+  if (typeof hex !== 'string') throw new Error('sha256 expects a hex string');
   if (hex.length % 2 !== 0)
     throw new Error(`invalid hex string length: ${hex}`);
   const hexEncoded = hexEncoding.parse(hex);
@@ -32,7 +32,7 @@ const sha256 = hex => {
 const generateRandomNumber = () => {
   return cryptoRand
     .randomBytes(Math.ceil(RandomNumberLength / 2))
-    .toString("hex")
+    .toString('hex')
     .slice(0, RandomNumberLength);
 };
 
@@ -46,14 +46,14 @@ const calculateRandomNumberHash = (randomNumber, timestamp) => {
   const timestampHexStr = timestamp.toString(16);
   let timestampHexStrFormat = timestampHexStr;
   for (let i = 0; i < 16 - timestampHexStr.length; i++) {
-    timestampHexStrFormat = "0" + timestampHexStrFormat;
+    timestampHexStrFormat = '0' + timestampHexStrFormat;
   }
-  const timestampBytes = Buffer.from(timestampHexStrFormat, "hex");
+  const timestampBytes = Buffer.from(timestampHexStrFormat, 'hex');
   const newBuffer = Buffer.concat([
-    Buffer.from(randomNumber, "hex"),
-    timestampBytes
+    Buffer.from(randomNumber, 'hex'),
+    timestampBytes,
   ]);
-  return sha256(newBuffer.toString("hex"));
+  return sha256(newBuffer.toString('hex'));
 };
 
 /**
@@ -64,18 +64,18 @@ const calculateRandomNumberHash = (randomNumber, timestamp) => {
  * @returns {string} sha256 result
  */
 const calculateSwapID = (randomNumberHash, sender, senderOtherChain) => {
-  const randomNumberHashBytes = Buffer.from(randomNumberHash, "hex");
+  const randomNumberHashBytes = Buffer.from(randomNumberHash, 'hex');
   const senderBytes = crypto.decodeAddress(sender);
   const sendOtherChainBytes = Buffer.from(
     senderOtherChain.toLowerCase(),
-    "utf8"
+    'utf8'
   );
   const newBuffer = Buffer.concat([
     randomNumberHashBytes,
     senderBytes,
-    sendOtherChainBytes
+    sendOtherChainBytes,
   ]);
-  return sha256(newBuffer.toString("hex"));
+  return sha256(newBuffer.toString('hex'));
 };
 
 /**
@@ -90,10 +90,10 @@ const convertCoinDecimals = (inputAmount, inputDenom, outputDenom) => {
 
   try {
     if (!precision[inputDenom] || !precision[outputDenom]) {
-      throw new Error("Invalid asset pairing for decimal conversion.");
+      throw new Error('Invalid asset pairing for decimal conversion.');
     }
   } catch (err) {
-    console.log("Error:", err.message);
+    console.log('Error:', err.message);
     return;
   }
 
@@ -113,9 +113,9 @@ const convertCoinDecimals = (inputAmount, inputDenom, outputDenom) => {
  */
 const formatCoin = (amount, denom) => {
   return {
-      denom: String(denom),
-      amount: String(amount)
-    };
+    denom: String(denom),
+    amount: String(amount),
+  };
 };
 
 /**
@@ -128,8 +128,8 @@ const formatCoins = (amount, denom) => {
   return [
     {
       denom: String(denom),
-      amount: String(amount)
-    }
+      amount: String(amount),
+    },
   ];
 };
 
@@ -142,17 +142,17 @@ const formatCoins = (amount, denom) => {
 const formatMultiCoins = (amounts, denoms) => {
   try {
     if (amounts.length != denoms.lenth) {
-      throw new Error("Every amount must have exactly 1 corresponding denom.");
+      throw new Error('Every amount must have exactly 1 corresponding denom.');
     }
   } catch (err) {
-    console.log("Error:", err.message);
+    console.log('Error:', err.message);
     return;
   }
 
   var coins = [];
-  for(var i = 0; i < amounts.length; i++) {
-    let coin = formatCoin(amounts[i], denoms[i])
-    coins.push(coin)
+  for (var i = 0; i < amounts.length; i++) {
+    let coin = formatCoin(amounts[i], denoms[i]);
+    coins.push(coin);
   }
   return coins;
 };
@@ -164,5 +164,5 @@ module.exports.utils = {
   convertCoinDecimals,
   formatCoin,
   formatCoins,
-  formatMultiCoins
+  formatMultiCoins,
 };
