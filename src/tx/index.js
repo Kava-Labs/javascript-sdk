@@ -73,11 +73,12 @@ async function getTx(path, base, timeout = 5000) {
  * Loads an account's account number and sequence from Kava
  * @param {String} address the address to be fetched
  * @param {String} base the request's base url
+ * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
  * @return {Promise}
  */
-async function loadMetaData(address, base) {
+async function loadMetaData(address, base, timeout=2000) {
   const path = api.getAccount + '/' + address;
-  const res = await getTx(path, base);
+  const res = await getTx(path, base, timeout);
   accNum = _.get(res, 'data.result.value.account_number');
   seqNum = _.get(res, 'data.result.value.sequence');
   if (!(accNum || seqNum)) {

@@ -39,7 +39,8 @@ const BinanceEndpoints = {
 }
 
 const BinanceDeputy = {
-    Testnet: "tbnb10uypsspvl6jlxcx5xse02pag39l8xpe7a3468h"
+    TestnetLegacy: "tbnb1et8vmd0dgvswjnyaf73ez8ye0jehc8a7t7fljv",
+    Testnet: "tbnb10uypsspvl6jlxcx5xse02pag39l8xpe7a3468h",
 }
 
 module.exports.env = {
