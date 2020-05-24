@@ -1,15 +1,15 @@
-const _ = require("lodash");
-const Env = require("./static/env").env
-const kavaUtils = require("../src/utils").utils;
-const KavaClient = require("../src/client").KavaClient;
-const BnbApiClient = require("@binance-chain/javascript-sdk");
+const _ = require('lodash');
+const Env = require('./static/env').env;
+const kavaUtils = require('../src/utils').utils;
+const KavaClient = require('../src/client').KavaClient;
+const BnbApiClient = require('@binance-chain/javascript-sdk');
 const bnbCrypto = BnbApiClient.crypto;
 
 const BNB_CONVERSION_FACTOR = 10 ** 8;
 
 var main = async () => {
-  await incomingSwap()
-}
+  await incomingSwap();
+};
 
 var incomingSwap = async () => {
   // Start new Kava client
@@ -19,8 +19,10 @@ var incomingSwap = async () => {
 
   // Start Binance Chain client
   const bnbClient = await new BnbApiClient(Env.BinanceEndpoints.Testnet);
-  bnbClient.chooseNetwork("testnet");
-  const privateKey = bnbCrypto.getPrivateKeyFromMnemonic(Env.BinanceAccount.Testnet.Mnemonic);
+  bnbClient.chooseNetwork('testnet');
+  const privateKey = bnbCrypto.getPrivateKeyFromMnemonic(
+    Env.BinanceAccount.Testnet.Mnemonic
+  );
   bnbClient.setPrivateKey(privateKey);
   await bnbClient.initChain();
 
@@ -28,7 +30,7 @@ var incomingSwap = async () => {
   //                       Binance Chain blockchain interaction
   // -------------------------------------------------------------------------------
   // Assets involved in the swap
-  const asset = "BNB";
+  const asset = 'BNB';
   const amount = 1 * BNB_CONVERSION_FACTOR;
 
   // Addresses involved in the swap
@@ -41,10 +43,10 @@ var incomingSwap = async () => {
   const tokens = [
     {
       denom: asset,
-      amount: amount
-    }
+      amount: amount,
+    },
   ];
-  const expectedIncome = [String(amount), ":", asset].join("");
+  const expectedIncome = [String(amount), ':', asset].join('');
 
   // Number of blocks that swap will be active
   const heightSpan = 10005;
@@ -56,9 +58,9 @@ var incomingSwap = async () => {
     randomNumber,
     timestamp
   );
-  console.log("Secret random number:", randomNumber);
+  console.log('Secret random number:', randomNumber);
 
-  printSwapIDs(randomNumberHash, sender, senderOtherChain)
+  printSwapIDs(randomNumberHash, sender, senderOtherChain);
 
   // Send create swap tx using Binance Chain client
   const res = await bnbClient.swap.HTLT(
@@ -75,42 +77,37 @@ var incomingSwap = async () => {
   );
 
   if (res && res.status == 200) {
-    console.log(
-      "\nCreate swap tx hash (Binance Chain): ",
-      res.result[0].hash
-    );
+    console.log('\nCreate swap tx hash (Binance Chain): ', res.result[0].hash);
   } else {
-    console.log("Tx error:", res);
+    console.log('Tx error:', res);
     return;
   }
-
   // Wait for deputy to see the new swap on Binance Chain and relay it to Kava
-  console.log("Waiting for deputy to witness and relay the swap...")
-  await sleep(45000); // 45 seconds
+  console.log('Waiting for deputy to witness and relay the swap...');
 
-  // -------------------------------------------------------------------------------
-  //                           Kava blockchain interaction
-  // -------------------------------------------------------------------------------
-   // Calculate the expected swap ID on Kava
-   const expectedKavaSwapID = kavaUtils.calculateSwapID(
+  // Calculate the expected swap ID on Kava
+  const expectedKavaSwapID = kavaUtils.calculateSwapID(
     randomNumberHash,
     senderOtherChain,
     sender
   );
+  await kavaClient.getSwap(expectedKavaSwapID, 45000); // 45 seconds
+
+  // -------------------------------------------------------------------------------
+  //                           Kava blockchain interaction
+  // -------------------------------------------------------------------------------
 
   // Send claim swap tx using Kava client
   const txHashClaim = await kavaClient.claimSwap(
     expectedKavaSwapID,
     randomNumber
   );
-  console.log("Claim swap tx hash (Kava): ".concat(txHashClaim));
-
-  await sleep(10000); // 10 seconds
+  console.log('Claim swap tx hash (Kava): '.concat(txHashClaim));
 
   // Check the claim tx hash
-  const txRes = await kavaClient.checkTxHash(txHashClaim)
-  console.log("\nTx result:", txRes.raw_log);
-}
+  const txRes = await kavaClient.checkTxHash(txHashClaim, 15000);
+  console.log('\nTx result:', txRes.raw_log);
+};
 
 // Print swap IDs
 var printSwapIDs = (randomNumberHash, sender, senderOtherChain) => {
@@ -128,13 +125,8 @@ var printSwapIDs = (randomNumberHash, sender, senderOtherChain) => {
     sender
   );
 
-  console.log("Expected Kava swap ID:", originChainSwapID);
-  console.log("Expected Bnbchain swap ID:", destChainSwapID);
+  console.log('Expected Kava swap ID:', originChainSwapID);
+  console.log('Expected Bnbchain swap ID:', destChainSwapID);
 };
-
-// Sleep is a wait function
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
 
 main();

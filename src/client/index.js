@@ -1,27 +1,27 @@
-const sig = require("@kava-labs/sig");
-const _ = require("lodash");
-const tx = require("../tx").tx;
-const msg = require("../msg").msg;
+const sig = require('@kava-labs/sig');
+const _ = require('lodash');
+const tx = require('../tx').tx;
+const msg = require('../msg').msg;
 
-const defaultPrefix = "kava";
+const defaultPrefix = 'kava';
 const defaultDerivationPath = "m/44'/459'/0'/0/0";
 
 const api = {
-  nodeInfo: "/node_info",
-  txs: "/txs",
-  getParamsPricefeed: "/pricefeed/parameters",
-  getParamsAuction: "/auction/parameters",
-  getParamsCDP: "/cdp/parameters",
-  getParamsBEP3: "/bep3/parameters",
-  getAccount: "/auth/accounts",
-  getPrice: "/pricefeed/price",
-  getRawPrices: "/pricefeed/rawprices",
-  getSwap: "bep3/swap",
-  getSwaps: "/bep3/swaps",
-  getCDP: "cdp/cdps/cdp",
-  getCDPs: "/cdp/cdps/denom",
-  getAuction: "/auction/auctions",
-  getAuctions: "/auction/auctions"
+  nodeInfo: '/node_info',
+  txs: '/txs',
+  getParamsPricefeed: '/pricefeed/parameters',
+  getParamsAuction: '/auction/parameters',
+  getParamsCDP: '/cdp/parameters',
+  getParamsBEP3: '/bep3/parameters',
+  getAccount: '/auth/accounts',
+  getPrice: '/pricefeed/price',
+  getRawPrices: '/pricefeed/rawprices',
+  getSwap: 'bep3/swap',
+  getSwaps: '/bep3/swaps',
+  getCDP: 'cdp/cdps/cdp',
+  getCDPs: '/cdp/cdps/denom',
+  getAuction: '/auction/auctions',
+  getAuctions: '/auction/auctions',
 };
 
 /**
@@ -33,10 +33,10 @@ class KavaClient {
    */
   constructor(server) {
     if (!server) {
-      throw new Error("Kava server should not be null");
+      throw new Error('Kava server should not be null');
     }
     this.baseURI = server;
-    this.broadcastMode = "sync"; // default broadcast mode
+    this.broadcastMode = 'sync'; // default broadcast mode
   }
 
   /**
@@ -46,7 +46,7 @@ class KavaClient {
   async initChain() {
     if (!this.chainID) {
       const res = await tx.getTx(api.nodeInfo, this.baseURI);
-      this.chainID = _.get(res, "data.node_info.network");
+      this.chainID = _.get(res, 'data.node_info.network');
     }
     return this;
   }
@@ -57,7 +57,7 @@ class KavaClient {
    */
   setChainID(chainID) {
     if (!chainID) {
-      throw new Error("chainID cannot be undefined");
+      throw new Error('chainID cannot be undefined');
     }
     this.chainID = chainID;
     return this;
@@ -69,7 +69,7 @@ class KavaClient {
    */
   setAccountNumber(accNum) {
     if (!accNum) {
-      throw new Error("account number cannot be undefined");
+      throw new Error('account number cannot be undefined');
     }
     this.accNum = String(accNum);
     return this;
@@ -81,10 +81,14 @@ class KavaClient {
    */
   setBroadcastMode(mode) {
     if (!mode) {
-      throw new Error("broadcast mode cannot be undefined");
+      throw new Error('broadcast mode cannot be undefined');
     }
-    if(mode != "async" && mode != "sync" && mode != "block") {
-      throw new Error("invalid broadcast mode ",  mode, " - must be async, sync, or block");
+    if (mode != 'async' && mode != 'sync' && mode != 'block') {
+      throw new Error(
+        'invalid broadcast mode ',
+        mode,
+        ' - must be async, sync, or block'
+      );
     }
     this.broadcastMode = String(mode);
     return this;
@@ -100,12 +104,12 @@ class KavaClient {
    */
   setWallet(
     mnemonic,
-    password = "",
+    password = '',
     prefix = defaultPrefix,
     derivationPath = defaultDerivationPath
   ) {
     if (!mnemonic) {
-      throw new Error("mnemonic cannot be undefined");
+      throw new Error('mnemonic cannot be undefined');
     }
     this.wallet = sig.createWalletFromMnemonic(
       mnemonic,
@@ -128,7 +132,7 @@ class KavaClient {
       signInfo = {
         chain_id: this.chainID,
         account_number: String(this.accNum),
-        sequence: String(sequence)
+        sequence: String(sequence),
       };
     } else {
       // Load meta data from the account's chain state
@@ -136,8 +140,11 @@ class KavaClient {
       // Select manually set values over automatically pulled values
       signInfo = {
         chain_id: this.chainID,
-        account_number: this.accNum != null ? String(this.accNum) : String(meta.account_number),
-        sequence: sequence ? String(sequence) : String(meta.sequence)
+        account_number:
+          this.accNum != null
+            ? String(this.accNum)
+            : String(meta.account_number),
+        sequence: sequence ? String(sequence) : String(meta.sequence),
       };
     }
     return signInfo;
@@ -153,7 +160,7 @@ class KavaClient {
    * @return {Promise}
    */
   async getAccount(address) {
-    const path = api.getAccount + "/" + address;
+    const path = api.getAccount + '/' + address;
     const res = await tx.getTx(path, this.baseURI);
     if (res && res.data) {
       return res.data.result;
@@ -210,7 +217,7 @@ class KavaClient {
    * @return {Promise}
    */
   async getPrice(market) {
-    const path = api.getPrice + "/" + market;
+    const path = api.getPrice + '/' + market;
     const res = await tx.getTx(path, this.baseURI);
     if (res && res.data) {
       return res.data.result;
@@ -218,7 +225,7 @@ class KavaClient {
   }
 
   async getRawPrices(market) {
-    const path = api.getRawPrices + "/" + market;
+    const path = api.getRawPrices + '/' + market;
     const res = await tx.getTx(path, this.baseURI);
     if (res && res.data) {
       return res.data.result;
@@ -232,7 +239,7 @@ class KavaClient {
    * @return {Promise}
    */
   async getCDP(owner, collateralDenom) {
-    const path = api.getCDP + "/" + owner + "/" + collateralDenom;
+    const path = api.getCDP + '/' + owner + '/' + collateralDenom;
     const res = await tx.getTx(path, this.baseURI);
     if (res && res.data) {
       return res.data.result;
@@ -245,7 +252,7 @@ class KavaClient {
    * @return {Promise}
    */
   async getCDPs(collateralDenom) {
-    const path = api.getCDPs + "/" + collateralDenom;
+    const path = api.getCDPs + '/' + collateralDenom;
     const res = await tx.getTx(path, this.baseURI);
     if (res && res.data) {
       return res.data.result;
@@ -258,7 +265,7 @@ class KavaClient {
    * @return {Promise}
    */
   async getAuction(id) {
-    const path = api.getAuction + "/" + id;
+    const path = api.getAuction + '/' + id;
     const res = await tx.getTx(path, this.baseURI);
     if (res && res.data) {
       return res.data.result;
@@ -281,9 +288,9 @@ class KavaClient {
    * @param {String} swapID the swap's unique identifier
    * @return {Promise}
    */
-  async getSwap(swapID) {
-    const path = api.getSwap + "/" + swapID;
-    const res = await tx.getTx(path, this.baseURI);
+  async getSwap(swapID, timeout=2000) {
+    const path = api.getSwap + '/' + swapID;
+    const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
       return res.data.result;
     }
@@ -303,14 +310,18 @@ class KavaClient {
   /**
    * Checks a transaction hash for on-chain results
    * @param {String} txHash the transaction's hash
+   * @param {Number} timeout milliseconds until the transaction will be considered not found
    * @return {Promise}
    */
-  async checkTxHash(txHash) {
-    const path = api.txs + "/" + txHash;
-    const res = await tx.getTx(path, this.baseURI);
-    if (res) {
-      return res.data
+  async checkTxHash(txHash, timeout = 10000) {
+    const path = api.txs + '/' + txHash;
+    let res;
+    try {
+      res = await tx.getTx(path, this.baseURI, timeout);
+    } catch (e) {
+      throw new Error(`tx not found: ${e}`);
     }
+    return res.data;
   }
 
   /***************************************************
@@ -366,7 +377,7 @@ class KavaClient {
       principal,
       collateral
     );
-    const fee = { amount: [], gas: "250000" };
+    const fee = { amount: [], gas: '250000' };
     const rawTx = msg.newStdTx([msgCreateCDP], fee);
     const signInfo = await this.prepareSignInfo(sequence);
     const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
