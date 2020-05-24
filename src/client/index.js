@@ -160,7 +160,7 @@ class KavaClient {
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getAccount(address, timeout=2000) {
+  async getAccount(address, timeout = 2000) {
     const path = api.getAccount + '/' + address;
     const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
@@ -173,7 +173,7 @@ class KavaClient {
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getParamsPricefeed(timeout=2000) {
+  async getParamsPricefeed(timeout = 2000) {
     const res = await tx.getTx(api.getParamsPricefeed, this.baseURI, timeout);
     if (res && res.data) {
       return res.data.result;
@@ -185,7 +185,7 @@ class KavaClient {
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getParamsAuction(timeout=2000) {
+  async getParamsAuction(timeout = 2000) {
     const res = await tx.getTx(api.getParamsAuction, this.baseURI, timeout);
     if (res && res.data) {
       return res.data.result;
@@ -197,7 +197,7 @@ class KavaClient {
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getParamsCDP(timeout=2000) {
+  async getParamsCDP(timeout = 2000) {
     const res = await tx.getTx(api.getParamsCDP, this.baseURI, timeout);
     if (res && res.data) {
       return res.data.result;
@@ -209,7 +209,7 @@ class KavaClient {
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getParamsBEP3(timeout=2000) {
+  async getParamsBEP3(timeout = 2000) {
     const res = await tx.getTx(api.getParamsBEP3, this.baseURI, timeout);
     if (res && res.data) {
       return res.data.result;
@@ -222,7 +222,7 @@ class KavaClient {
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getPrice(market, timeout=2000) {
+  async getPrice(market, timeout = 2000) {
     const path = api.getPrice + '/' + market;
     const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
@@ -236,7 +236,7 @@ class KavaClient {
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getRawPrices(market, timeout=2000) {
+  async getRawPrices(market, timeout = 2000) {
     const path = api.getRawPrices + '/' + market;
     const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
@@ -251,7 +251,7 @@ class KavaClient {
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getCDP(owner, collateralDenom, timeout=2000) {
+  async getCDP(owner, collateralDenom, timeout = 2000) {
     const path = api.getCDP + '/' + owner + '/' + collateralDenom;
     const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
@@ -265,7 +265,7 @@ class KavaClient {
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getCDPs(collateralDenom, timeout=2000) {
+  async getCDPs(collateralDenom, timeout = 2000) {
     const path = api.getCDPs + '/' + collateralDenom;
     const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
@@ -279,7 +279,7 @@ class KavaClient {
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getAuction(id, timeout=2000) {
+  async getAuction(id, timeout = 2000) {
     const path = api.getAuction + '/' + id;
     const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
@@ -292,7 +292,7 @@ class KavaClient {
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getAuctions(timeout=2000) {
+  async getAuctions(timeout = 2000) {
     const res = await tx.getTx(api.getAuctions, this.baseURI, timeout);
     if (res && res.data) {
       return res.data.result;
@@ -305,7 +305,7 @@ class KavaClient {
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getSwap(swapID, timeout=2000) {
+  async getSwap(swapID, timeout = 2000) {
     const path = api.getSwap + '/' + swapID;
     const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
@@ -318,7 +318,7 @@ class KavaClient {
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getSwaps(timeout=2000) {
+  async getSwaps(timeout = 2000) {
     const res = await tx.getTx(api.getSwaps, this.baseURI, timeout);
     if (res && res.data) {
       return res.data.result;

@@ -76,7 +76,7 @@ async function getTx(path, base, timeout = 5000) {
  * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
  * @return {Promise}
  */
-async function loadMetaData(address, base, timeout=2000) {
+async function loadMetaData(address, base, timeout = 2000) {
   const path = api.getAccount + '/' + address;
   const res = await getTx(path, base, timeout);
   accNum = _.get(res, 'data.result.value.account_number');

@@ -1,16 +1,16 @@
-const _ = require("lodash");
+const _ = require('lodash');
 
-const defaultFee = { amount: [], gas: "200000" };
+const defaultFee = { amount: [], gas: '200000' };
 
 // newStdTx creates a new StdTx from some messages, with default values for fees, memo and sigs
-function newStdTx(msgs, fee = defaultFee, memo = "", signatures = null) {
+function newStdTx(msgs, fee = defaultFee, memo = '', signatures = null) {
   return {
-    type: "cosmos-sdk/StdTx",
+    type: 'cosmos-sdk/StdTx',
     value: {
-    msg: msgs,
-    fee: fee,
-    signatures: signatures,
-    memo: memo
+      msg: msgs,
+      fee: fee,
+      signatures: signatures,
+      memo: memo,
     },
   };
 }
@@ -22,14 +22,14 @@ function newStdTx(msgs, fee = defaultFee, memo = "", signatures = null) {
 // newMsgSend creates a new MsgSend
 function newMsgSend(address, to, coins) {
   const sendTx = {
-    type: "cosmos-sdk/MsgSend",
+    type: 'cosmos-sdk/MsgSend',
     value: {
       from_address: address,
       to_address: to,
-      amount: _.sortBy(coins, "denom")
-    }
+      amount: _.sortBy(coins, 'denom'),
+    },
   };
-  return sendTx
+  return sendTx;
 }
 
 /***************************************************
@@ -38,79 +38,79 @@ function newMsgSend(address, to, coins) {
 
 function newMsgPostPrice(from, marketID, price, expiry) {
   return {
-    type: "pricefeed/MsgPostPrice",
+    type: 'pricefeed/MsgPostPrice',
     value: {
       from: from,
       market_id: marketID,
       price: price,
-      expiry: expiry
-    }
+      expiry: expiry,
+    },
   };
 }
 
 function newMsgCreateCDP(sender, principal, collateral) {
   return {
-    type: "cdp/MsgCreateCDP",
+    type: 'cdp/MsgCreateCDP',
     value: {
       sender: sender,
       principal: principal,
-      collateral: collateral
-    }
+      collateral: collateral,
+    },
   };
 }
 
 function newMsgDeposit(owner, depositor, collateral) {
   return {
-    type: "cdp/MsgDeposit",
+    type: 'cdp/MsgDeposit',
     value: {
       owner: owner,
       depositor: depositor,
-      collateral: collateral
-    }
+      collateral: collateral,
+    },
   };
 }
 
 function newMsgWithdraw(owner, depositor, collateral) {
   return {
-    type: "cdp/MsgWithdraw",
+    type: 'cdp/MsgWithdraw',
     value: {
       owner: owner,
       depositor: depositor,
-      collateral: collateral
-    }
+      collateral: collateral,
+    },
   };
 }
 
 function newMsgDrawDebt(sender, cdpDenom, principal) {
   return {
-    type: "cdp/MsgDrawDebt",
+    type: 'cdp/MsgDrawDebt',
     value: {
       sender: sender,
       cdp_denom: cdpDenom,
-      principal: principal
-    }
+      principal: principal,
+    },
   };
 }
 
 function newMsgRepayDebt(sender, payment, cdpDenom) {
   return {
-    type: "cdp/MsgRepayDebt",
+    type: 'cdp/MsgRepayDebt',
     value: {
       sender: sender,
       payment: payment,
-      cdp_denom: cdpDenom
-    }
+      cdp_denom: cdpDenom,
+    },
   };
 }
 
 function newMsgPlaceBid(auctionID, bidder, amount) {
   return {
-    type: "auction/MsgPlaceBid",
+    type: 'auction/MsgPlaceBid',
     value: {
       auction_id: auctionID,
       bidder: bidder,
-      amount: amount
-    }
+      amount: amount,
+    },
   };
 }
 
@@ -127,7 +127,7 @@ function newMsgCreateAtomicSwap(
   crossChain
 ) {
   return {
-    type: "bep3/MsgCreateAtomicSwap",
+    type: 'bep3/MsgCreateAtomicSwap',
     value: {
       from: sender,
       to: recipient,
@@ -137,31 +137,31 @@ function newMsgCreateAtomicSwap(
       timestamp: String(timestamp),
       amount: amount,
       height_span: String(heightSpan),
-      cross_chain: crossChain
-    }
+      cross_chain: crossChain,
+    },
   };
 }
 
 // newMsgClaimAtomicSwap creates a new MsgClaimAtomicSwap
 function newMsgClaimAtomicSwap(sender, swapID, randomNumber) {
   return {
-    type: "bep3/MsgClaimAtomicSwap",
+    type: 'bep3/MsgClaimAtomicSwap',
     value: {
       from: sender,
       swap_id: swapID,
-      random_number: randomNumber
-    }
+      random_number: randomNumber,
+    },
   };
 }
 
 // newMsgRefundAtomicSwap creates a new MsgRefundAtomicSwap
 function newMsgRefundAtomicSwap(sender, swapID) {
   return {
-    type: "bep3/MsgRefundAtomicSwap",
+    type: 'bep3/MsgRefundAtomicSwap',
     value: {
       from: sender,
-      swap_id: swapID
-    }
+      swap_id: swapID,
+    },
   };
 }
 
@@ -177,5 +177,5 @@ module.exports.msg = {
   newMsgPlaceBid,
   newMsgCreateAtomicSwap,
   newMsgClaimAtomicSwap,
-  newMsgRefundAtomicSwap
+  newMsgRefundAtomicSwap,
 };
