@@ -15,7 +15,7 @@ const api = {
  * @param {Function} fn - Returns a promise
  * @param {Object} thisArg - the object that will be the 'this' argument to the input function
  * @param {Array} args - array of arguments to call the input function with
- * @param {Number} retriesLeft - Number of retries. If -1 will keep retrying
+ * @param {Number} retriesLeft - Number of retries. If >1 will keep retrying
  * @param {Number} interval - milliseconds between retries. If exponential set to true will be doubled each retry
  * @param {Boolean} exponential - Flag for exponential back-off mode
  * @return {Promise<*>}
