@@ -22,7 +22,7 @@ The client requires an address mnemonic and the url of a Kava api endpoint.
 
 ```javascript
 const kava = require("@kava-labs/javascript-sdk");
-const client = kava.client;
+const KavaClient = kava.client;
 
 var main = async () => {
   const mnemonic = "secret words that unlock a kava address";
@@ -30,7 +30,7 @@ var main = async () => {
   const localURL = "http://localhost:1317"; // local testing endpoint
 
   // Declare a new Kava client, set wallet, and initialize chain
-  client = new client(testnetURL);
+  client = new KavaClient(testnetURL);
   client.setWallet(mnemonic);
   await client.initChain();
 
