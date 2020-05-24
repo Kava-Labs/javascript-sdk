@@ -17,16 +17,9 @@ var main = async () => {
     const txHash = await kavaClient.transfer(recipient, coins);
     console.log("Tx hash:", txHash);
 
-    await sleep(10000); // 10 seconds
-
     // Check the resulting tx hash
-    const txRes = await kavaClient.checkTxHash(txHash)
+    const txRes = await kavaClient.checkTxHash(txHash, 15000) // 15 seconds
     console.log("Tx result:", txRes);
-}
-
-// Sleep is a wait function
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
 }
   
 main()

@@ -55,7 +55,7 @@ var main = async () => {
     console.log("Create CDP tx hash (Kava): ".concat(txHashCDP));
 
     // Get account balance
-    account = await kavaClient.getAccount(kavaClient.wallet.address);
+    account = await kavaClient.getAccount(kavaClient.wallet.address, 5000);
     console.log("Address:", _.get(account, "value.address"));
     console.log("Balances:", _.get(account, "value.coins"), "\n");
 };
