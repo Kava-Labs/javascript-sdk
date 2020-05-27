@@ -341,7 +341,7 @@ class KavaClient {
     }
     return res.data;
   }
-
+  
   /***************************************************
    *                 POST tx methods
    ***************************************************/
@@ -415,7 +415,8 @@ class KavaClient {
       this.wallet.address,
       collateral
     );
-    const rawTx = msg.newStdTx([msgDeposit]);
+    const fee = { amount: [], gas: '250000' };
+    const rawTx = msg.newStdTx([msgDeposit], fee);
     const signInfo = await this.prepareSignInfo(sequence);
     const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
     return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
@@ -434,7 +435,8 @@ class KavaClient {
       this.wallet.address,
       collateral
     );
-    const rawTx = msg.newStdTx([msgWithdraw]);
+    const fee = { amount: [], gas: '250000' };
+    const rawTx = msg.newStdTx([msgWithdraw], fee);
     const signInfo = await this.prepareSignInfo(sequence);
     const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
     return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
@@ -453,7 +455,8 @@ class KavaClient {
       cdpDenom,
       principal
     );
-    const rawTx = msg.newStdTx([msgDrawDebt]);
+    const fee = { amount: [], gas: '250000' };
+    const rawTx = msg.newStdTx([msgDrawDebt], fee);
     const signInfo = await this.prepareSignInfo(sequence);
     const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
     return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
@@ -461,18 +464,19 @@ class KavaClient {
 
   /**
    * Repay debt by returning principal to a collateralized debt position
-   * @param {String} payment the amount of pricipal to be repaid
    * @param {String} cdpDenom the denom of this CDP's collateral asset
+   * @param {String} payment the amount of pricipal to be repaid
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async repayDebt(payment, cdpDenom, sequence = null) {
+  async repayDebt(cdpDenom, payment, sequence = null) {
     const msgRepayDebt = msg.newMsgRepayDebt(
       this.wallet.address,
       payment,
       cdpDenom
     );
-    const rawTx = msg.newStdTx([msgRepayDebt]);
+    const fee = { amount: [], gas: '250000' };
+    const rawTx = msg.newStdTx([msgRepayDebt], fee);
     const signInfo = await this.prepareSignInfo(sequence);
     const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
     return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
