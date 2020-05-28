@@ -54,10 +54,9 @@ var main = async () => {
     const txHashCDP = await kavaClient.createCDP(principal, collateral);
     console.log("Create CDP tx hash (Kava): ".concat(txHashCDP));
 
-    // Get account balance
-    account = await kavaClient.getAccount(kavaClient.wallet.address, 5000);
-    console.log("Address:", _.get(account, "value.address"));
-    console.log("Balances:", _.get(account, "value.coins"), "\n");
+    // Check the claim tx hash
+    const txRes = await kavaClient.checkTxHash(txHashCDP, 15000);
+    console.log('\nTx result:', txRes);
 };
 
 main()
