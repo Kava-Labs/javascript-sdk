@@ -334,11 +334,25 @@ class KavaClient {
   async checkTxHash(txHash, timeout = 10000) {
     const path = api.txs + '/' + txHash;
     let res;
+
+    // Query the chain for a transaction with this hash
     try {
       res = await tx.getTx(path, this.baseURI, timeout);
     } catch (e) {
       throw new Error(`tx not found: ${e}`);
     }
+
+    // If the transaction is found, check that it was accepted by the chain
+    try {
+      if (_.get(res, 'data.code')) {
+        throw new Error(
+          `tx not accepted by chain: "${_.get(res, 'data.raw_log')}"`
+        );
+      }
+     } catch (e) {
+       console.log("\n" + e)
+     }
+    
     return res.data;
   }
   
