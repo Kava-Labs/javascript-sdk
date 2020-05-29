@@ -1,25 +1,27 @@
-const sig = require("@tendermint/sig");
-const _ = require("lodash");
-const tx = require("../tx").tx;
-const msg = require("../msg").msg;
+const sig = require('@kava-labs/sig');
+const _ = require('lodash');
+const tx = require('../tx').tx;
+const msg = require('../msg').msg;
 
-const defaultPrefix = "kava";
+const defaultPrefix = 'kava';
 const defaultDerivationPath = "m/44'/459'/0'/0/0";
 
 const api = {
-  nodeInfo: "/node_info",
-  getParamsPricefeed: "/pricefeed/parameters",
-  getParamsAuction: "/auction/parameters",
-  getParamsCDP: "/cdp/parameters",
-  getParamsBEP3: "/bep3/parameters",
-  getAccount: "/auth/accounts",
-  getPrice: "/pricefeed/price",
-  getSwap: "bep3/swap",
-  getSwaps: "/bep3/swaps",
-  getCDP: "cdp/cdps/cdp",
-  getCDPs: "/cdp/cdps/denom",
-  getAuction: "/auction/auctions",
-  getAuctions: "/auction/auctions"
+  nodeInfo: '/node_info',
+  txs: '/txs',
+  getParamsPricefeed: '/pricefeed/parameters',
+  getParamsAuction: '/auction/parameters',
+  getParamsCDP: '/cdp/parameters',
+  getParamsBEP3: '/bep3/parameters',
+  getAccount: '/auth/accounts',
+  getPrice: '/pricefeed/price',
+  getRawPrices: '/pricefeed/rawprices',
+  getSwap: 'bep3/swap',
+  getSwaps: '/bep3/swaps',
+  getCDP: 'cdp/cdps/cdp',
+  getCDPs: '/cdp/cdps/denom',
+  getAuction: '/auction/auctions',
+  getAuctions: '/auction/auctions',
 };
 
 /**
@@ -31,9 +33,10 @@ class KavaClient {
    */
   constructor(server) {
     if (!server) {
-      throw new Error("Kava server should not be null");
+      throw new Error('Kava server should not be null');
     }
     this.baseURI = server;
+    this.broadcastMode = 'sync'; // default broadcast mode
   }
 
   /**
@@ -43,7 +46,7 @@ class KavaClient {
   async initChain() {
     if (!this.chainID) {
       const res = await tx.getTx(api.nodeInfo, this.baseURI);
-      this.chainID = _.get(res, "data.node_info.network");
+      this.chainID = _.get(res, 'data.node_info.network');
     }
     return this;
   }
@@ -54,7 +57,7 @@ class KavaClient {
    */
   setChainID(chainID) {
     if (!chainID) {
-      throw new Error("chainID cannot be undefined");
+      throw new Error('chainID cannot be undefined');
     }
     this.chainID = chainID;
     return this;
@@ -66,9 +69,28 @@ class KavaClient {
    */
   setAccountNumber(accNum) {
     if (!accNum) {
-      throw new Error("account number cannot be undefined");
+      throw new Error('account number cannot be undefined');
     }
     this.accNum = String(accNum);
+    return this;
+  }
+
+  /**
+   * Set broadcast mode
+   * @param {String} mode transaction broadcast mode
+   */
+  setBroadcastMode(mode) {
+    if (!mode) {
+      throw new Error('broadcast mode cannot be undefined');
+    }
+    if (mode != 'async' && mode != 'sync' && mode != 'block') {
+      throw new Error(
+        'invalid broadcast mode ',
+        mode,
+        ' - must be async, sync, or block'
+      );
+    }
+    this.broadcastMode = String(mode);
     return this;
   }
 
@@ -82,12 +104,12 @@ class KavaClient {
    */
   setWallet(
     mnemonic,
-    password = "",
+    password = '',
     prefix = defaultPrefix,
     derivationPath = defaultDerivationPath
   ) {
     if (!mnemonic) {
-      throw new Error("mnemonic cannot be undefined");
+      throw new Error('mnemonic cannot be undefined');
     }
     this.wallet = sig.createWalletFromMnemonic(
       mnemonic,
@@ -109,8 +131,8 @@ class KavaClient {
       // Prepare signing info from manually set values
       signInfo = {
         chain_id: this.chainID,
-        account_number: this.accNum,
-        sequence: String(sequence)
+        account_number: String(this.accNum),
+        sequence: String(sequence),
       };
     } else {
       // Load meta data from the account's chain state
@@ -118,8 +140,11 @@ class KavaClient {
       // Select manually set values over automatically pulled values
       signInfo = {
         chain_id: this.chainID,
-        account_number: this.accNum != null ? this.accNum : meta.account_number,
-        sequence: sequence ? String(sequence) : meta.sequence
+        account_number:
+          this.accNum != null
+            ? String(this.accNum)
+            : String(meta.account_number),
+        sequence: sequence ? String(sequence) : String(meta.sequence),
       };
     }
     return signInfo;
@@ -132,11 +157,12 @@ class KavaClient {
   /**
    * Get information about an account
    * @param {String} address account to query
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getAccount(address) {
-    const path = api.getAccount + "/" + address;
-    const res = await tx.getTx(path, this.baseURI);
+  async getAccount(address, timeout = 2000) {
+    const path = api.getAccount + '/' + address;
+    const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
       return res.data.result;
     }
@@ -144,10 +170,11 @@ class KavaClient {
 
   /**
    * Get the params of the pricefeed module
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getParamsPricefeed() {
-    const res = await tx.getTx(api.getParamsPricefeed, this.baseURI);
+  async getParamsPricefeed(timeout = 2000) {
+    const res = await tx.getTx(api.getParamsPricefeed, this.baseURI, timeout);
     if (res && res.data) {
       return res.data.result;
     }
@@ -155,10 +182,11 @@ class KavaClient {
 
   /**
    * Get the params of the auction module
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getParamsAuction() {
-    const res = await tx.getTx(api.getParamsAuction, this.baseURI);
+  async getParamsAuction(timeout = 2000) {
+    const res = await tx.getTx(api.getParamsAuction, this.baseURI, timeout);
     if (res && res.data) {
       return res.data.result;
     }
@@ -166,10 +194,11 @@ class KavaClient {
 
   /**
    * Get the params of the cdp module
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getParamsCDP() {
-    const res = await tx.getTx(api.getParamsCDP, this.baseURI);
+  async getParamsCDP(timeout = 2000) {
+    const res = await tx.getTx(api.getParamsCDP, this.baseURI, timeout);
     if (res && res.data) {
       return res.data.result;
     }
@@ -177,10 +206,11 @@ class KavaClient {
 
   /**
    * Get the params of the bep3 module
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getParamsBEP3() {
-    const res = await tx.getTx(api.getParamsBEP3, this.baseURI);
+  async getParamsBEP3(timeout = 2000) {
+    const res = await tx.getTx(api.getParamsBEP3, this.baseURI, timeout);
     if (res && res.data) {
       return res.data.result;
     }
@@ -189,11 +219,26 @@ class KavaClient {
   /**
    * Get the current system price of an asset
    * @param {String} market asset's market identifier
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getPrice(market) {
-    const path = api.getPrice + "/" + market;
-    const res = await tx.getTx(path, this.baseURI);
+  async getPrice(market, timeout = 2000) {
+    const path = api.getPrice + '/' + market;
+    const res = await tx.getTx(path, this.baseURI, timeout);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Get all active oracle prices for an asset
+   * @param {String} market asset's market identifier
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getRawPrices(market, timeout = 2000) {
+    const path = api.getRawPrices + '/' + market;
+    const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
       return res.data.result;
     }
@@ -203,11 +248,12 @@ class KavaClient {
    * Get CDP if one exists for an owner and asset type
    * @param {String} owner address of the CDP's owner
    * @param {String} collateralDenom denom of the CDP's collateral asset
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getCDP(owner, collateralDenom) {
-    const path = api.getCDP + "/" + owner + "/" + collateralDenom;
-    const res = await tx.getTx(path, this.baseURI);
+  async getCDP(owner, collateralDenom, timeout = 2000) {
+    const path = api.getCDP + '/' + owner + '/' + collateralDenom;
+    const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
       return res.data.result;
     }
@@ -216,11 +262,12 @@ class KavaClient {
   /**
    * Get all CDPs for an asset
    * @param {String} collateralDenom denom of the CDP's collateral asset
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getCDPs(collateralDenom) {
-    const path = api.getCDPs + "/" + collateralDenom;
-    const res = await tx.getTx(path, this.baseURI);
+  async getCDPs(collateralDenom, timeout = 2000) {
+    const path = api.getCDPs + '/' + collateralDenom;
+    const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
       return res.data.result;
     }
@@ -229,11 +276,12 @@ class KavaClient {
   /**
    * Get auction by ID
    * @param {String} id auctions unique identifier
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getAuction(id) {
-    const path = api.getAuction + "/" + id;
-    const res = await tx.getTx(path, this.baseURI);
+  async getAuction(id, timeout = 2000) {
+    const path = api.getAuction + '/' + id;
+    const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
       return res.data.result;
     }
@@ -241,10 +289,11 @@ class KavaClient {
 
   /**
    * Get all active auctions
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getAuctions() {
-    const res = await tx.getTx(api.getAuctions, this.baseURI);
+  async getAuctions(timeout = 2000) {
+    const res = await tx.getTx(api.getAuctions, this.baseURI, timeout);
     if (res && res.data) {
       return res.data.result;
     }
@@ -253,11 +302,12 @@ class KavaClient {
   /**
    * Get a swap by its ID
    * @param {String} swapID the swap's unique identifier
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getSwap(swapID) {
-    const path = api.getSwap + "/" + swapID;
-    const res = await tx.getTx(path, this.baseURI);
+  async getSwap(swapID, timeout = 2000) {
+    const path = api.getSwap + '/' + swapID;
+    const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
       return res.data.result;
     }
@@ -265,15 +315,47 @@ class KavaClient {
 
   /**
    * Get all swaps
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getSwaps() {
-    const res = await tx.getTx(api.getSwaps, this.baseURI);
+  async getSwaps(timeout = 2000) {
+    const res = await tx.getTx(api.getSwaps, this.baseURI, timeout);
     if (res && res.data) {
       return res.data.result;
     }
   }
 
+  /**
+   * Checks a transaction hash for on-chain results
+   * @param {String} txHash the transaction's hash
+   * @param {Number} timeout milliseconds until the transaction will be considered not found
+   * @return {Promise}
+   */
+  async checkTxHash(txHash, timeout = 10000) {
+    const path = api.txs + '/' + txHash;
+    let res;
+
+    // Query the chain for a transaction with this hash
+    try {
+      res = await tx.getTx(path, this.baseURI, timeout);
+    } catch (e) {
+      throw new Error(`tx not found: ${e}`);
+    }
+
+    // If the transaction is found, check that it was accepted by the chain
+    try {
+      if (_.get(res, 'data.code')) {
+        throw new Error(
+          `tx not accepted by chain: "${_.get(res, 'data.raw_log')}"`
+        );
+      }
+     } catch (e) {
+       console.log("\n" + e)
+     }
+    
+    return res.data;
+  }
+  
   /***************************************************
    *                 POST tx methods
    ***************************************************/
@@ -290,7 +372,7 @@ class KavaClient {
     const rawTx = msg.newStdTx([msgSend]);
     const signInfo = await this.prepareSignInfo(sequence);
     const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI);
+    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
   }
 
   /**
@@ -311,7 +393,7 @@ class KavaClient {
     const rawTx = msg.newStdTx([msgPostPrice]);
     const signInfo = await this.prepareSignInfo(sequence);
     const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI);
+    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
   }
 
   /**
@@ -327,11 +409,11 @@ class KavaClient {
       principal,
       collateral
     );
-    const fee = { amount: [], gas: "250000" };
+    const fee = { amount: [], gas: '250000' };
     const rawTx = msg.newStdTx([msgCreateCDP], fee);
     const signInfo = await this.prepareSignInfo(sequence);
     const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI);
+    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
   }
 
   /**
@@ -347,10 +429,11 @@ class KavaClient {
       this.wallet.address,
       collateral
     );
-    const rawTx = msg.newStdTx([msgDeposit]);
+    const fee = { amount: [], gas: '250000' };
+    const rawTx = msg.newStdTx([msgDeposit], fee);
     const signInfo = await this.prepareSignInfo(sequence);
     const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI);
+    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
   }
 
   /**
@@ -366,10 +449,11 @@ class KavaClient {
       this.wallet.address,
       collateral
     );
-    const rawTx = msg.newStdTx([msgWithdraw]);
+    const fee = { amount: [], gas: '250000' };
+    const rawTx = msg.newStdTx([msgWithdraw], fee);
     const signInfo = await this.prepareSignInfo(sequence);
     const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI);
+    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
   }
 
   /**
@@ -385,29 +469,31 @@ class KavaClient {
       cdpDenom,
       principal
     );
-    const rawTx = msg.newStdTx([msgDrawDebt]);
+    const fee = { amount: [], gas: '250000' };
+    const rawTx = msg.newStdTx([msgDrawDebt], fee);
     const signInfo = await this.prepareSignInfo(sequence);
     const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI);
+    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
   }
 
   /**
    * Repay debt by returning principal to a collateralized debt position
-   * @param {String} payment the amount of pricipal to be repaid
    * @param {String} cdpDenom the denom of this CDP's collateral asset
+   * @param {String} payment the amount of pricipal to be repaid
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async repayDebt(payment, cdpDenom, sequence = null) {
+  async repayDebt(cdpDenom, payment, sequence = null) {
     const msgRepayDebt = msg.newMsgRepayDebt(
       this.wallet.address,
       payment,
       cdpDenom
     );
-    const rawTx = msg.newStdTx([msgRepayDebt]);
+    const fee = { amount: [], gas: '250000' };
+    const rawTx = msg.newStdTx([msgRepayDebt], fee);
     const signInfo = await this.prepareSignInfo(sequence);
     const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI);
+    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
   }
 
   /**
@@ -426,7 +512,7 @@ class KavaClient {
     const rawTx = msg.newStdTx([msgPlaceBid]);
     const signInfo = await this.prepareSignInfo(sequence);
     const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI);
+    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
   }
 
   /**
@@ -437,9 +523,7 @@ class KavaClient {
    * @param {String} randomNumberHash resulting hex-encoded hash from sha256(timestamp, random number)
    * @param {String} timestamp the timestamp in unix, must be within 15-30 minutes of current time
    * @param {String} amount the amount in coins to be transferred
-   * @param {String} expectedIncome the amount of coins expected to be received by the recipient
    * @param {String} heightSpan the number of blocks that this swap will be active/claimable
-   * @param {String} crossChain denotes if this swap is a cross-chain swap or a same-chain swap
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
@@ -450,9 +534,7 @@ class KavaClient {
     randomNumberHash,
     timestamp,
     amount,
-    expectedIncome,
     heightSpan,
-    crossChain,
     sequence = null
   ) {
     const msgCreateAtomicSwap = msg.newMsgCreateAtomicSwap(
@@ -463,14 +545,12 @@ class KavaClient {
       randomNumberHash.toUpperCase(),
       timestamp,
       amount,
-      expectedIncome,
-      heightSpan,
-      crossChain
+      heightSpan
     );
     const rawTx = msg.newStdTx([msgCreateAtomicSwap]);
     const signInfo = await this.prepareSignInfo(sequence);
     const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI);
+    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
   }
 
   /**
@@ -488,7 +568,7 @@ class KavaClient {
     const rawTx = msg.newStdTx([msgClaimAtomicSwap]);
     const signInfo = await this.prepareSignInfo(sequence);
     const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI);
+    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
   }
 
   /**
@@ -504,7 +584,7 @@ class KavaClient {
     const rawTx = msg.newStdTx([msgRefundAtomicSwap]);
     const signInfo = await this.prepareSignInfo(sequence);
     const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI);
+    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
   }
 }
 
