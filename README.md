@@ -8,7 +8,7 @@ The Kava JavaScript SDK allows browsers and node.js clients to interact with Kav
 - crypto - core cryptographic functions.
 - utils - utility functions such as client-side secret generation.
 
-# Installation
+## Installation
 
 Install the package via npm.
 
@@ -16,7 +16,7 @@ Install the package via npm.
 npm install @kava-labs/javascript-sdk
 ```
 
-# Client setup
+## Client setup
 
 The client requires an address mnemonic and the url of a Kava api endpoint.
 
@@ -38,9 +38,9 @@ var main = async () => {
 };
 ```
 
-# Important information for cross-chain transfers
+## Important information for cross-chain transfers
 
-## Testnet-6000
+### Testnet-6000
 
 Testnet-6000 includes minting incentives and goverance committees.
 
@@ -49,7 +49,7 @@ Testnet-6000 includes minting incentives and goverance committees.
 - Kava's current testnet-6000 api endpoint is http://54.88.243.146:1317.
 - We recommend using Binance Chain api endpoint https://testnet-dex.binance.org/.
 
-## Testnet-5000
+### Testnet-5000
 
 Testnet-5000 introduces support for cross-chain transfers between Binance Chain and Kava.
 
@@ -58,11 +58,11 @@ Testnet-5000 introduces support for cross-chain transfers between Binance Chain 
 - Kava's official testnet-5000 api endpoint is http://kava-testnet-5000.kava.io:1317.
 - We recommend using Binance Chain api endpoint https://testnet-dex.binance.org/.
 
-# Examples
+## Examples
 
 The `examples` folder contains complete code examples for transferring funds from Binance Chain to Kava, opening a CDP, tranferring funds on Kava, and transferring funds back to Binance Chain. The following selected examples demonstrate basic client usage.
 
-## Transfer coins
+### Transfer coins
 
 ```javascript
 const utils = kava.utils;
@@ -77,13 +77,13 @@ const txRes = await client.checkTxHash(txHash, 15000); // 15 second timeout
 console.log('Tx result:', txRes.raw_log);
 ```
 
-## Swaps
+### Swaps
 
 Kava's testnet-5000 introduced support for secure transfers of BNB from Binance Chain to Kava and back via swaps. The [bep3-deputy](https://github.com/binance-chain/bep3-deputy) process sits between the two blockchains and services swaps by relaying information back and forth.
 
 Swaps use a simple secret sharing scheme. A secret random number is generated on the client and hashed with a timestamp in order to create a random number hash that's stored with the swap. The swap can be securely claimed on the opposite chain using the secret random number. Swaps expire after n blocks, a duration that can be modified via the height span parameter. Once expired, the swap can be refunded.
 
-## Create swap
+### Create swap
 
 In order for an address to submit a swap on Kava it must hold pegged bnb tokens. The Binance Chain [docs](https://docs.binance.org/atomic-swap.html) describe how to create a swap on Binance Chain with BNB. Make sure to use the deputy's addresses as the swap's `recipient` and `senderOtherChain`, respectively, or the deputy will not relay the swap.
 
@@ -146,7 +146,7 @@ const txRes = await client.checkTxHash(txHash, 15000);
 console.log('\nTx result:', txRes.raw_log);
 ```
 
-## Claim swap
+### Claim swap
 
 Only active swaps can be claimed. Anyone can send the claim request, but funds will only be released to the intended recipient if the secret random number matches the random number hash. A successful claim sends funds exclusively to the intended recipient's address.
 
@@ -160,7 +160,7 @@ const swapID =
 const txHash = await client.claimSwap(swapID, randomNumber);
 ```
 
-## Refund swap
+### Refund swap
 
 Only expired swaps can be refunded. Anyone can send the refund request, but funds are always returned to the swap's original creator.
 
@@ -171,6 +171,6 @@ const swapID =
 const txHash = await client.refundSwap(swapID);
 ```
 
-# Contributing
+## Contributing
 
 Kava is an open source project and contributions to the Kava JavaScript SDK are welcome. If you'd like contribute, please open an issue or pull request.
