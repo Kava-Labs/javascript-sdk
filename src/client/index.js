@@ -9,19 +9,26 @@ const defaultDerivationPath = "m/44'/459'/0'/0/0";
 const api = {
   nodeInfo: '/node_info',
   getLatestBlock: '/blocks/latest',
+  getBlock: '/blocks/',
+  getLatestValidatorSet: '/validatorsets/latest',
+  getValidatorSet: '/validatorsets/',
   txs: '/txs',
   getParamsPricefeed: '/pricefeed/parameters',
   getParamsAuction: '/auction/parameters',
   getParamsCDP: '/cdp/parameters',
   getParamsBEP3: '/bep3/parameters',
   getAccount: '/auth/accounts',
+  getBalances: '/bank/balances',
+  getSupply: '/supply/total',
   getPrice: '/pricefeed/price',
   getRawPrices: '/pricefeed/rawprices',
   getSwap: 'bep3/swap',
   getSwaps: '/bep3/swaps',
+  getAssetSupply: 'bep3/supply',
+  getAssetSupplies: 'bep3/supplies',
   getCDP: 'cdp/cdps/cdp',
   getCDPs: '/cdp/cdps/denom',
-  getAuction: '/auction/auctions',
+  getAuction: '/auction/auctions', // TODO:
   getAuctions: '/auction/auctions',
 };
 
@@ -155,7 +162,7 @@ class KavaClient {
    *                   Tendermint
    ***************************************************/
   /**
-   * Get information about an account
+   * Get the latest block
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
@@ -164,6 +171,46 @@ class KavaClient {
       if (res && res.data) {
         return res.data;
       }
+  }
+
+  /**
+   * Get a block at a specific height
+   * @param {Number} height the block's height
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getBlock(height, timeout = 2000) {
+    const path = api.getBlock + '/' + String(height);
+    const res = await tx.getTx(path, this.baseURI, timeout);
+    if (res && res.data) {
+      return res.data;
+    }
+  }
+
+  /**
+   * Get the latest set of validators
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getLatestValidatorSet(timeout = 2000) {
+    const res = await tx.getTx(api.getLatestValidatorSet, this.baseURI, timeout);
+    if (res && res.data) {
+      return res.data;
+    }
+  }
+
+  /**
+   * Get a set of validators at a specific block height
+   * @param {Number} height the block's height
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getValidatorSet(height, timeout = 2000) {
+    const path = api.getValidatorSet + '/' + String(height);
+    const res = await tx.getTx(path, this.baseURI, timeout);
+    if (res && res.data) {
+      return res.data;
+    }
   }
 
   /**
@@ -208,6 +255,46 @@ class KavaClient {
    */
   async getAccount(address, timeout = 2000) {
     const path = api.getAccount + '/' + address;
+    const res = await tx.getTx(path, this.baseURI, timeout);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Get an account's balances
+   * @param {String} address account to query
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getBalances(address, timeout = 2000) {
+    const path = api.getBalances + '/' + address;
+    const res = await tx.getTx(path, this.baseURI, timeout);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Get the total supply of coins on the chain
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getSupply(timeout = 2000) {
+    const res = await tx.getTx(api.getSupply, this.baseURI, timeout);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Get the total supply of coins on the chain
+   * @param {String} denom the name of the asset whose total supply will be queried
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getSupplyOf(denom, timeout = 2000) {
+    const path = api.getSupply + '/' + denom;
     const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
       return res.data.result;
@@ -526,6 +613,7 @@ class KavaClient {
     }
   }
 
+  // TODO: swap filtering
   /**
    * Get all swaps
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
@@ -533,6 +621,32 @@ class KavaClient {
    */
   async getSwaps(timeout = 2000) {
     const res = await tx.getTx(api.getSwaps, this.baseURI, timeout);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Get an asset's total supply by its denom
+   * @param {String} assetDenom the asset's denom
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getAssetSupply(assetDenom, timeout = 2000) {
+    const path = api.getAssetSupply + '/' + assetDenom;
+    const res = await tx.getTx(path, this.baseURI, timeout);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Get all supplies
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getAssetSupplies(timeout = 2000) {
+    const res = await tx.getTx(api.getAssetSupplies, this.baseURI, timeout);
     if (res && res.data) {
       return res.data.result;
     }
@@ -608,7 +722,7 @@ class KavaClient {
     const signInfo = await this.prepareSignInfo(sequence);
     const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
     return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
-  }  
+  }
 }
 
 module.exports.KavaClient = KavaClient;
