@@ -7,16 +7,17 @@ const defaultPrefix = 'kava';
 const defaultDerivationPath = "m/44'/459'/0'/0/0";
 
 const api = {
+  txs: '/txs',
   nodeInfo: '/node_info',
+  getBlock: '/blocks',
   getLatestBlock: '/blocks/latest',
-  getBlock: '/blocks/',
   getLatestValidatorSet: '/validatorsets/latest',
   getValidatorSet: '/validatorsets/',
-  txs: '/txs',
   getParamsPricefeed: '/pricefeed/parameters',
   getParamsAuction: '/auction/parameters',
   getParamsCDP: '/cdp/parameters',
   getParamsBEP3: '/bep3/parameters',
+  getParamsIncentive: '/incentive/parameters',
   getAccount: '/auth/accounts',
   getBalances: '/bank/balances',
   getSupply: '/supply/total',
@@ -32,6 +33,9 @@ const api = {
   getCDPs: '/cdp/cdps/denom',
   getAuction: '/auction/auctions', // TODO:
   getAuctions: '/auction/auctions',
+  getClaims: '/incentive/claims',
+  getRewardPeriods: '/incentive/rewardperiods',
+  getClaimPeriods: '/incentive/claimperiods',
 };
 
 /**
@@ -751,6 +755,78 @@ class KavaClient {
     const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
     return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
   }
+
+  /***************************************************
+   *                    Incentive
+   ***************************************************/
+  /**
+   * Get the params of the incentive module
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getParamsIncentive(timeout = 2000) {
+    const res = await tx.getTx(api.getParamsIncentive, this.baseURI, timeout);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Get the params of the incentive module
+   * @param {String} address the address to be queried
+   * @param {String} denom name of the asset to be queried
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getClaims(address, denom, timeout = 2000) {
+    const path = api.getClaims + '/' + address + '/' + denom;
+    const res = await tx.getTx(api.getClaims, this.baseURI, timeout);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Get all incentive reward periods
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getRewardPeriods(timeout = 2000) {
+    const res = await tx.getTx(api.getRewardPeriods, this.baseURI, timeout);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Get all incentive claim periods
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getClaimPeriods(timeout = 2000) {
+    const res = await tx.getTx(api.getClaimPeriods, this.baseURI, timeout);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Claim a reward by denom
+   * @param {String} denom the name of the asset to be claimed
+   * @param {String} sequence optional account sequence
+   * @return {Promise}
+   */
+  async claimReward(denom, sequence = null) {
+    const msgClaimReward = msg.newMsgClaimReward(
+      this.wallet.address,
+      denom
+    );
+    const rawTx = msg.newStdTx([msgClaimReward]);
+    const signInfo = await this.prepareSignInfo(sequence);
+    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
+    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+  }
+
 }
 
 module.exports.KavaClient = KavaClient;

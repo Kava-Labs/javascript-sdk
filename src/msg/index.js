@@ -165,6 +165,16 @@ function newMsgRefundAtomicSwap(sender, swapID) {
   };
 }
 
+function newMsgClaimReward(sender, denom) {
+  return {
+    type: 'incentive/MsgClaimReward',
+    value: {
+      sender: sender,
+      denom: denom,
+    },
+  };
+}
+
 module.exports.msg = {
   newStdTx,
   newMsgSend,
@@ -178,4 +188,5 @@ module.exports.msg = {
   newMsgCreateAtomicSwap,
   newMsgClaimAtomicSwap,
   newMsgRefundAtomicSwap,
+  newMsgClaimReward,
 };
