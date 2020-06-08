@@ -152,9 +152,8 @@ class KavaClient {
   }
 
   /***************************************************
-   *                 GET tx methods
+   *                   Tendermint
    ***************************************************/
-
   /**
    * Get information about an account
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
@@ -167,6 +166,40 @@ class KavaClient {
       }
   }
 
+  /**
+   * Checks a transaction hash for on-chain results
+   * @param {String} txHash the transaction's hash
+   * @param {Number} timeout milliseconds until the transaction will be considered not found
+   * @return {Promise}
+   */
+  async checkTxHash(txHash, timeout = 10000) {
+    const path = api.txs + '/' + txHash;
+    let res;
+
+    // Query the chain for a transaction with this hash
+    try {
+      res = await tx.getTx(path, this.baseURI, timeout);
+    } catch (e) {
+      throw new Error(`tx not found: ${e}`);
+    }
+
+    // If the transaction is found, check that it was accepted by the chain
+    try {
+      if (_.get(res, 'data.code')) {
+        throw new Error(
+          `tx not accepted by chain: "${_.get(res, 'data.raw_log')}"`
+        );
+      }
+     } catch (e) {
+       console.log("\n" + e)
+     }
+    
+    return res.data;
+  }
+
+  /***************************************************
+   *                   Cosmos SDK
+   ***************************************************/
   /**
    * Get information about an account
    * @param {String} address account to query
@@ -182,48 +215,30 @@ class KavaClient {
   }
 
   /**
+   * Sends coins to an address
+   * @param {String} recipient address that will receive coins
+   * @param {String} coins amount of coins to send
+   * @param {String} sequence optional account sequence
+   * @return {Promise}
+   */
+  async transfer(recipient, coins, sequence = null) {
+    const msgSend = msg.newMsgSend(this.wallet.address, recipient, coins);
+    const rawTx = msg.newStdTx([msgSend]);
+    const signInfo = await this.prepareSignInfo(sequence);
+    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
+    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+  }
+
+  /***************************************************
+   *                   Pricefeed
+   ***************************************************/
+  /**
    * Get the params of the pricefeed module
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
   async getParamsPricefeed(timeout = 2000) {
     const res = await tx.getTx(api.getParamsPricefeed, this.baseURI, timeout);
-    if (res && res.data) {
-      return res.data.result;
-    }
-  }
-
-  /**
-   * Get the params of the auction module
-   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
-   * @return {Promise}
-   */
-  async getParamsAuction(timeout = 2000) {
-    const res = await tx.getTx(api.getParamsAuction, this.baseURI, timeout);
-    if (res && res.data) {
-      return res.data.result;
-    }
-  }
-
-  /**
-   * Get the params of the cdp module
-   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
-   * @return {Promise}
-   */
-  async getParamsCDP(timeout = 2000) {
-    const res = await tx.getTx(api.getParamsCDP, this.baseURI, timeout);
-    if (res && res.data) {
-      return res.data.result;
-    }
-  }
-
-  /**
-   * Get the params of the bep3 module
-   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
-   * @return {Promise}
-   */
-  async getParamsBEP3(timeout = 2000) {
-    const res = await tx.getTx(api.getParamsBEP3, this.baseURI, timeout);
     if (res && res.data) {
       return res.data.result;
     }
@@ -258,29 +273,36 @@ class KavaClient {
   }
 
   /**
-   * Get CDP if one exists for an owner and asset type
-   * @param {String} owner address of the CDP's owner
-   * @param {String} collateralDenom denom of the CDP's collateral asset
-   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * Allows oracles to post an asset's price to the pricefeed
+   * @param {String} marketID the asset's on chain market ID, such as 'btc:usd'
+   * @param {String} price the asset's price
+   * @param {String} expiry time duration that this price is valid for
+   * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async getCDP(owner, collateralDenom, timeout = 2000) {
-    const path = api.getCDP + '/' + owner + '/' + collateralDenom;
-    const res = await tx.getTx(path, this.baseURI, timeout);
-    if (res && res.data) {
-      return res.data.result;
-    }
+  async postPrice(marketID, price, expiry, sequence = null) {
+    const msgPostPrice = msg.newMsgPostPrice(
+      this.wallet.address,
+      marketID,
+      price,
+      expiry
+    );
+    const rawTx = msg.newStdTx([msgPostPrice]);
+    const signInfo = await this.prepareSignInfo(sequence);
+    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
+    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
   }
 
+  /***************************************************
+   *                    Auction
+   ***************************************************/
   /**
-   * Get all CDPs for an asset
-   * @param {String} collateralDenom denom of the CDP's collateral asset
+   * Get the params of the auction module
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getCDPs(collateralDenom, timeout = 2000) {
-    const path = api.getCDPs + '/' + collateralDenom;
-    const res = await tx.getTx(path, this.baseURI, timeout);
+  async getParamsAuction(timeout = 2000) {
+    const res = await tx.getTx(api.getParamsAuction, this.baseURI, timeout);
     if (res && res.data) {
       return res.data.result;
     }
@@ -313,13 +335,48 @@ class KavaClient {
   }
 
   /**
-   * Get a swap by its ID
-   * @param {String} swapID the swap's unique identifier
+   * Place a bid on an auction
+   * @param {String} auctionID the unique ID of the auction
+   * @param {String} amount the coins amount to bid
+   * @param {String} sequence optional account sequence
+   * @return {Promise}
+   */
+  async placeBid(auctionID, amount, sequence = null) {
+    const msgPlaceBid = msg.newMsgPlaceBid(
+      auctionID,
+      this.wallet.address,
+      amount
+    );
+    const rawTx = msg.newStdTx([msgPlaceBid]);
+    const signInfo = await this.prepareSignInfo(sequence);
+    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
+    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+  }
+
+  /***************************************************
+   *                     CDP
+   ***************************************************/
+  /**
+   * Get the params of the cdp module
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getSwap(swapID, timeout = 2000) {
-    const path = api.getSwap + '/' + swapID;
+  async getParamsCDP(timeout = 2000) {
+    const res = await tx.getTx(api.getParamsCDP, this.baseURI, timeout);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Get CDP if one exists for an owner and asset type
+   * @param {String} owner address of the CDP's owner
+   * @param {String} collateralDenom denom of the CDP's collateral asset
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getCDP(owner, collateralDenom, timeout = 2000) {
+    const path = api.getCDP + '/' + owner + '/' + collateralDenom;
     const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
       return res.data.result;
@@ -327,86 +384,17 @@ class KavaClient {
   }
 
   /**
-   * Get all swaps
+   * Get all CDPs for an asset
+   * @param {String} collateralDenom denom of the CDP's collateral asset
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getSwaps(timeout = 2000) {
-    const res = await tx.getTx(api.getSwaps, this.baseURI, timeout);
+  async getCDPs(collateralDenom, timeout = 2000) {
+    const path = api.getCDPs + '/' + collateralDenom;
+    const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
       return res.data.result;
     }
-  }
-
-  /**
-   * Checks a transaction hash for on-chain results
-   * @param {String} txHash the transaction's hash
-   * @param {Number} timeout milliseconds until the transaction will be considered not found
-   * @return {Promise}
-   */
-  async checkTxHash(txHash, timeout = 10000) {
-    const path = api.txs + '/' + txHash;
-    let res;
-
-    // Query the chain for a transaction with this hash
-    try {
-      res = await tx.getTx(path, this.baseURI, timeout);
-    } catch (e) {
-      throw new Error(`tx not found: ${e}`);
-    }
-
-    // If the transaction is found, check that it was accepted by the chain
-    try {
-      if (_.get(res, 'data.code')) {
-        throw new Error(
-          `tx not accepted by chain: "${_.get(res, 'data.raw_log')}"`
-        );
-      }
-     } catch (e) {
-       console.log("\n" + e)
-     }
-    
-    return res.data;
-  }
-  
-  /***************************************************
-   *                 POST tx methods
-   ***************************************************/
-
-  /**
-   * Sends coins to an address
-   * @param {String} recipient address that will receive coins
-   * @param {String} coins amount of coins to send
-   * @param {String} sequence optional account sequence
-   * @return {Promise}
-   */
-  async transfer(recipient, coins, sequence = null) {
-    const msgSend = msg.newMsgSend(this.wallet.address, recipient, coins);
-    const rawTx = msg.newStdTx([msgSend]);
-    const signInfo = await this.prepareSignInfo(sequence);
-    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
-  }
-
-  /**
-   * Allows oracles to post an asset's price to the pricefeed
-   * @param {String} marketID the asset's on chain market ID, such as 'btc:usd'
-   * @param {String} price the asset's price
-   * @param {String} expiry time duration that this price is valid for
-   * @param {String} sequence optional account sequence
-   * @return {Promise}
-   */
-  async postPrice(marketID, price, expiry, sequence = null) {
-    const msgPostPrice = msg.newMsgPostPrice(
-      this.wallet.address,
-      marketID,
-      price,
-      expiry
-    );
-    const rawTx = msg.newStdTx([msgPostPrice]);
-    const signInfo = await this.prepareSignInfo(sequence);
-    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
   }
 
   /**
@@ -509,23 +497,45 @@ class KavaClient {
     return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
   }
 
+  /***************************************************
+   *                     BEP3
+   ***************************************************/
   /**
-   * Place a bid on an auction
-   * @param {String} auctionID the unique ID of the auction
-   * @param {String} amount the coins amount to bid
-   * @param {String} sequence optional account sequence
+   * Get the params of the bep3 module
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async placeBid(auctionID, amount, sequence = null) {
-    const msgPlaceBid = msg.newMsgPlaceBid(
-      auctionID,
-      this.wallet.address,
-      amount
-    );
-    const rawTx = msg.newStdTx([msgPlaceBid]);
-    const signInfo = await this.prepareSignInfo(sequence);
-    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+  async getParamsBEP3(timeout = 2000) {
+    const res = await tx.getTx(api.getParamsBEP3, this.baseURI, timeout);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Get a swap by its ID
+   * @param {String} swapID the swap's unique identifier
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getSwap(swapID, timeout = 2000) {
+    const path = api.getSwap + '/' + swapID;
+    const res = await tx.getTx(path, this.baseURI, timeout);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Get all swaps
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getSwaps(timeout = 2000) {
+    const res = await tx.getTx(api.getSwaps, this.baseURI, timeout);
+    if (res && res.data) {
+      return res.data.result;
+    }
   }
 
   /**
@@ -598,7 +608,7 @@ class KavaClient {
     const signInfo = await this.prepareSignInfo(sequence);
     const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
     return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
-  }
+  }  
 }
 
 module.exports.KavaClient = KavaClient;
