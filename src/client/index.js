@@ -8,6 +8,7 @@ const defaultDerivationPath = "m/44'/459'/0'/0/0";
 
 const api = {
   nodeInfo: '/node_info',
+  getLatestBlock: '/blocks/latest',
   txs: '/txs',
   getParamsPricefeed: '/pricefeed/parameters',
   getParamsAuction: '/auction/parameters',
@@ -153,6 +154,18 @@ class KavaClient {
   /***************************************************
    *                 GET tx methods
    ***************************************************/
+
+  /**
+   * Get information about an account
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getLatestBlock(timeout = 2000) {
+      const res = await tx.getTx(api.getLatestBlock, this.baseURI, timeout);
+      if (res && res.data) {
+        return res.data;
+      }
+  }
 
   /**
    * Get information about an account
