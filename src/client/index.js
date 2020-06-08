@@ -20,6 +20,8 @@ const api = {
   getAccount: '/auth/accounts',
   getBalances: '/bank/balances',
   getSupply: '/supply/total',
+  getMarkets: 'pricefeed/markets',
+  getOracles: 'pricefeed/oracles',
   getPrice: '/pricefeed/price',
   getRawPrices: '/pricefeed/rawprices',
   getSwap: 'bep3/swap',
@@ -353,6 +355,32 @@ class KavaClient {
    */
   async getRawPrices(market, timeout = 2000) {
     const path = api.getRawPrices + '/' + market;
+    const res = await tx.getTx(path, this.baseURI, timeout);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Get all active markets
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getMarkets(timeout = 2000) {
+    const res = await tx.getTx(api.getMarkets, this.baseURI, timeout);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Get all active oracles for an asset
+   * @param {String} denom asset's name
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getOracles(denom, timeout = 2000) {
+    const path = api.getOracles + '/' + denom;
     const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
       return res.data.result;
