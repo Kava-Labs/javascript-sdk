@@ -31,11 +31,14 @@ const api = {
   getAssetSupplies: 'bep3/supplies',
   getCDP: 'cdp/cdps/cdp',
   getCDPs: '/cdp/cdps/denom',
-  getAuction: '/auction/auctions', // TODO:
+  getAuction: '/auction/auctions',
   getAuctions: '/auction/auctions',
   getClaims: '/incentive/claims',
   getRewardPeriods: '/incentive/rewardperiods',
   getClaimPeriods: '/incentive/claimperiods',
+  getCommittee: '/committee/committees', // endpoint also used by getCommitteeProposals
+  getCommittees: '/committee/committees',
+  getProposal: '/committee/proposals', // endpoint also used by getProposer, getProposalTally, getProposalVotes
 };
 
 /**
@@ -827,6 +830,140 @@ class KavaClient {
     return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
   }
 
+ /***************************************************
+   *                    Committee
+   ***************************************************/
+  /**
+   * Get a committee by ID
+   * @param {Number} committeeID unique identifier of the committee to be queried
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getCommittee(committeeID, timeout = 2000) {
+    const path = api.getCommittee + '/' + committeeID
+    const res = await tx.getTx(path, this.baseURI, timeout);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Get all committees
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getCommittees(timeout = 2000) {
+    const res = await tx.getTx(api.getCommittees, this.baseURI, timeout);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Get all proposals by a committee
+   * @param {Number} committeeID unique identifier of the committee whose proposals will be queried
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getCommitteeProposals(committeeID, timeout = 2000) {
+    const path = api.getCommittee + '/' + committeeID + '/proposals'
+    const res = await tx.getTx(path, this.baseURI, timeout);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Get a proposal by ID
+   * @param {Number} proposalID unique identifier of the proposal to be queried
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getProposal(proposalID, timeout = 2000) {
+    const path = api.getProposal + '/' + proposalID
+    const res = await tx.getTx(path, this.baseURI, timeout);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Get a proposal's proposer by proposal ID
+   * @param {Number} proposalID unique identifier of the proposal whose proposer will be queried
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getProposer(proposalID, timeout = 2000) {
+    const path = api.getProposal + '/' + proposalID + "/proposer"
+    const res = await tx.getTx(path, this.baseURI, timeout);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Get a proposal's tally by proposal ID
+   * @param {Number} proposalID unique identifier of the proposal whose tally will be queried
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getProposalTally(proposalID, timeout = 2000) {
+    const path = api.getProposal + '/' + proposalID + "/tally"
+    const res = await tx.getTx(path, this.baseURI, timeout);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Get a proposal's votes by proposal ID
+   * @param {Number} proposalID unique identifier of the proposal whose votes will be queried
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getProposalVotes(proposalID, timeout = 2000) {
+    const path = api.getProposal + '/' + proposalID + "/votes"
+    const res = await tx.getTx(path, this.baseURI, timeout);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Submit a public proposal by a selected committee (must be a member)
+   * @param {String} proposal the proposal to be submitted
+   * @param {String} committeeID the unique identifier of the committee
+   * @param {String} sequence optional account sequence
+   * @return {Promise}
+   */
+  async submitCommitteeProposal(proposal, committeeID, sequence = null) {
+    const msgSubmitProposal = msg.newMsgSubmitProposal(
+      proposal,
+      this.wallet.address,
+      committeeID
+    );
+    const rawTx = msg.newStdTx([msgSubmitProposal]);
+    const signInfo = await this.prepareSignInfo(sequence);
+    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
+    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+  }
+
+  /**
+   * Vote on a public proposal by ID
+   * @param {String} proposalID the unique identifier of the proposal
+   * @param {String} sequence optional account sequence
+   * @return {Promise}
+   */
+  async voteOnCommitteeProposal(proposalID, sequence = null) {
+    const msgVote = msg.newMsgVote(
+      proposalID,
+      this.wallet.address
+    );
+    const rawTx = msg.newStdTx([msgVote]);
+    const signInfo = await this.prepareSignInfo(sequence);
+    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
+    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+  }
 }
 
 module.exports.KavaClient = KavaClient;

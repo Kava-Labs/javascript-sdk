@@ -1,6 +1,6 @@
 const _ = require('lodash');
 
-const defaultFee = { amount: [], gas: '200000' };
+const defaultFee = { amount: [], gas: '250000' };
 
 // newStdTx creates a new StdTx from some messages, with default values for fees, memo and sigs
 function newStdTx(msgs, fee = defaultFee, memo = '', signatures = null) {
@@ -175,6 +175,27 @@ function newMsgClaimReward(sender, denom) {
   };
 }
 
+function newMsgSubmitProposal(proposal, proposer, committeeID) {
+  return {
+    type: 'kava/MsgSubmitProposal',
+    value: {
+      pub_proposal: proposal,
+      proposer: proposer,
+      committee_id: String(committeeID),
+    },
+  };
+}
+
+function newMsgVote(proposalID, voter) {
+  return {
+    type: 'kava/MsgVote',
+    value: {
+      proposal_id: String(proposalID),
+      voter: voter,
+    },
+  };
+}
+
 module.exports.msg = {
   newStdTx,
   newMsgSend,
@@ -189,4 +210,6 @@ module.exports.msg = {
   newMsgClaimAtomicSwap,
   newMsgRefundAtomicSwap,
   newMsgClaimReward,
+  newMsgSubmitProposal,
+  newMsgVote,
 };
