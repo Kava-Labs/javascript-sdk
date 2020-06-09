@@ -31,6 +31,8 @@ const api = {
   getAssetSupplies: 'bep3/supplies',
   getCDP: 'cdp/cdps/cdp',
   getCDPs: '/cdp/cdps/denom',
+  getCDPsRatio: '/cdp/cdps/ratio',
+  getDeposits: '/cdp/cdps/deposits',
   getAuction: '/auction/auctions',
   getAuctions: '/auction/auctions',
   getClaims: '/incentive/claims',
@@ -514,6 +516,36 @@ class KavaClient {
    */
   async getCDPs(collateralDenom, timeout = 2000) {
     const path = api.getCDPs + '/' + collateralDenom;
+    const res = await tx.getTx(path, this.baseURI, timeout);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Get all CDPs for an asset that are under the collateralization ratio specified
+   * @param {String} collateralDenom denom of the CDP's collateral asset
+   * @param {String} ratio upper collateralization ratio limit of the query
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getCDPsByRatio(collateralDenom, ratio, timeout = 2000) {
+    const path = api.getCDPsRatio + '/' + collateralDenom + '/' + ratio;
+    const res = await tx.getTx(path, this.baseURI, timeout);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Get all deposits for the CDP with the specified owner and collateral asset
+   * @param {String} owner the address that owns the CDP
+   * @param {String} collateralDenom denom of the CDP's collateral asset
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getDeposits(owner, collateralDenom, timeout = 2000) {
+    const path = api.getDeposits + '/' + owner + '/' + collateralDenom;
     const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
       return res.data.result;
