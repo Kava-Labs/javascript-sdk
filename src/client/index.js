@@ -445,12 +445,13 @@ class KavaClient {
   }
 
   /**
-   * Get all active auctions
+   * Get auctions, filterable by args.
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @param {Object} args request args as JSON. Example: {type: "collateral", denom: "btc"}
    * @return {Promise}
    */
-  async getAuctions(timeout = 2000) {
-    const res = await tx.getTx(api.getAuctions, this.baseURI, timeout);
+  async getAuctions(timeout = 2000, args = {}) {
+    const res = await tx.getTx(api.getAuctions, this.baseURI, timeout, args);
     if (res && res.data) {
       return res.data.result;
     }
@@ -648,14 +649,14 @@ class KavaClient {
     }
   }
 
-  // TODO: swap filtering
   /**
-   * Get all swaps
+   * Get swaps, filterable by args.
+   * @param {Object} args request args as JSON. Example: {status: "Open", direction: "Incoming"}
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getSwaps(timeout = 2000) {
-    const res = await tx.getTx(api.getSwaps, this.baseURI, timeout);
+  async getSwaps(timeout = 2000, args = {}) {
+    const res = await tx.getTx(api.getSwaps, this.baseURI, timeout, args);
     if (res && res.data) {
       return res.data.result;
     }
