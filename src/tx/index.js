@@ -9,6 +9,43 @@ const api = {
 };
 
 /**
+ * Sends an HTTP GET request to Kava
+ * @param {String} path the request's url extension
+ * @param {String} base the request's base url
+ * @return {Promise}
+ */
+async function getTx(path, base, timeout = 5000, args = {}) {
+  const requestUrl = new URL(path, base).toString()
+
+  try {
+    return await retry(
+      axios.get,
+      axios,
+      [applyRequestArgs(requestUrl, args)],
+      Math.floor(timeout / 1000),
+      1000,
+      false
+    );
+  } catch (err) {
+    throw new Error(err);
+  }
+}
+
+/**
+ * Apply args to an HTTP GET request's url
+ * @param {String} url the request's url (base + path extension)
+ * @param {String} args the request's http arguments in JSON e.g. {status: 'Open'}
+ * @return {String}
+ */
+function applyRequestArgs(url, args = {}) {
+  const search = []
+  for (let k in args) {
+    search.push(`${k}=${args[k]}`)
+  }
+  return `${url}?${search.join("&")}`
+}
+
+/**
  * Retries the given function until it succeeds given a number of retries and an interval between them. They are set
  * by default to retry 5 times with 1sec in between. There's also a flag for exponential back-off.
  * source (with minor edits): https://gitlab.com/snippets/1775781
@@ -45,27 +82,6 @@ async function retry(
     } else
       throw new Error(`Max retries reached:
     error: ${error}`);
-  }
-}
-
-/**
- * Sends an HTTP GET request to Kava
- * @param {String} path the request's url extension
- * @param {String} base the request's base url
- * @return {Promise}
- */
-async function getTx(path, base, timeout = 5000) {
-  try {
-    return await retry(
-      axios.get,
-      axios,
-      [new URL(path, base).toString()],
-      Math.floor(timeout / 1000),
-      1000,
-      false
-    );
-  } catch (err) {
-    throw new Error(err);
   }
 }
 
