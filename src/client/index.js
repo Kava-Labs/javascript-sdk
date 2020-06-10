@@ -3,8 +3,9 @@ const _ = require('lodash');
 const tx = require('../tx').tx;
 const msg = require('../msg').msg;
 
-const defaultPrefix = 'kava';
-const defaultDerivationPath = "m/44'/459'/0'/0/0";
+const KAVA_PREFIX = 'kava';
+const DERIVATION_PATH = "m/44'/459'/0'/0/0";
+const DERIVATION_PATH_LEGACY = "m/44'/118'/0'/0/0";
 
 const api = {
   nodeInfo: '/node_info',
@@ -98,23 +99,22 @@ class KavaClient {
    * Set the client's wallet which is used for signature generation
    * @param {String} mnemonic Kava address mnemonic
    * @param {String} password optional param for wallet password
-   * @param {String} prefix optional param for custom address prefix
-   * @param {String} derivationPath optional param for custom derivation path
+   * @param {boolean} legacy optional param to use the legacy coin type
    * @return {Promise}
    */
   setWallet(
     mnemonic,
     password = '',
-    prefix = defaultPrefix,
-    derivationPath = defaultDerivationPath
+    legacy = false,
   ) {
     if (!mnemonic) {
       throw new Error('mnemonic cannot be undefined');
     }
+    const derivationPath = legacy ? DERIVATION_PATH_LEGACY : DERIVATION_PATH
     this.wallet = sig.createWalletFromMnemonic(
       mnemonic,
       password,
-      prefix,
+      KAVA_PREFIX,
       derivationPath
     );
     return this;
