@@ -99,18 +99,17 @@ async function loadMetaData(address, base, timeout = 2000) {
   seqNum = _.get(res, 'data.result.value.sequence');
   let signMetaData
   if ((typeof accNum === 'undefined' || typeof seqNum === 'undefined')) {
-    signMetaData = {
-      account_number: '0',
-      sequence: '0',
+     signMetaData = {
+      account_number: typeof accNum === 'undefined' ? '0' : accNum,
+      sequence: typeof seqNum === 'undefined' ? '0' : seqNum,
     };
+    return signMetaData
   }
 
-  signMetaData = {
+  return {
     account_number: accNum,
     sequence: seqNum,
   };
-
-  return signMetaData;
 }
 
 /**
