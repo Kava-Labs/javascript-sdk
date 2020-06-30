@@ -97,13 +97,15 @@ async function loadMetaData(address, base, timeout = 2000) {
   const res = await getTx(path, base, timeout);
   accNum = _.get(res, 'data.result.value.account_number');
   seqNum = _.get(res, 'data.result.value.sequence');
-  if (!(accNum || seqNum)) {
-    throw new Error(
-      'account number or sequence number from rest server are undefined'
-    );
+  let signMetaData
+  if ((typeof accNum === 'undefined' || typeof seqNum === 'undefined')) {
+    signMetaData = {
+      account_number: '0',
+      sequence: '0',
+    };
   }
 
-  const signMetaData = {
+  signMetaData = {
     account_number: accNum,
     sequence: seqNum,
   };
