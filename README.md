@@ -124,9 +124,9 @@ Users create outgoing swaps on Kava by entering the deputy's Kava address in the
 const utils = kava.utils;
 
 // Declare addresses involved in the swap
-const recipient = "kava1tfvn5t8qwngqd2q427za2mel48pcus3z9u73fl"; // deputy's address on kava
-const recipientOtherChain = "kava1c84ezutjcgrsxarjq5mzsxxz2k9znn94zxmqjz"; // user's address on bnbchain
-const senderOtherChain = "tbnb1mdvtph9y0agm4nx7dcl86t7nuvt5mtcul8zld6"; // deputy's address on bnbchain
+const recipient = "kava1tfvn5t8qwngqd2q427za2mel48pcus3z9u73fl"; // deputy's address on kava testnet
+const recipientOtherChain = "tbnb1hc0gvpxgw78ky9ay6xfql8jw9lry9ftc5g7ddj"; // user's address on bnbchain testnet
+const senderOtherChain = "tbnb1mdvtph9y0agm4nx7dcl86t7nuvt5mtcul8zld6"; // deputy's address on bnbchain testnet
 
 // Set up swap parameters
 const amount = 1000000;
