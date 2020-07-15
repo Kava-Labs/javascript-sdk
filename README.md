@@ -103,7 +103,7 @@ console.log('\nTx result:', txRes);
 
 ### Transferring funds to Kava
 
-Kava supports for secure transfers of BNB from Binance Chain to Kava and back via atomic swaps. The [bep3-deputy](https://github.com/binance-chain/bep3-deputy) process sits between the two blockchains and services swaps by relaying information back and forth.
+Kava supports secure transfers of BNB from Binance Chain to Kava and back via atomic swaps. The [bep3-deputy](https://github.com/binance-chain/bep3-deputy) process sits between the two blockchains and services swaps by relaying information back and forth.
 
 Swaps use a simple secret sharing scheme. A secret random number is generated on the client and hashed with a timestamp in order to create a random number hash that's stored with the swap. The swap can be securely claimed on the opposite chain using the secret random number. Swaps expire after n blocks, a duration that can be modified via the height span parameter. Once expired, the swap can be refunded.
 
