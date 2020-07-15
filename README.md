@@ -96,7 +96,7 @@ const collateral = Kava.utils.formatCoin(collateralAmount, "bnb");
 const txHashCDP = await client.createCDP(principal, collateral);
 console.log("Create CDP tx hash (Kava): ".concat(txHashCDP));
 
-// Check the claim tx hash
+// Check the tx hash
 const txRes = await client.checkTxHash(txHashCDP, 15000);
 console.log('\nTx result:', txRes);
 ```
