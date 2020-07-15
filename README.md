@@ -111,7 +111,7 @@ BEP3 transfer user steps
 1. Create an atomic swap on Binance Chain (note: atomic swaps are called HTLTs on Binance Chain)
 The deputy will automatically relay the swap from Kava to Binance Chain
 2a. Claim the atomic swap on Kava within swap's height span
-2b. Refund the atomic swap on Kava after the swap's height span
+2b. Refund the atomic swap on Kava after the swap's height span - this happens if the swap is not claimed in time. 
 
 ### Create swap
 
