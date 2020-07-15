@@ -8,8 +8,9 @@ const USDX_CONVERSION_FACTOR = 10 ** 6;
 
 var main = async () => {
     // Start new Kava client
-    kavaClient = new KavaClient(Env.KavaEndpoints.Testnet6000);
-    kavaClient.setWallet(Env.KavaAccount.Testnet6000.Mnemonic);
+    kavaClient = new KavaClient(Env.KavaEndpoints.Testnet);
+    kavaClient.setWallet(Env.KavaAccount.Testnet.Mnemonic);
+    kavaClient.setBroadcastMode("async");
     await kavaClient.initChain();
 
     // Get minimum principal amount required for CDP creation
@@ -24,7 +25,8 @@ var main = async () => {
     const bnbValuation = await kavaClient.getPrice("bnb:usd");
     const equivalentCollateral =
     Number(principalAmount) / Number(bnbValuation.price);
-    // Minimum collateralization ratio is 200%, we'll do 210%
+
+    // Assuming the collateralization ratio is 200%, we'll do 210%
     const rawRequiredAmount = equivalentCollateral * 2.1;
     const adjustedAmount =
     (rawRequiredAmount / USDX_CONVERSION_FACTOR) * BNB_CONVERSION_FACTOR;

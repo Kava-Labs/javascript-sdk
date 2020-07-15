@@ -3,33 +3,35 @@ const KavaAccount = {
         Address: "",
         Mnemonic: ""   
     },
-    Testnet5000: {
-        Address: "kava1g0qywkx6mt5jmvefv6hs7c7h333qas5ks63a6t",
-        Mnemonic: "lecture draw addict sea prefer erupt army someone album liquid sadness manual fence vintage obey shrimp figure retreat kick refuse verify alien east brand",  
+    Testnet: {
+        Address: "",
+        Mnemonic: "",  
     },
-    Testnet6000: {
-        Address: "kava1g0qywkx6mt5jmvefv6hs7c7h333qas5ks63a6t",
-        Mnemonic: "lecture draw addict sea prefer erupt army someone album liquid sadness manual fence vintage obey shrimp figure retreat kick refuse verify alien east brand",  
+    Mainnet: {
+        Address: "",
+        Mnemonic: "",  
     }
 }
 
 const KavaEndpoints = {
     Local: "http://localhost:1317",
-    Testnet5000: "http://kava-testnet-5000.kava.io:1317",
-    Testnet6000: "http://54.88.243.146:1317",
-    Mainnet: "",
+    Testnet: "https://kava-testnet-8000.kava.io",
+    Mainnet: "https://kava3.data.kava.io",
 }
 
 const KavaDeputy = {
-    Local: "",
-    Testnet5000: "kava1aphsdnz5hu2t5ty2au6znprug5kx3zpy6zwq29",
-    Testnet6000: "kava1tfvn5t8qwngqd2q427za2mel48pcus3z9u73fl",
+    Testnet: "kava1tfvn5t8qwngqd2q427za2mel48pcus3z9u73fl",
+    Mainnet: "kava1r4v2zdhdalfj2ydazallqvrus9fkphmglhn6u6",
 }
 
 const BinanceAccount = {
     Testnet: {
-        Address: "tbnb17vwyu8npjj5pywh3keq2lm7d4v76n434pwd8av",
-        Mnemonic: "lawsuit margin siege phrase fabric matrix like picnic day thrive correct velvet stool type broom upon flee fee ten senior install wrestle soap sick",
+        Address: "",
+        Mnemonic: "",
+    },
+    Mainnet: {
+        Address: "",
+        Mnemonic: ""
     }
 }
 
@@ -39,8 +41,8 @@ const BinanceEndpoints = {
 }
 
 const BinanceDeputy = {
-    TestnetLegacy: "tbnb1et8vmd0dgvswjnyaf73ez8ye0jehc8a7t7fljv",
-    Testnet: "tbnb10uypsspvl6jlxcx5xse02pag39l8xpe7a3468h",
+    Testnet: "tbnb1et8vmd0dgvswjnyaf73ez8ye0jehc8a7t7fljv",
+    Mainnet: "bnb1jh7uv2rm6339yue8k4mj9406k3509kr4wt5nxn"
 }
 
 module.exports.env = {
