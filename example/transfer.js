@@ -1,4 +1,3 @@
-const _ = require("lodash");
 const Env = require("./static/env").env
 const kavaUtils = require("../src/utils").utils;
 const KavaClient = require("../src/client").KavaClient;
@@ -7,9 +6,9 @@ var main = async () => {
     const recipient = "kava1g0qywkx6mt5jmvefv6hs7c7h333qas5ks63a6t";
 
     // Start new Kava client
-    kavaClient = new KavaClient(Env.KavaEndpoints.Testnet6000);
-    kavaClient.setWallet(Env.KavaAccount.Testnet6000.Mnemonic);
-    kavaClient.setBroadcastMode("async"); // Default broadcast mode is 'sync'
+    kavaClient = new KavaClient(Env.KavaEndpoints.Testnet);
+    kavaClient.setWallet(Env.KavaAccount.Testnet.Mnemonic);
+    kavaClient.setBroadcastMode("async");
     await kavaClient.initChain();
 
     // Load coins and transfer to recipient's address

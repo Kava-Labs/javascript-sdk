@@ -1,4 +1,3 @@
-const _ = require('lodash');
 const Env = require('./static/env').env;
 const kavaUtils = require('../src/utils').utils;
 const KavaClient = require('../src/client').KavaClient;
@@ -13,8 +12,9 @@ var main = async () => {
 
 var incomingSwap = async () => {
   // Start new Kava client
-  kavaClient = new KavaClient(Env.KavaEndpoints.Testnet6000);
-  kavaClient.setWallet(Env.KavaAccount.Testnet6000.Mnemonic);
+  kavaClient = new KavaClient(Env.KavaEndpoints.Testnet);
+  kavaClient.setWallet(Env.KavaAccount.Testnet.Mnemonic);
+  kavaClient.setBroadcastMode("async");
   await kavaClient.initChain();
 
   // Start Binance Chain client
@@ -34,10 +34,10 @@ var incomingSwap = async () => {
   const amount = 1 * BNB_CONVERSION_FACTOR;
 
   // Addresses involved in the swap
-  const sender = Env.BinanceAccount.Testnet.Address; // user's address on Binance Chain
-  const recipient = Env.BinanceDeputy.Testnet; // deputy's address on Binance Chain
-  const senderOtherChain = Env.KavaDeputy.Testnet6000; // deputy's address on Kava
-  const recipientOtherChain = Env.KavaAccount.Testnet6000.Address; // user's address on Kava
+  const sender = Env.BinanceAccount.Testnet.Address // user's address on Binance Chain
+  const recipient = Env.BinanceDeputy.Testnet // deputy's address on Binance Chain
+  const senderOtherChain = Env.KavaDeputy.Testnet // deputy's address on Kava
+  const recipientOtherChain = Env.KavaAccount.Testnet.Address; // user's address on Kava
 
   // Format asset/amount parameters as tokens, expectedIncome
   const tokens = [
@@ -49,10 +49,10 @@ var incomingSwap = async () => {
   const expectedIncome = [String(amount), ':', asset].join('');
 
   // Number of blocks that swap will be active
-  const heightSpan = 10005;
+  const heightSpan = 10001;
 
   // Generate random number hash from timestamp and hex-encoded random number
-  const randomNumber = kavaUtils.generateRandomNumber();
+  let randomNumber = kavaUtils.generateRandomNumber();
   const timestamp = Math.floor(Date.now() / 1000);
   const randomNumberHash = kavaUtils.calculateRandomNumberHash(
     randomNumber,
@@ -91,7 +91,9 @@ var incomingSwap = async () => {
     senderOtherChain,
     sender
   );
-  await kavaClient.getSwap(expectedKavaSwapID, 45000); // 45 seconds
+
+  await sleep(45000); // 45 seconds
+  await kavaClient.getSwap(expectedKavaSwapID);
 
   // -------------------------------------------------------------------------------
   //                           Kava blockchain interaction
@@ -125,8 +127,13 @@ var printSwapIDs = (randomNumberHash, sender, senderOtherChain) => {
     sender
   );
 
-  console.log('Expected Kava swap ID:', originChainSwapID);
-  console.log('Expected Bnbchain swap ID:', destChainSwapID);
+  console.log('Expected Bnbchain swap ID:', originChainSwapID);
+  console.log('Expected Kava swap ID:', destChainSwapID);
 };
+
+// Sleep is a wait function
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 main();
