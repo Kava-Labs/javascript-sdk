@@ -28,7 +28,7 @@ npm install @kava-labs/javascript-sdk
 
 ### Testnet
 
-- Chain ID: testnet-8000
+- Chain ID: kava-testnet-8000
 - REST API endpoint: https://kava-testnet-8000.kava.io
 - BEP3 deputy's Kava address: kava1tfvn5t8qwngqd2q427za2mel48pcus3z9u73fl
 - BEP3 deputy's Binance Chain testnet address: tbnb1mdvtph9y0agm4nx7dcl86t7nuvt5mtcul8zld6
