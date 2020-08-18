@@ -28,7 +28,7 @@ Binance Chain mainnet REST API endpoint: https://dex.binance.org/
 
 ### Testnet
 
-Chain ID: testnet-8000
+Chain ID: kava-testnet-8000
 REST API endpoint: https://kava-testnet-8000.kava.io
 BEP3 deputy's Kava address: kava1tfvn5t8qwngqd2q427za2mel48pcus3z9u73fl
 BEP3 deputy's Binance Chain testnet address: tbnb1mdvtph9y0agm4nx7dcl86t7nuvt5mtcul8zld6
@@ -111,7 +111,7 @@ BEP3 transfer user steps
 1. Create an atomic swap on Binance Chain (note: atomic swaps are called HTLTs on Binance Chain)
 The deputy will automatically relay the swap from Kava to Binance Chain
 2a. Claim the atomic swap on Kava within swap's height span. Users have about 30 minutes to claim a swap after it is created.
-2b. Refund the atomic swap on Kava after the swap's height span - this happens if the swap is not claimed in time. 
+2b. Refund the atomic swap on Kava after the swap's height span - this happens if the swap is not claimed in time.
 
 ### Create swap
 
