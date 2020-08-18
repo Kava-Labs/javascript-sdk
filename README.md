@@ -20,11 +20,11 @@ npm install @kava-labs/javascript-sdk
 
 ### Mainnet
 
-Chain ID: kava-3
-REST API endpoint: https://kava3.data.kava.io
-BEP3 deputy's Kava address: kava1r4v2zdhdalfj2ydazallqvrus9fkphmglhn6u6
-BEP3 deputy's Binance Chain address: bnb1jh7uv2rm6339yue8k4mj9406k3509kr4wt5nxn
-Binance Chain mainnet REST API endpoint: https://dex.binance.org/
+- Chain ID: kava-3
+- REST API endpoint: https://kava3.data.kava.io
+- BEP3 deputy's Kava address: kava1r4v2zdhdalfj2ydazallqvrus9fkphmglhn6u6
+- BEP3 deputy's Binance Chain address: bnb1jh7uv2rm6339yue8k4mj9406k3509kr4wt5nxn
+- Binance Chain mainnet REST API endpoint: https://dex.binance.org/
 
 ### Testnet
 
