@@ -16,9 +16,7 @@ var main = async () => {
     // Get minimum principal amount required for CDP creation
     const paramsCDP = await kavaClient.getParamsCDP();
     const debtParam = _.get(paramsCDP, "debt_param");
-    const principalAmount = Number(
-    debtParam.debt_floor
-    );
+    const principalAmount = Number(debtParam.debt_floor);
     console.log("Minimum principal:", principalAmount + "usdx");
 
     // Calculate collateral required for this principal amount
@@ -38,22 +36,21 @@ var main = async () => {
     account = await kavaClient.getAccount(kavaClient.wallet.address);
     const coins = _.get(account, "value.coins");
     const bnbBalance = coins.find(coin => coin.denom == "bnb").amount;
-    if (bnbBalance < collateralAmount) {
-        throw {
-        message: "Account only has " + adjustedBnbAmount + "bnb"
-        };
+    if ((bnbBalance)* BNB_CONVERSION_FACTOR < collateralAmount) {
+        throw { message: "Account only has " + bnbBalance + "bnb" };
     }
     } catch (err) {
-    console.log("Error:", err.message);
-    return;
+        console.log("Error:", err.message);
+        return;
     }
 
     // Load principal, collateral as formatted coins
     const principal = kavaUtils.formatCoin(principalAmount, "usdx");
     const collateral = kavaUtils.formatCoin(collateralAmount, "bnb");
+    const collateralType = "bnb-a";
 
     // Send create CDP tx using Kava client
-    const txHashCDP = await kavaClient.createCDP(principal, collateral);
+    const txHashCDP = await kavaClient.createCDP(principal, collateral, collateralType);
     console.log("Create CDP tx hash (Kava): ".concat(txHashCDP));
 
     // Check the claim tx hash
