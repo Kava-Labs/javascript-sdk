@@ -1,4 +1,4 @@
-const Env = require("./static/env").env
+const Env = require("./static/env").env;
 const KavaClient = require("../src/client").KavaClient;
 
 var main = async () => {
@@ -9,13 +9,19 @@ var main = async () => {
     await kavaClient.initChain();
 
     // Query all swaps
-    const allSwaps = await kavaClient.getSwaps(timeout);
-    console.log("All swaps:", allSwaps)
+    const allSwaps = await kavaClient.getSwaps();
+    console.log("All swaps:", allSwaps);
 
     // Query only swaps that meet our filter
-    const timeout = 5000;
-    const args = {direction: 'Incoming', status: 'Completed', page: 1, limit: 1000}
-    const filteredSwaps = await kavaClient.getSwaps(timeout, args);
+    const args = {
+        direction: 'Incoming',
+        status: 'Completed',
+        involve: '',
+        expiration: '1273092',
+        page: 1,
+        limit: 1000
+    }
+    const filteredSwaps = await kavaClient.getSwaps(args);
     console.log("Filtered swaps:", filteredSwaps)
 }
 
