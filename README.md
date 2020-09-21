@@ -1,6 +1,6 @@
 # Kava JavaScript SDK
 
-The Kava JavaScript SDK allows browsers and node.js clients to interact with Kava. Code examples are in the `examples` folder.
+The Kava JavaScript SDK allows browsers and node.js clients to interact with Kava. Core functionality and query examples are in the `examples` folder.
 
 - client - client that implements Kava transactions and messages.
 - tx - Kava transaction types.
@@ -88,12 +88,13 @@ const USDX_CONVERSION_FACTOR = 10 ** 6;
 const principalAmount = 10 * USDX_CONVERSION_FACTOR;
 const collateralAmount = 2 * BNB_CONVERSION_FACTOR;
 
-// Load principal, collateral as formatted coins
+// Load principal, collateral as formatted coins and set up collateral type
 const principal = Kava.utils.formatCoin(principalAmount, "usdx");
 const collateral = Kava.utils.formatCoin(collateralAmount, "bnb");
+const collateralType = "bnb-a";
 
 // Send create CDP tx using Kava client
-const txHashCDP = await client.createCDP(principal, collateral);
+const txHashCDP = await client.createCDP(principal, collateral, collateralType);
 console.log("Create CDP tx hash (Kava): ".concat(txHashCDP));
 
 // Check the tx hash
