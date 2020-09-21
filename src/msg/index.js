@@ -48,57 +48,60 @@ function newMsgPostPrice(from, marketID, price, expiry) {
   };
 }
 
-function newMsgCreateCDP(sender, principal, collateral) {
+function newMsgCreateCDP(sender, principal, collateral, collateralType) {
   return {
     type: 'cdp/MsgCreateCDP',
     value: {
       sender: sender,
       principal: principal,
       collateral: collateral,
+      collateral_type: collateralType,
     },
   };
 }
 
-function newMsgDeposit(owner, depositor, collateral) {
+function newMsgDeposit(owner, depositor, collateral, collateralType) {
   return {
     type: 'cdp/MsgDeposit',
     value: {
       owner: owner,
       depositor: depositor,
       collateral: collateral,
+      collateral_type: collateralType,
     },
   };
 }
 
-function newMsgWithdraw(owner, depositor, collateral) {
+function newMsgWithdraw(owner, depositor, collateral, collateralType) {
   return {
     type: 'cdp/MsgWithdraw',
     value: {
       owner: owner,
       depositor: depositor,
       collateral: collateral,
+      collateral_type: collateralType,
     },
   };
 }
 
-function newMsgDrawDebt(sender, cdpDenom, principal) {
+function newMsgDrawDebt(sender, collateralType, principal) {
   return {
     type: 'cdp/MsgDrawDebt',
     value: {
       sender: sender,
-      cdp_denom: cdpDenom,
+      collateral_type: collateralType,
       principal: principal,
     },
   };
 }
 
-function newMsgRepayDebt(sender, payment, cdpDenom) {
+function newMsgRepayDebt(sender, collateralType, payment) {
   return {
     type: 'cdp/MsgRepayDebt',
     value: {
       sender: sender,
+      collateral_type: collateralType,
       payment: payment,
-      cdp_denom: cdpDenom,
     },
   };
 }
@@ -123,8 +126,7 @@ function newMsgCreateAtomicSwap(
   randomNumberHash,
   timestamp,
   amount,
-  heightSpan,
-  crossChain
+  heightSpan
 ) {
   return {
     type: 'bep3/MsgCreateAtomicSwap',
@@ -137,7 +139,6 @@ function newMsgCreateAtomicSwap(
       timestamp: String(timestamp),
       amount: amount,
       height_span: String(heightSpan),
-      cross_chain: crossChain,
     },
   };
 }
