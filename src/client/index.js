@@ -21,7 +21,7 @@ const api = {
   getParamsBEP3: '/bep3/parameters',
   getParamsIncentive: '/incentive/parameters',
   getAccount: '/auth/accounts',
-  // getBalances: '/bank/balances', TODO: Will be supported soon.
+  getBalances: '/bank/balances',
   getSupply: '/supply/total',
   getMarkets: 'pricefeed/markets',
   getOracles: 'pricefeed/oracles',
@@ -275,19 +275,19 @@ class KavaClient {
     }
   }
 
-  // /**  TODO: Will be supported soon.
-  //  * Get an account's balances
-  //  * @param {String} address account to query
-  //  * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
-  //  * @return {Promise}
-  //  */
-  // async getBalances(address, timeout = 2000) {
-  //   const path = api.getBalances + '/' + address;
-  //   const res = await tx.getTx(path, this.baseURI, timeout);
-  //   if (res && res.data) {
-  //     return res.data.result;
-  //   }
-  // }
+  /**
+   * Get an account's balances
+   * @param {String} address account to query
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getBalances(address, timeout = 2000) {
+    const path = api.getBalances + '/' + address;
+    const res = await tx.getTx(path, this.baseURI, timeout);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
 
   /**
    * Get the total supply of coins on the chain

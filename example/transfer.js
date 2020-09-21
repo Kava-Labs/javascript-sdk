@@ -14,10 +14,10 @@ var main = async () => {
     await kavaClient.initChain();
 
     // First let's check our account balances
-    let kavaAccount = await kavaClient.getAccount(Env.KavaAccount.Testnet.Address);
-    console.log("Account balances:", kavaAccount.value.coins);
+    let balances = await kavaClient.getBalances(Env.KavaAccount.Testnet.Address);
+    console.log("Balances:", balances);
     // Print our KAVA balance (if we have one)
-    let kavaBalance = kavaAccount.value.coins.find((item) => item.denom.toUpperCase() === "UKAVA");
+    let kavaBalance = balances.find((item) => item.denom.toUpperCase() === "UKAVA");
     if(kavaBalance) {
         console.log("\tBalance (kava):", kavaBalance.amount / KAVA_CONVERSION_FACTOR);
     }
