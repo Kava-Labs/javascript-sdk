@@ -32,7 +32,8 @@ const api = {
   getAssetSupply: 'bep3/supply',
   getAssetSupplies: 'bep3/supplies',
   getCDP: 'cdp/cdps/cdp',
-  getCDPs: '/cdp/cdps/denom',
+  getCDPs: '/cdp/cdps',
+  getCDPsByCollateralType: '/cdp/cdps/collateralType',
   getCDPsRatio: '/cdp/cdps/ratio',
   getDeposits: '/cdp/cdps/deposits',
   getSavingsRateDistributed: '/cdp/savingsRateDist',
@@ -530,7 +531,7 @@ class KavaClient {
    * @return {Promise}
    */
   async getCDPsByCollateralType(collateralType, timeout = 2000) {
-    const path = api.getCDPs + '/' + collateralType;
+    const path = api.getCDPsByCollateralType + '/' + collateralType;
     const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
       return res.data.result;
@@ -578,8 +579,6 @@ class KavaClient {
       return res.data.result;
     }
   }
-
-  // TODO: adjust gas (might be too low, might be too high)
 
   /**
    * Create a collateralized debt position
