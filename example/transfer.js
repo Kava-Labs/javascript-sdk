@@ -1,6 +1,8 @@
-const Env = require("./static/env").env
+const Env = require("./static/env").env;
 const kavaUtils = require("../src/utils").utils;
 const KavaClient = require("../src/client").KavaClient;
+
+const KAVA_CONVERSION_FACTOR = 10 ** 6;
 
 var main = async () => {
     const recipient = "kava1g0qywkx6mt5jmvefv6hs7c7h333qas5ks63a6t";
@@ -11,14 +13,23 @@ var main = async () => {
     kavaClient.setBroadcastMode("async");
     await kavaClient.initChain();
 
-    // Load coins and transfer to recipient's address
-    const coins = kavaUtils.formatCoins(1, "ukava");
+    // First let's check our account balances
+    let kavaAccount = await kavaClient.getAccount(Env.KavaAccount.Testnet.Address);
+    console.log("Account balances:", kavaAccount.value.coins);
+    // Print our KAVA balance (if we have one)
+    let kavaBalance = kavaAccount.value.coins.find((item) => item.denom.toUpperCase() === "UKAVA");
+    if(kavaBalance) {
+        console.log("\tBalance (kava):", kavaBalance.amount / KAVA_CONVERSION_FACTOR);
+    }
+
+    // Transfer 1 kava to recipient's address
+    const coins = kavaUtils.formatCoins(1 * KAVA_CONVERSION_FACTOR, "ukava");
     const txHash = await kavaClient.transfer(recipient, coins);
     console.log("Tx hash:", txHash);
 
     // Check the resulting tx hash
-    const txRes = await kavaClient.checkTxHash(txHash, 15000) // 15 seconds
+    const txRes = await kavaClient.checkTxHash(txHash, 15000); // 15 seconds
     console.log("Tx result:", txRes);
 }
-  
-main()
+
+main();
