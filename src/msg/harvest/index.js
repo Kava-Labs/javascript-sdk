@@ -20,14 +20,14 @@ function newMsgWithdraw(depositor, amount, depositType) {
   };
 };
 
-function newMsgClaimReward(sender, receiver, depositDenom, rewardMultiplier, depositType) {
+function newMsgClaimReward(sender, receiver, depositDenom, multiplierName, depositType) {
   return {
     type: 'hvt/MsgClaimReward',
     value: {
       sender: sender,
       receiver: receiver,
       deposit_denom: depositDenom,
-      reward_multiplier: rewardMultiplier,
+      multiplier_name: multiplierName,
       deposit_type: depositType,
     },
   };
