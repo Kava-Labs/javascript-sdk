@@ -4,8 +4,8 @@ const msg = require('../../msg').msg;
 const DEFAULT_GAS = 300000;
 
 const api = {
-    getParams: '/harvest/parameters', // "error": "unknown request: unknown harvest query endpoint"
-    getModAccounts: 'harvest/accounts', //
+    getParams: '/harvest/parameters',
+    getModAccounts: 'harvest/accounts',
     getDeposits: 'harvest/deposits',
     getClaims: 'harvest/claims'
   };
