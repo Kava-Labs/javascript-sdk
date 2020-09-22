@@ -15,7 +15,7 @@ const api = {
  * @return {Promise}
  */
 async function getTx(path, base, timeout = 5000, args = {}) {
-  const requestUrl = new URL(path, base).toString()
+  const requestUrl = new URL(path, base).toString();
 
   try {
     return await retry(
