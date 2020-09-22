@@ -22,7 +22,7 @@ var main = async () => {
 
     await sleep(5000); // Wait 5 seconds
 
-    // // Claim harvest rewards
+    // Claim harvest rewards
     const args = {"owner": Env.KavaAccount.Testnet.Address, "deposit_denom": "bnb"};
     const claim = await kavaClient.harvest.getClaims(args);
     if(claim) {
