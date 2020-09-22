@@ -131,8 +131,8 @@ class Harvest {
       this.kavaClient.wallet.address,
       receiver,
       depositDenom,
-      depositType,
-      multiplier
+      multiplier,
+      depositType
     );
     const fee = { amount: [], gas: String(gas) };
     const rawTx = msg.cosmos.newStdTx([msgClaimReward], fee);
