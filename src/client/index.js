@@ -21,6 +21,8 @@ const api = {
   getParamsCDP: '/cdp/parameters',
   getParamsBEP3: '/bep3/parameters',
   getParamsIncentive: '/incentive/parameters',
+  getParamsCommittee: '/committee/parameters',
+  getParamsIssuance: '/issuance/parameters',
   getAccount: '/auth/accounts',
   getBalances: '/bank/balances',
   getSupply: '/supply/total',
@@ -919,6 +921,18 @@ class KavaClient {
    *                    Committee
    ***************************************************/
   /**
+   * Get the params of the committee module
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getParamsCommittee(timeout = 2000) {
+    const res = await tx.getTx(api.getParamsCommittee, this.baseURI, timeout);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
    * Get a committee by ID
    * @param {Number} committeeID unique identifier of the committee to be queried
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
@@ -1054,6 +1068,123 @@ class KavaClient {
     return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
   }
 
+  /***************************************************
+   *                    Issuance
+   ***************************************************/
+  /**
+   * Get the params of the issuance module
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getParamsIssuance(timeout = 2000) {
+    const res = await tx.getTx(api.getParamsIssuance, this.baseURI, timeout);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Issues (mints) coins to a recipient address
+   * @param {String} tokens coins to be issued
+   * @param {String} receiver the recipient of the newly issued coins
+   * @param {Number} gas optional gas amount
+   * @param {String} sequence optional account sequence
+   * @return {Promise}
+   */
+  async issueTokens(tokens, receiver, gas = DEFAULT_GAS, sequence = null) {
+    const msgIssueTokens = msg.kava.newMsgIssueTokens(
+      this.wallet.address,
+      tokens,
+      receiver
+    );
+    const fee = { amount: [], gas: String(gas) };
+    const rawTx = msg.cosmos.newStdTx([msgIssueTokens], fee);
+    const signInfo = await this.prepareSignInfo(sequence);
+    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
+    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+  }
+
+  /**
+   * Redeems tokens
+   * @param {String} tokens coins to be redeemed
+   * @param {Number} gas optional gas amount
+   * @param {String} sequence optional account sequence
+   * @return {Promise}
+   */
+  async redeemTokens(tokens, gas = DEFAULT_GAS, sequence = null) {
+    const msgRedeemTokens = msg.kava.newMsgRedeemTokens(
+      this.wallet.address,
+      tokens
+    );
+    const fee = { amount: [], gas: String(gas) };
+    const rawTx = msg.cosmos.newStdTx([msgRedeemTokens], fee);
+    const signInfo = await this.prepareSignInfo(sequence);
+    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
+    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+  }
+
+  /**
+   * Blocks an address from interacting with a specific token denom
+   * @param {String} denom the asset denom the address will be blocked from using
+   * @param {String} blockedAddress the address to be blocked
+   * @param {Number} gas optional gas amount
+   * @param {String} sequence optional account sequence
+   * @return {Promise}
+   */
+  async blockAddress(denom, blockedAddress, gas = DEFAULT_GAS, sequence = null) {
+    const msgBlockAddress = msg.kava.newMsgBlockAddress(
+      this.wallet.address,
+      denom,
+      blockedAddress
+    );
+    const fee = { amount: [], gas: String(gas) };
+    const rawTx = msg.cosmos.newStdTx([msgBlockAddress], fee);
+    const signInfo = await this.prepareSignInfo(sequence);
+    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
+    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+  }
+
+  /**
+   * Unblocks an address that's blocked from interacting with a specific token denom
+   * @param {String} denom the asset denom the address will be unblocked from using
+   * @param {String} address the address to be unblocked
+   * @param {Number} gas optional gas amount
+   * @param {String} sequence optional account sequence
+   * @return {Promise}
+   */
+  async unblockAddress(denom, blockedAddress, gas = DEFAULT_GAS, sequence = null) {
+    const msgUnblockAddress = msg.kava.newMsgUnblockAddress(
+      this.wallet.address,
+      denom,
+      blockedAddress
+    );
+    const fee = { amount: [], gas: String(gas) };
+    const rawTx = msg.cosmos.newStdTx([msgUnblockAddress], fee);
+    const signInfo = await this.prepareSignInfo(sequence);
+    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
+    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+  }
+
+  /**
+   * Updates the paused/unpaused status for a specific token denom
+   * @param {String} denom the asset denom whose status will be updated
+   * @param {String} status bool representing the token's new active/inactive status
+   * @param {Number} gas optional gas amount
+   * @param {String} sequence optional account sequence
+   * @return {Promise}
+   */
+  async setPauseStatus(denom, status, gas = DEFAULT_GAS, sequence = null) {
+    const msgSetPauseStatus = msg.kava.newMsgSetPauseStatus(
+      this.wallet.address,
+      denom,
+      status
+    );
+    const fee = { amount: [], gas: String(gas) };
+    const rawTx = msg.cosmos.newStdTx([msgSetPauseStatus], fee);
+    const signInfo = await this.prepareSignInfo(sequence);
+    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
+    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+  }
 }
 
 module.exports.KavaClient = KavaClient;

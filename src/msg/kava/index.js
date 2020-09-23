@@ -183,6 +183,64 @@ function newMsgVote(proposalID, voter) {
   };
 }
 
+/***************************************************
+ *                   Issuance
+ ***************************************************/
+
+function newMsgIssueTokens(sender, tokens, receiver) {
+  return {
+    type: 'issuance/MsgIssueTokens',
+    value: {
+      sender: sender,
+      tokens: tokens,
+      receiver: receiver,
+    },
+  };
+}
+
+function newMsgRedeemTokens(sender, tokens) {
+  return {
+    type: 'issuance/MsgRedeemTokens',
+    value: {
+      sender: sender,
+      tokens: tokens,
+    },
+  };
+}
+
+function newMsgBlockAddress(sender, denom, blockedAddress) {
+  return {
+    type: 'issuance/MsgBlockAddress',
+    value: {
+      sender: sender,
+      denom: denom,
+      blocked_address: blockedAddress,
+    },
+  };
+}
+
+function newMsgUnblockAddress(sender, denom, address) {
+  return {
+    type: 'issuance/MsgUnblockAddress',
+    value: {
+      sender: sender,
+      denom: denom,
+      address: address,
+    },
+  };
+}
+
+function newMsgSetPauseStatus(sender, denom, status) {
+  return {
+    type: 'issuance/MsgChangePauseStatus',
+    value: {
+      sender: sender,
+      denom: denom,
+      status: status,
+    },
+  };
+}
+
 module.exports.kava = {
   newMsgPostPrice,
   newMsgCreateCDP,
@@ -197,4 +255,9 @@ module.exports.kava = {
   newMsgClaimReward,
   newMsgSubmitProposal,
   newMsgVote,
+  newMsgIssueTokens,
+  newMsgRedeemTokens,
+  newMsgBlockAddress,
+  newMsgUnblockAddress,
+  newMsgSetPauseStatus
 };
