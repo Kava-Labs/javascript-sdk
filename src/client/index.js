@@ -176,6 +176,20 @@ class KavaClient {
     return signInfo;
   }
 
+  /**
+   * Sends messages to the Kava blockchain
+   * @param {Array} msgs an array of msgs to be sent
+   * @param {Object} fee the transaction's fee that includes gas amount
+   * @param {String} sequence account sequence
+   * @return {Promise}
+   */
+  async sendTx(msgs, fee, sequence) {
+    const rawTx = msg.cosmos.newStdTx(msgs, fee);
+    const signInfo = await this.prepareSignInfo(sequence);
+    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
+    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+  }
+
   /***************************************************
    *                   Tendermint
    ***************************************************/
@@ -323,15 +337,14 @@ class KavaClient {
    * Sends coins to an address
    * @param {String} recipient address that will receive coins
    * @param {String} coins amount of coins to send
+   * @param {Number} gas optional gas amount
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async transfer(recipient, coins, sequence = null) {
+  async transfer(recipient, coins, gas = DEFAULT_GAS, sequence = null) {
+    const fee = { amount: [], gas: String(gas) };
     const msgSend = msg.cosmos.newMsgSend(this.wallet.address, recipient, coins);
-    const rawTx = msg.cosmos.newStdTx([msgSend]);
-    const signInfo = await this.prepareSignInfo(sequence);
-    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+    return await this.sendTx([msgSend], fee, sequence);
   }
 
   /***************************************************
@@ -408,20 +421,19 @@ class KavaClient {
    * @param {String} marketID the asset's on chain market ID, such as 'btc:usd'
    * @param {String} price the asset's price
    * @param {String} expiry time duration that this price is valid for
+   * @param {Number} gas optional gas amount
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async postPrice(marketID, price, expiry, sequence = null) {
+  async postPrice(marketID, price, expiry, gas = DEFAULT_GAS, sequence = null) {
+    const fee = { amount: [], gas: String(gas) };
     const msgPostPrice = msg.kava.newMsgPostPrice(
       this.wallet.address,
       marketID,
       price,
       expiry
     );
-    const rawTx = msg.cosmos.newStdTx([msgPostPrice]);
-    const signInfo = await this.prepareSignInfo(sequence);
-    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+    return await this.sendTx([msgPostPrice], fee, sequence);
   }
 
   /***************************************************
@@ -470,19 +482,18 @@ class KavaClient {
    * Place a bid on an auction
    * @param {String} auctionID the unique ID of the auction
    * @param {String} amount the coins amount to bid
+   * @param {Number} gas optional gas amount
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async placeBid(auctionID, amount, sequence = null) {
+  async placeBid(auctionID, amount, gas = DEFAULT_GAS, sequence = null) {
+    const fee = { amount: [], gas: String(gas) };
     const msgPlaceBid = msg.kava.newMsgPlaceBid(
       auctionID,
       this.wallet.address,
       amount
     );
-    const rawTx = msg.cosmos.newStdTx([msgPlaceBid]);
-    const signInfo = await this.prepareSignInfo(sequence);
-    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+    return await this.sendTx([msgPlaceBid], fee, sequence);
   }
 
   /***************************************************
@@ -601,10 +612,7 @@ class KavaClient {
       collateralType
     );
     const fee = { amount: [], gas: String(gas) };
-    const rawTx = msg.cosmos.newStdTx([msgCreateCDP], fee);
-    const signInfo = await this.prepareSignInfo(sequence);
-    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+    return await this.sendTx([msgCreateCDP], fee, sequence);
   }
 
   /**
@@ -624,10 +632,7 @@ class KavaClient {
       collateralType
     );
     const fee = { amount: [], gas: String(gas) };
-    const rawTx = msg.cosmos.newStdTx([msgDeposit], fee);
-    const signInfo = await this.prepareSignInfo(sequence);
-    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+    return await this.sendTx([msgDeposit], fee, sequence);
   }
 
   /**
@@ -647,10 +652,7 @@ class KavaClient {
       collateralType
     );
     const fee = { amount: [], gas: String(gas) };
-    const rawTx = msg.cosmos.newStdTx([msgWithdraw], fee);
-    const signInfo = await this.prepareSignInfo(sequence);
-    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+    return await this.sendTx([msgWithdraw], fee, sequence);
   }
 
   /**
@@ -668,10 +670,7 @@ class KavaClient {
       principal
     );
     const fee = { amount: [], gas: String(gas) };
-    const rawTx = msg.cosmos.newStdTx([msgDrawDebt], fee);
-    const signInfo = await this.prepareSignInfo(sequence);
-    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+    return await this.sendTx([msgDrawDebt], fee, sequence);
   }
 
   /**
@@ -689,10 +688,7 @@ class KavaClient {
       payment
     );
     const fee = { amount: [], gas: String(gas) };
-    const rawTx = msg.cosmos.newStdTx([msgRepayDebt], fee);
-    const signInfo = await this.prepareSignInfo(sequence);
-    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+    return await this.sendTx([msgRepayDebt], fee, sequence);
   }
 
   /***************************************************
@@ -798,10 +794,7 @@ class KavaClient {
       heightSpan
     );
     const fee = { amount: [], gas: String(gas) };
-    const rawTx = msg.cosmos.newStdTx([msgCreateAtomicSwap], fee);
-    const signInfo = await this.prepareSignInfo(sequence);
-    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+    return await this.sendTx([msgCreateAtomicSwap], fee, sequence);
   }
 
   /**
@@ -819,10 +812,7 @@ class KavaClient {
       randomNumber.toUpperCase()
     );
     const fee = { amount: [], gas: String(gas) };
-    const rawTx = msg.cosmos.newStdTx([msgClaimAtomicSwap], fee);
-    const signInfo = await this.prepareSignInfo(sequence);
-    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+    return await this.sendTx([msgClaimAtomicSwap], fee, sequence);
   }
 
   /**
@@ -838,10 +828,7 @@ class KavaClient {
       swapID.toUpperCase()
     );
     const fee = { amount: [], gas: String(gas) };
-    const rawTx = msg.cosmos.newStdTx([msgRefundAtomicSwap], fee);
-    const signInfo = await this.prepareSignInfo(sequence);
-    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+    return await this.sendTx([msgRefundAtomicSwap], fee, sequence);
   }
 
   /***************************************************
@@ -911,10 +898,7 @@ class KavaClient {
       denom
     );
     const fee = { amount: [], gas: String(gas) };
-    const rawTx = msg.cosmos.newStdTx([msgClaimReward], fee);
-    const signInfo = await this.prepareSignInfo(sequence);
-    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+    return await this.sendTx([msgClaimReward], fee, sequence);
   }
 
  /***************************************************
@@ -1043,10 +1027,7 @@ class KavaClient {
       committeeID
     );
     const fee = { amount: [], gas: String(gas) };
-    const rawTx = msg.cosmos.newStdTx([msgSubmitProposal], fee);
-    const signInfo = await this.prepareSignInfo(sequence);
-    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+    return await this.sendTx([msgSubmitProposal], fee, sequence);
   }
 
   /**
@@ -1062,10 +1043,7 @@ class KavaClient {
       this.wallet.address
     );
     const fee = { amount: [], gas: String(gas) };
-    const rawTx = msg.cosmos.newStdTx([msgVote], fee);
-    const signInfo = await this.prepareSignInfo(sequence);
-    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+    return await this.sendTx([msgVote], fee, sequence);
   }
 
   /***************************************************
@@ -1098,10 +1076,7 @@ class KavaClient {
       receiver
     );
     const fee = { amount: [], gas: String(gas) };
-    const rawTx = msg.cosmos.newStdTx([msgIssueTokens], fee);
-    const signInfo = await this.prepareSignInfo(sequence);
-    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+    return await this.sendTx([msgIssueTokens], fee, sequence);
   }
 
   /**
@@ -1117,10 +1092,7 @@ class KavaClient {
       tokens
     );
     const fee = { amount: [], gas: String(gas) };
-    const rawTx = msg.cosmos.newStdTx([msgRedeemTokens], fee);
-    const signInfo = await this.prepareSignInfo(sequence);
-    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+    return await this.sendTx([msgRedeemTokens], fee, sequence);
   }
 
   /**
@@ -1138,10 +1110,7 @@ class KavaClient {
       blockedAddress
     );
     const fee = { amount: [], gas: String(gas) };
-    const rawTx = msg.cosmos.newStdTx([msgBlockAddress], fee);
-    const signInfo = await this.prepareSignInfo(sequence);
-    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+    return await this.sendTx([msgBlockAddress], fee, sequence);
   }
 
   /**
@@ -1159,10 +1128,7 @@ class KavaClient {
       blockedAddress
     );
     const fee = { amount: [], gas: String(gas) };
-    const rawTx = msg.cosmos.newStdTx([msgUnblockAddress], fee);
-    const signInfo = await this.prepareSignInfo(sequence);
-    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+    return await this.sendTx([msgUnblockAddress], fee, sequence);
   }
 
   /**
@@ -1180,10 +1146,7 @@ class KavaClient {
       status
     );
     const fee = { amount: [], gas: String(gas) };
-    const rawTx = msg.cosmos.newStdTx([msgSetPauseStatus], fee);
-    const signInfo = await this.prepareSignInfo(sequence);
-    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+    return await this.sendTx([msgSetPauseStatus], fee, sequence);
   }
 }
 

@@ -89,10 +89,7 @@ class Harvest {
       depositType,
     );
     const fee = { amount: [], gas: String(gas) };
-    const rawTx = msg.cosmos.newStdTx([msgDeposit], fee);
-    const signInfo = await this.kavaClient.prepareSignInfo(sequence);
-    const signedTx = tx.signTx(rawTx, signInfo, this.kavaClient.wallet);
-    return await tx.broadcastTx(signedTx, this.kavaClient.baseURI, this.kavaClient.broadcastMode);
+    return await this.kavaClient.sendTx([msgDeposit], fee, sequence);
   }
 
   /**
@@ -110,10 +107,7 @@ class Harvest {
       depositType,
     );
     const fee = { amount: [], gas: String(gas) };
-    const rawTx = msg.cosmos.newStdTx([msgWithdraw], fee);
-    const signInfo = await this.kavaClient.prepareSignInfo(sequence);
-    const signedTx = tx.signTx(rawTx, signInfo, this.kavaClient.wallet);
-    return await tx.broadcastTx(signedTx, this.kavaClient.baseURI, this.kavaClient.broadcastMode);
+    return await this.kavaClient.sendTx([msgWithdraw], fee, sequence);
   }
 
   /**
@@ -135,10 +129,7 @@ class Harvest {
       depositType
     );
     const fee = { amount: [], gas: String(gas) };
-    const rawTx = msg.cosmos.newStdTx([msgClaimReward], fee);
-    const signInfo = await this.kavaClient.prepareSignInfo(sequence);
-    const signedTx = tx.signTx(rawTx, signInfo, this.kavaClient.wallet);
-    return await tx.broadcastTx(signedTx, this.kavaClient.baseURI, this.kavaClient.broadcastMode);
+    return await this.kavaClient.sendTx([msgClaimReward], fee, sequence);
   }
 }
 
