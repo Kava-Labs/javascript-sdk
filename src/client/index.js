@@ -2,10 +2,12 @@ const sig = require('@kava-labs/sig');
 const _ = require('lodash');
 const tx = require('../tx').tx;
 const msg = require('../msg').msg;
+const Harvest = require('./harvest').Harvest;
 
 const KAVA_PREFIX = 'kava';
 const DERIVATION_PATH = "m/44'/459'/0'/0/0";
 const DERIVATION_PATH_LEGACY = "m/44'/118'/0'/0/0";
+const DEFAULT_GAS = 300000;
 
 const api = {
   txs: '/txs',
@@ -19,8 +21,10 @@ const api = {
   getParamsCDP: '/cdp/parameters',
   getParamsBEP3: '/bep3/parameters',
   getParamsIncentive: '/incentive/parameters',
+  getParamsCommittee: '/committee/parameters',
+  getParamsIssuance: '/issuance/parameters',
   getAccount: '/auth/accounts',
-  // getBalances: '/bank/balances', TODO: Will be supported soon.
+  getBalances: '/bank/balances',
   getSupply: '/supply/total',
   getMarkets: 'pricefeed/markets',
   getOracles: 'pricefeed/oracles',
@@ -31,9 +35,11 @@ const api = {
   getAssetSupply: 'bep3/supply',
   getAssetSupplies: 'bep3/supplies',
   getCDP: 'cdp/cdps/cdp',
-  getCDPs: '/cdp/cdps/denom',
+  getCDPs: '/cdp/cdps',
+  getCDPsByCollateralType: '/cdp/cdps/collateralType',
   getCDPsRatio: '/cdp/cdps/ratio',
   getDeposits: '/cdp/cdps/deposits',
+  getSavingsRateDistributed: '/cdp/savingsRateDist',
   getAuction: '/auction/auctions',
   getAuctions: '/auction/auctions',
   getClaims: '/incentive/claims',
@@ -57,6 +63,7 @@ class KavaClient {
     }
     this.baseURI = server;
     this.broadcastMode = 'sync'; // default broadcast mode
+    this.harvest = new Harvest(this);
   }
 
   /**
@@ -169,6 +176,20 @@ class KavaClient {
     return signInfo;
   }
 
+  /**
+   * Sends messages to the Kava blockchain
+   * @param {Array} msgs an array of msgs to be sent
+   * @param {Object} fee the transaction's fee that includes gas amount
+   * @param {String} sequence account sequence
+   * @return {Promise}
+   */
+  async sendTx(msgs, fee, sequence) {
+    const rawTx = msg.cosmos.newStdTx(msgs, fee);
+    const signInfo = await this.prepareSignInfo(sequence);
+    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
+    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+  }
+
   /***************************************************
    *                   Tendermint
    ***************************************************/
@@ -251,7 +272,7 @@ class KavaClient {
      } catch (e) {
        console.log("\n" + e)
      }
-    
+
     return res.data;
   }
 
@@ -272,19 +293,19 @@ class KavaClient {
     }
   }
 
-  // /**  TODO: Will be supported soon.
-  //  * Get an account's balances
-  //  * @param {String} address account to query
-  //  * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
-  //  * @return {Promise}
-  //  */
-  // async getBalances(address, timeout = 2000) {
-  //   const path = api.getBalances + '/' + address;
-  //   const res = await tx.getTx(path, this.baseURI, timeout);
-  //   if (res && res.data) {
-  //     return res.data.result;
-  //   }
-  // }
+  /**
+   * Get an account's balances
+   * @param {String} address account to query
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getBalances(address, timeout = 2000) {
+    const path = api.getBalances + '/' + address;
+    const res = await tx.getTx(path, this.baseURI, timeout);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
 
   /**
    * Get the total supply of coins on the chain
@@ -316,15 +337,14 @@ class KavaClient {
    * Sends coins to an address
    * @param {String} recipient address that will receive coins
    * @param {String} coins amount of coins to send
+   * @param {Number} gas optional gas amount
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async transfer(recipient, coins, sequence = null) {
-    const msgSend = msg.newMsgSend(this.wallet.address, recipient, coins);
-    const rawTx = msg.newStdTx([msgSend]);
-    const signInfo = await this.prepareSignInfo(sequence);
-    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+  async transfer(recipient, coins, gas = DEFAULT_GAS, sequence = null) {
+    const fee = { amount: [], gas: String(gas) };
+    const msgSend = msg.cosmos.newMsgSend(this.wallet.address, recipient, coins);
+    return await this.sendTx([msgSend], fee, sequence);
   }
 
   /***************************************************
@@ -401,20 +421,19 @@ class KavaClient {
    * @param {String} marketID the asset's on chain market ID, such as 'btc:usd'
    * @param {String} price the asset's price
    * @param {String} expiry time duration that this price is valid for
+   * @param {Number} gas optional gas amount
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async postPrice(marketID, price, expiry, sequence = null) {
-    const msgPostPrice = msg.newMsgPostPrice(
+  async postPrice(marketID, price, expiry, gas = DEFAULT_GAS, sequence = null) {
+    const fee = { amount: [], gas: String(gas) };
+    const msgPostPrice = msg.kava.newMsgPostPrice(
       this.wallet.address,
       marketID,
       price,
       expiry
     );
-    const rawTx = msg.newStdTx([msgPostPrice]);
-    const signInfo = await this.prepareSignInfo(sequence);
-    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+    return await this.sendTx([msgPostPrice], fee, sequence);
   }
 
   /***************************************************
@@ -448,11 +467,11 @@ class KavaClient {
 
   /**
    * Get auctions, filterable by args.
+   * @param {Object} args request args as JSON. Example: {type: "collateral", denom: "btc", owner: "kava1l0xsq2z7gqd7yly0g40y5836g0appumark77ny"}
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
-   * @param {Object} args request args as JSON. Example: {type: "collateral", denom: "btc"}
    * @return {Promise}
    */
-  async getAuctions(timeout = 2000, args = {}) {
+  async getAuctions(args = {}, timeout = 2000) {
     const res = await tx.getTx(api.getAuctions, this.baseURI, timeout, args);
     if (res && res.data) {
       return res.data.result;
@@ -463,19 +482,18 @@ class KavaClient {
    * Place a bid on an auction
    * @param {String} auctionID the unique ID of the auction
    * @param {String} amount the coins amount to bid
+   * @param {Number} gas optional gas amount
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async placeBid(auctionID, amount, sequence = null) {
-    const msgPlaceBid = msg.newMsgPlaceBid(
+  async placeBid(auctionID, amount, gas = DEFAULT_GAS, sequence = null) {
+    const fee = { amount: [], gas: String(gas) };
+    const msgPlaceBid = msg.kava.newMsgPlaceBid(
       auctionID,
       this.wallet.address,
       amount
     );
-    const rawTx = msg.newStdTx([msgPlaceBid]);
-    const signInfo = await this.prepareSignInfo(sequence);
-    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+    return await this.sendTx([msgPlaceBid], fee, sequence);
   }
 
   /***************************************************
@@ -496,12 +514,12 @@ class KavaClient {
   /**
    * Get CDP if one exists for an owner and asset type
    * @param {String} owner address of the CDP's owner
-   * @param {String} collateralDenom denom of the CDP's collateral asset
+   * @param {String} collateralType type of the CDP's collateral asset
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getCDP(owner, collateralDenom, timeout = 2000) {
-    const path = api.getCDP + '/' + owner + '/' + collateralDenom;
+  async getCDP(owner, collateralType, timeout = 2000) {
+    const path = api.getCDP + '/' + owner + '/' + collateralType;
     const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
       return res.data.result;
@@ -509,13 +527,26 @@ class KavaClient {
   }
 
   /**
-   * Get all CDPs for an asset
-   * @param {String} collateralDenom denom of the CDP's collateral asset
+   * Get all CDPs by filterable args
+   * @param {Object} args request args as JSON. Example: {collateral-type: "btc-a", id: "52", ratio: "2.75", owner: "kava1l0xsq2z7gqd7yly0g40y5836g0appumark77ny"}
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getCDPs(collateralDenom, timeout = 2000) {
-    const path = api.getCDPs + '/' + collateralDenom;
+  async getCDPs(args = {}, timeout = 2000) {
+    const res = await tx.getTx(api.getCDPs, this.baseURI, timeout, args);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Get all CDPs for an asset type
+   * @param {String} collateralType type of the CDP's collateral asset
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getCDPsByCollateralType(collateralType, timeout = 2000) {
+    const path = api.getCDPsByCollateralType + '/' + collateralType;
     const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
       return res.data.result;
@@ -524,13 +555,13 @@ class KavaClient {
 
   /**
    * Get all CDPs for an asset that are under the collateralization ratio specified
-   * @param {String} collateralDenom denom of the CDP's collateral asset
+   * @param {String} collateralType type of the CDP's collateral asset
    * @param {String} ratio upper collateralization ratio limit of the query
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getCDPsByRatio(collateralDenom, ratio, timeout = 2000) {
-    const path = api.getCDPsRatio + '/' + collateralDenom + '/' + ratio;
+  async getCDPsByRatio(collateralType, ratio, timeout = 2000) {
+    const path = api.getCDPsRatio + '/' + collateralType + '/' + ratio;
     const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
       return res.data.result;
@@ -538,15 +569,27 @@ class KavaClient {
   }
 
   /**
-   * Get all deposits for the CDP with the specified owner and collateral asset
+   * Get all deposits for the CDP with the specified owner and collateral type
    * @param {String} owner the address that owns the CDP
-   * @param {String} collateralDenom denom of the CDP's collateral asset
+   * @param {String} collateralType denom of the CDP's collateral asset
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getDeposits(owner, collateralDenom, timeout = 2000) {
-    const path = api.getDeposits + '/' + owner + '/' + collateralDenom;
+  async getDeposits(owner, collateralType, timeout = 2000) {
+    const path = api.getDeposits + '/' + owner + '/' + collateralType;
     const res = await tx.getTx(path, this.baseURI, timeout);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Get the total amount of USDX distributed via the savings rate mechanism
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getSavingsRateDistributed(timeout = 2000) {
+    const res = await tx.getTx(api.getSavingsRateDistributed, this.baseURI, timeout);
     if (res && res.data) {
       return res.data.result;
     }
@@ -556,100 +599,96 @@ class KavaClient {
    * Create a collateralized debt position
    * @param {String} principal the coins that will be drawn as debt
    * @param {String} collateral the coins that will be held as collateral
+   * @param {String} collateralType the CDP's collateral type
+   * @param {Number} gas optional gas amount
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async createCDP(principal, collateral, sequence = null) {
-    const msgCreateCDP = msg.newMsgCreateCDP(
+  async createCDP(principal, collateral, collateralType, gas = DEFAULT_GAS, sequence = null) {
+    const msgCreateCDP = msg.kava.newMsgCreateCDP(
       this.wallet.address,
       principal,
-      collateral
+      collateral,
+      collateralType
     );
-    const fee = { amount: [], gas: '250000' };
-    const rawTx = msg.newStdTx([msgCreateCDP], fee);
-    const signInfo = await this.prepareSignInfo(sequence);
-    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+    const fee = { amount: [], gas: String(gas) };
+    return await this.sendTx([msgCreateCDP], fee, sequence);
   }
 
   /**
    * Deposit collateral into a collateralized debt position
    * @param {String} owner the owner of the CDP
    * @param {String} collateral the coins that will deposited as additional collateral
+   * @param {String} collateralType the CDP's collateral type
+   * @param {Number} gas optional gas amount
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async deposit(owner, collateral, sequence = null) {
-    const msgDeposit = msg.newMsgDeposit(
+  async deposit(owner, collateral, collateralType, gas = DEFAULT_GAS, sequence = null) {
+    const msgDeposit = msg.kava.newMsgDeposit(
       owner,
       this.wallet.address,
-      collateral
+      collateral,
+      collateralType
     );
-    const fee = { amount: [], gas: '250000' };
-    const rawTx = msg.newStdTx([msgDeposit], fee);
-    const signInfo = await this.prepareSignInfo(sequence);
-    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+    const fee = { amount: [], gas: String(gas) };
+    return await this.sendTx([msgDeposit], fee, sequence);
   }
 
   /**
    * Withdraw collateral from a collateralized debt position
    * @param {String} owner the owner of the CDP
    * @param {String} collateral the coins that will withdrawn from existing collateral
+   * @param {String} collateralType the CDP's collateral type
+   * @param {Number} gas optional gas amount
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async withdraw(owner, collateral, sequence = null) {
-    const msgWithdraw = msg.newMsgWithdraw(
+  async withdraw(owner, collateral, collateralType, gas = DEFAULT_GAS, sequence = null) {
+    const msgWithdraw = msg.kava.newMsgWithdraw(
       owner,
       this.wallet.address,
-      collateral
+      collateral,
+      collateralType
     );
-    const fee = { amount: [], gas: '250000' };
-    const rawTx = msg.newStdTx([msgWithdraw], fee);
-    const signInfo = await this.prepareSignInfo(sequence);
-    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+    const fee = { amount: [], gas: String(gas) };
+    return await this.sendTx([msgWithdraw], fee, sequence);
   }
 
   /**
    * Draw additional debt from a collateralized debt position
-   * @param {String} cdpDenom the denom of this CDP's collateral asset
+   * @param {String} collateralType the CDP's collateral type
    * @param {String} principal the coins that will be drawn as additional principal
+   * @param {Number} gas optional gas amount
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async drawDebt(cdpDenom, principal, sequence = null) {
-    const msgDrawDebt = msg.newMsgDrawDebt(
+  async drawDebt(collateralType, principal, gas = DEFAULT_GAS, sequence = null) {
+    const msgDrawDebt = msg.kava.newMsgDrawDebt(
       this.wallet.address,
-      cdpDenom,
+      collateralType,
       principal
     );
-    const fee = { amount: [], gas: '250000' };
-    const rawTx = msg.newStdTx([msgDrawDebt], fee);
-    const signInfo = await this.prepareSignInfo(sequence);
-    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+    const fee = { amount: [], gas: String(gas) };
+    return await this.sendTx([msgDrawDebt], fee, sequence);
   }
 
   /**
    * Repay debt by returning principal to a collateralized debt position
-   * @param {String} cdpDenom the denom of this CDP's collateral asset
+   * @param {String} collateralType the CDP's collateral type
    * @param {String} payment the amount of pricipal to be repaid
+   * @param {Number} gas optional gas amount
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async repayDebt(cdpDenom, payment, sequence = null) {
-    const msgRepayDebt = msg.newMsgRepayDebt(
+  async repayDebt(collateralType, payment, gas = DEFAULT_GAS, sequence = null) {
+    const msgRepayDebt = msg.kava.newMsgRepayDebt(
       this.wallet.address,
-      payment,
-      cdpDenom
+      collateralType,
+      payment
     );
-    const fee = { amount: [], gas: '250000' };
-    const rawTx = msg.newStdTx([msgRepayDebt], fee);
-    const signInfo = await this.prepareSignInfo(sequence);
-    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+    const fee = { amount: [], gas: String(gas) };
+    return await this.sendTx([msgRepayDebt], fee, sequence);
   }
 
   /***************************************************
@@ -687,7 +726,7 @@ class KavaClient {
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getSwaps(timeout = 2000, args = {}) {
+  async getSwaps(args = {}, timeout = 2000) {
     const res = await tx.getTx(api.getSwaps, this.baseURI, timeout, args);
     if (res && res.data) {
       return res.data.result;
@@ -729,6 +768,7 @@ class KavaClient {
    * @param {String} timestamp the timestamp in unix, must be within 15-30 minutes of current time
    * @param {String} amount the amount in coins to be transferred
    * @param {String} heightSpan the number of blocks that this swap will be active/claimable
+   * @param {Number} gas optional gas amount
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
@@ -740,9 +780,10 @@ class KavaClient {
     timestamp,
     amount,
     heightSpan,
+    gas = DEFAULT_GAS,
     sequence = null
   ) {
-    const msgCreateAtomicSwap = msg.newMsgCreateAtomicSwap(
+    const msgCreateAtomicSwap = msg.kava.newMsgCreateAtomicSwap(
       this.wallet.address,
       recipient,
       recipientOtherChain,
@@ -752,44 +793,42 @@ class KavaClient {
       amount,
       heightSpan
     );
-    const rawTx = msg.newStdTx([msgCreateAtomicSwap]);
-    const signInfo = await this.prepareSignInfo(sequence);
-    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+    const fee = { amount: [], gas: String(gas) };
+    return await this.sendTx([msgCreateAtomicSwap], fee, sequence);
   }
 
   /**
    * Claim an atomic swap
    * @param {String} swapID the swap's unique identifier
    * @param {String} randomNumber the secret random number used to generate this swap's random number hash
+   * @param {Number} gas optional gas amount
+   * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async claimSwap(swapID, randomNumber, sequence = null) {
-    const msgClaimAtomicSwap = msg.newMsgClaimAtomicSwap(
+  async claimSwap(swapID, randomNumber, gas = DEFAULT_GAS, sequence = null) {
+    const msgClaimAtomicSwap = msg.kava.newMsgClaimAtomicSwap(
       this.wallet.address,
       swapID.toUpperCase(),
       randomNumber.toUpperCase()
     );
-    const rawTx = msg.newStdTx([msgClaimAtomicSwap]);
-    const signInfo = await this.prepareSignInfo(sequence);
-    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+    const fee = { amount: [], gas: String(gas) };
+    return await this.sendTx([msgClaimAtomicSwap], fee, sequence);
   }
 
   /**
    * Refund an atomic swap
    * @param {String} swapID the swap's unique identifier
+   * @param {Number} gas optional gas amount
+   * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async refundSwap(swapID, sequence = null) {
-    const msgRefundAtomicSwap = msg.newMsgRefundAtomicSwap(
+  async refundSwap(swapID, gas = DEFAULT_GAS, sequence = null) {
+    const msgRefundAtomicSwap = msg.kava.newMsgRefundAtomicSwap(
       this.wallet.address,
       swapID.toUpperCase()
     );
-    const rawTx = msg.newStdTx([msgRefundAtomicSwap]);
-    const signInfo = await this.prepareSignInfo(sequence);
-    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+    const fee = { amount: [], gas: String(gas) };
+    return await this.sendTx([msgRefundAtomicSwap], fee, sequence);
   }
 
   /***************************************************
@@ -808,7 +847,7 @@ class KavaClient {
   }
 
   /**
-   * Get the params of the incentive module
+   * Get the claims of an address for a specific denom
    * @param {String} address the address to be queried
    * @param {String} denom name of the asset to be queried
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
@@ -816,7 +855,7 @@ class KavaClient {
    */
   async getClaims(address, denom, timeout = 2000) {
     const path = api.getClaims + '/' + address + '/' + denom;
-    const res = await tx.getTx(api.getClaims, this.baseURI, timeout);
+    const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
       return res.data.result;
     }
@@ -849,23 +888,34 @@ class KavaClient {
   /**
    * Claim a reward by denom
    * @param {String} denom the name of the asset to be claimed
+   * @param {Number} gas optional gas amount
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async claimReward(denom, sequence = null) {
-    const msgClaimReward = msg.newMsgClaimReward(
+  async claimReward(denom, gas = DEFAULT_GAS, sequence = null) {
+    const msgClaimReward = msg.kava.newMsgClaimReward(
       this.wallet.address,
       denom
     );
-    const rawTx = msg.newStdTx([msgClaimReward]);
-    const signInfo = await this.prepareSignInfo(sequence);
-    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+    const fee = { amount: [], gas: String(gas) };
+    return await this.sendTx([msgClaimReward], fee, sequence);
   }
 
  /***************************************************
    *                    Committee
    ***************************************************/
+  /**
+   * Get the params of the committee module
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getParamsCommittee(timeout = 2000) {
+    const res = await tx.getTx(api.getParamsCommittee, this.baseURI, timeout);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
   /**
    * Get a committee by ID
    * @param {Number} committeeID unique identifier of the committee to be queried
@@ -966,36 +1016,137 @@ class KavaClient {
    * Submit a public proposal by a selected committee (must be a member)
    * @param {String} proposal the proposal to be submitted
    * @param {String} committeeID the unique identifier of the committee
+   * @param {Number} gas optional gas amount
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async submitCommitteeProposal(proposal, committeeID, sequence = null) {
-    const msgSubmitProposal = msg.newMsgSubmitProposal(
+  async submitCommitteeProposal(proposal, committeeID, gas = DEFAULT_GAS, sequence = null) {
+    const msgSubmitProposal = msg.kava.newMsgSubmitProposal(
       proposal,
       this.wallet.address,
       committeeID
     );
-    const rawTx = msg.newStdTx([msgSubmitProposal]);
-    const signInfo = await this.prepareSignInfo(sequence);
-    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+    const fee = { amount: [], gas: String(gas) };
+    return await this.sendTx([msgSubmitProposal], fee, sequence);
   }
 
   /**
    * Vote on a public proposal by ID
    * @param {String} proposalID the unique identifier of the proposal
+   * @param {Number} gas optional gas amount
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async voteOnCommitteeProposal(proposalID, sequence = null) {
-    const msgVote = msg.newMsgVote(
+  async voteOnCommitteeProposal(proposalID,  gas = DEFAULT_GAS, sequence = null) {
+    const msgVote = msg.kava.newMsgVote(
       proposalID,
       this.wallet.address
     );
-    const rawTx = msg.newStdTx([msgVote]);
-    const signInfo = await this.prepareSignInfo(sequence);
-    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+    const fee = { amount: [], gas: String(gas) };
+    return await this.sendTx([msgVote], fee, sequence);
+  }
+
+  /***************************************************
+   *                    Issuance
+   ***************************************************/
+  /**
+   * Get the params of the issuance module
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getParamsIssuance(timeout = 2000) {
+    const res = await tx.getTx(api.getParamsIssuance, this.baseURI, timeout);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Issues (mints) coins to a recipient address
+   * @param {String} tokens coins to be issued
+   * @param {String} receiver the recipient of the newly issued coins
+   * @param {Number} gas optional gas amount
+   * @param {String} sequence optional account sequence
+   * @return {Promise}
+   */
+  async issueTokens(tokens, receiver, gas = DEFAULT_GAS, sequence = null) {
+    const msgIssueTokens = msg.kava.newMsgIssueTokens(
+      this.wallet.address,
+      tokens,
+      receiver
+    );
+    const fee = { amount: [], gas: String(gas) };
+    return await this.sendTx([msgIssueTokens], fee, sequence);
+  }
+
+  /**
+   * Redeems tokens
+   * @param {String} tokens coins to be redeemed
+   * @param {Number} gas optional gas amount
+   * @param {String} sequence optional account sequence
+   * @return {Promise}
+   */
+  async redeemTokens(tokens, gas = DEFAULT_GAS, sequence = null) {
+    const msgRedeemTokens = msg.kava.newMsgRedeemTokens(
+      this.wallet.address,
+      tokens
+    );
+    const fee = { amount: [], gas: String(gas) };
+    return await this.sendTx([msgRedeemTokens], fee, sequence);
+  }
+
+  /**
+   * Blocks an address from interacting with a specific token denom
+   * @param {String} denom the asset denom the address will be blocked from using
+   * @param {String} blockedAddress the address to be blocked
+   * @param {Number} gas optional gas amount
+   * @param {String} sequence optional account sequence
+   * @return {Promise}
+   */
+  async blockAddress(denom, blockedAddress, gas = DEFAULT_GAS, sequence = null) {
+    const msgBlockAddress = msg.kava.newMsgBlockAddress(
+      this.wallet.address,
+      denom,
+      blockedAddress
+    );
+    const fee = { amount: [], gas: String(gas) };
+    return await this.sendTx([msgBlockAddress], fee, sequence);
+  }
+
+  /**
+   * Unblocks an address that's blocked from interacting with a specific token denom
+   * @param {String} denom the asset denom the address will be unblocked from using
+   * @param {String} address the address to be unblocked
+   * @param {Number} gas optional gas amount
+   * @param {String} sequence optional account sequence
+   * @return {Promise}
+   */
+  async unblockAddress(denom, blockedAddress, gas = DEFAULT_GAS, sequence = null) {
+    const msgUnblockAddress = msg.kava.newMsgUnblockAddress(
+      this.wallet.address,
+      denom,
+      blockedAddress
+    );
+    const fee = { amount: [], gas: String(gas) };
+    return await this.sendTx([msgUnblockAddress], fee, sequence);
+  }
+
+  /**
+   * Updates the paused/unpaused status for a specific token denom
+   * @param {String} denom the asset denom whose status will be updated
+   * @param {String} status bool representing the token's new active/inactive status
+   * @param {Number} gas optional gas amount
+   * @param {String} sequence optional account sequence
+   * @return {Promise}
+   */
+  async setPauseStatus(denom, status, gas = DEFAULT_GAS, sequence = null) {
+    const msgSetPauseStatus = msg.kava.newMsgSetPauseStatus(
+      this.wallet.address,
+      denom,
+      status
+    );
+    const fee = { amount: [], gas: String(gas) };
+    return await this.sendTx([msgSetPauseStatus], fee, sequence);
   }
 }
 
