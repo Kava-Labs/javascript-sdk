@@ -1,6 +1,6 @@
 function newMsgDeposit(depositor, amount, depositType) {
   return {
-    type: 'hvt/MsgDeposit',
+    type: 'harvest/MsgDeposit',
     value: {
       depositor: depositor,
       amount: amount,
@@ -11,7 +11,7 @@ function newMsgDeposit(depositor, amount, depositType) {
 
 function newMsgWithdraw(depositor, amount, depositType) {
   return {
-    type: 'hvt/MsgWithdraw',
+    type: 'harvest/MsgWithdraw',
     value: {
       depositor: depositor,
       amount: amount,
@@ -22,7 +22,7 @@ function newMsgWithdraw(depositor, amount, depositType) {
 
 function newMsgClaimReward(sender, receiver, depositDenom, multiplierName, depositType) {
   return {
-    type: 'hvt/MsgClaimReward',
+    type: 'harvest/MsgClaimReward',
     value: {
       sender: sender,
       receiver: receiver,
