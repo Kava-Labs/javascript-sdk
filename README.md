@@ -10,29 +10,46 @@ The Kava JavaScript SDK allows browsers and node.js clients to interact with Kav
 
 ## Installation
 
-Install the package via npm.
+Install the package via npm. The current version compatible with kava-4 mainnet is 3.0.0-beta.2.
 
 ```bash
-npm install @kava-labs/javascript-sdk
+npm install @kava-labs/javascript-sdk@3.0.0-beta.2
 ```
 
 ## Network Information
 
 ### Mainnet
 
-- Chain ID: kava-3
-- REST API endpoint: https://kava3.data.kava.io
+- Chain ID: kava-4
+- REST API endpoint: https://kava4.data.kava.io
 - BEP3 deputy's Kava address: kava1r4v2zdhdalfj2ydazallqvrus9fkphmglhn6u6
 - BEP3 deputy's Binance Chain address: bnb1jh7uv2rm6339yue8k4mj9406k3509kr4wt5nxn
 - Binance Chain mainnet REST API endpoint: https://dex.binance.org/
 
+BEP3 deputies
+1. BNB
+  - Kava address: kava1r4v2zdhdalfj2ydazallqvrus9fkphmglhn6u6
+  - Binance Chain address: bnb1jh7uv2rm6339yue8k4mj9406k3509kr4wt5nxn
+2. BUSD
+  - Kava address: kava1hh4x3a4suu5zyaeauvmv7ypf7w9llwlfufjmuu
+  - Binance Chain address:
+3. BTCB
+  - Kava address: kava14qsmvzprqvhwmgql9fr0u3zv9n2qla8zhnm5pc
+  - Binance Chain address:
+4. XRPB
+  - Kava address: kava1qm2u6nyv7kg6awdm46caccgzn5h7mdkde0sue6
+  - Binance Chain address:
+
 ### Testnet
 
-- Chain ID: kava-testnet-8000
-- REST API endpoint: https://kava-testnet-8000.kava.io
-- BEP3 deputy's Kava address: kava1tfvn5t8qwngqd2q427za2mel48pcus3z9u73fl
-- BEP3 deputy's Binance Chain testnet address: tbnb1mdvtph9y0agm4nx7dcl86t7nuvt5mtcul8zld6
+- Chain ID: kava-4-test
+- REST API endpoint: https://kava-4-testnet.kava.io/
 - Binance Chain testnet REST API endpoint: https://testnet-dex.binance.org/
+
+BEP3 deputies
+1. BNB
+  - Kava address: kava1r4v2zdhdalfj2ydazallqvrus9fkphmglhn6u6
+  - Binance Chain address:
 
 ## Client Setup
 
