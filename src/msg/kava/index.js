@@ -148,12 +148,13 @@ function newMsgRefundAtomicSwap(sender, swapID) {
  *                   Incentive
  ***************************************************/
 
-function newMsgClaimReward(sender, denom) {
+function newMsgClaimReward(sender, collateralType, multiplierName) {
   return {
     type: 'incentive/MsgClaimReward',
     value: {
       sender: sender,
-      denom: denom,
+      collateral_type: collateralType,
+      multiplier_name: multiplierName
     },
   };
 }
