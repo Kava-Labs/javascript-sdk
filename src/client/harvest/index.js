@@ -50,7 +50,7 @@ class Harvest {
 
   /**
    * Get harvest deposits
-   * @param {Object} args optional arguments {deposit_denom: "btc", deposit_type: "btc-a", owner: "kava1l0xsq2z7gqd7yly0g40y5836g0appumark77ny"}
+   * @param {Object} args optional arguments {deposit_denom: "btc", deposit_type: "lp", owner: "kava1l0xsq2z7gqd7yly0g40y5836g0appumark77ny"}
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
@@ -63,7 +63,7 @@ class Harvest {
 
   /**
    * Get harvest deposits
-   * @param {Object} args optional arguments {deposit_denom: "btc", deposit_type: "btc-a", owner: "kava1l0xsq2z7gqd7yly0g40y5836g0appumark77ny"}
+   * @param {Object} args optional arguments {deposit_denom: "btc", deposit_type: "lp", owner: "kava1l0xsq2z7gqd7yly0g40y5836g0appumark77ny"}
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */

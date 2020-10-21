@@ -34,6 +34,7 @@ const api = {
   getSwaps: '/bep3/swaps',
   getAssetSupply: 'bep3/supply',
   getAssetSupplies: 'bep3/supplies',
+  getModAccountsCDP: 'cdp/accounts',
   getCDP: 'cdp/cdps/cdp',
   getCDPs: '/cdp/cdps',
   getCDPsByCollateralType: '/cdp/cdps/collateralType',
@@ -506,6 +507,19 @@ class KavaClient {
    */
   async getParamsCDP(timeout = 2000) {
     const res = await tx.getTx(api.getParamsCDP, this.baseURI, timeout);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Get module accounts associated with the CDP module
+   * @param {Object} args optional arguments {name: "cdp"}
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getModAccountsCDP(args = {}, timeout = 2000) {
+    const res = await tx.getTx(api.getModAccountsCDP, this.baseURI, timeout, args);
     if (res && res.data) {
       return res.data.result;
     }
@@ -1063,7 +1077,7 @@ class KavaClient {
 
   /**
    * Issues (mints) coins to a recipient address
-   * @param {String} tokens coins to be issued
+   * @param {Object} tokens coins to be issued as an sdk.Coin
    * @param {String} receiver the recipient of the newly issued coins
    * @param {Number} gas optional gas amount
    * @param {String} sequence optional account sequence
@@ -1121,11 +1135,11 @@ class KavaClient {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async unblockAddress(denom, blockedAddress, gas = DEFAULT_GAS, sequence = null) {
+  async unblockAddress(denom, address, gas = DEFAULT_GAS, sequence = null) {
     const msgUnblockAddress = msg.kava.newMsgUnblockAddress(
       this.wallet.address,
       denom,
-      blockedAddress
+      address
     );
     const fee = { amount: [], gas: String(gas) };
     return await this.sendTx([msgUnblockAddress], fee, sequence);
