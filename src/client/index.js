@@ -423,10 +423,11 @@ class KavaClient {
    * @param {String} expiry time duration that this price is valid for
    * @param {Number} gas optional gas amount
    * @param {String} sequence optional account sequence
+   * @param {String} feeAmount optional fee amount
    * @return {Promise}
    */
-  async postPrice(marketID, price, expiry, gas = DEFAULT_GAS, sequence = null) {
-    const fee = { amount: [], gas: String(gas) };
+  async postPrice(marketID, price, expiry, gas = DEFAULT_GAS, sequence = null, feeAmount = 50000) {
+    const fee = { amount: String(feeAmount), gas: String(gas) };
     const msgPostPrice = msg.kava.newMsgPostPrice(
       this.wallet.address,
       marketID,
