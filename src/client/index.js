@@ -482,12 +482,13 @@ class KavaClient {
    * Place a bid on an auction
    * @param {String} auctionID the unique ID of the auction
    * @param {String} amount the coins amount to bid
+   * @param {String} amount the coins amount to pay as fees
    * @param {Number} gas optional gas amount
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async placeBid(auctionID, amount, gas = DEFAULT_GAS, sequence = null) {
-    const fee = { amount: [], gas: String(gas) };
+  async placeBid(auctionID, amount, fees = [], gas = DEFAULT_GAS, sequence = null) {
+    const fee = { amount: fees, gas: String(gas) };
     const msgPlaceBid = msg.kava.newMsgPlaceBid(
       auctionID,
       this.wallet.address,
