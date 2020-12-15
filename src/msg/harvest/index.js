@@ -33,8 +33,30 @@ function newMsgClaimReward(sender, receiver, depositDenom, multiplierName, depos
   };
 };
 
+function newMsgBorrow(borrower, amount) {
+  return {
+    type: 'harvest/MsgBorrow',
+    value: {
+      borrower: borrower,
+      amount: amount
+    },
+  };
+};
+
+function newMsgRepay(sender, amount) {
+  return {
+    type: 'harvest/MsgRepay',
+    value: {
+      sender: sender,
+      amount: amount
+    },
+  };
+};
+
 module.exports.harvest = {
   newMsgDeposit,
   newMsgWithdraw,
-  newMsgClaimReward
+  newMsgClaimReward,
+  newMsgBorrow,
+  newMsgRepay
 };
