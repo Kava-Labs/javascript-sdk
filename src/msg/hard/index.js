@@ -1,4 +1,4 @@
-function newMsgDeposit(depositor, amount, depositType) {
+function newMsgDeposit(depositor, amount) {
   return {
     type: 'hard/MsgDeposit',
     value: {
@@ -8,7 +8,7 @@ function newMsgDeposit(depositor, amount, depositType) {
   };
 };
 
-function newMsgWithdraw(depositor, amount, depositType) {
+function newMsgWithdraw(depositor, amount) {
   return {
     type: 'hard/MsgWithdraw',
     value: {
