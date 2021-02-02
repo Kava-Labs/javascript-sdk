@@ -7,7 +7,10 @@ const api = {
     getParams: '/hard/parameters',
     getModAccounts: 'hard/accounts',
     getDeposits: 'hard/deposits',
-    getClaims: 'hard/claims'
+    getTotalDeposited: 'hard/total-deposited',
+    getBorrows: 'hard/borrows',
+    getTotalBorrowed: 'hard/total-borrowed',
+    getClaims: 'hard/claims' // FIXME
   };
 
 class Hard {
@@ -61,8 +64,47 @@ class Hard {
     }
   }
 
+    /**
+   * Get hard total-deposited
+   * @param {Object} args optional arguments {denom: "btc"}
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getTotalDeposited(args = {}, timeout = 2000) {
+    const res = await tx.getTx(api.getTotalDeposited, this.kavaClient.baseURI, timeout, args);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+   /**
+   * Get hard borrows
+   * @param {Object} args optional arguments {owner: "kava1l0xsq2z7gqd7yly0g40y5836g0appumark77ny" denom: "btc" }
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getBorrows(args = {}, timeout = 2000) {
+    const res = await tx.getTx(api.getBorrows, this.kavaClient.baseURI, timeout, args);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
   /**
-   * Get hard deposits
+   * Get hard total-borrowed
+   * @param {Object} args optional arguments {denom: "btc"}
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getTotalBorrowed(args = {}, timeout = 2000) {
+    const res = await tx.getTx(api.getTotalBorrowed, this.kavaClient.baseURI, timeout, args);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Get hard claims
    * @param {Object} args optional arguments {deposit_denom: "btc", deposit_type: "btc-a", owner: "kava1l0xsq2z7gqd7yly0g40y5836g0appumark77ny"}
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
