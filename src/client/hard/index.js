@@ -4,27 +4,27 @@ const msg = require('../../msg').msg;
 const DEFAULT_GAS = 300000;
 
 const api = {
-    getParams: '/harvest/parameters',
-    getModAccounts: 'harvest/accounts',
-    getDeposits: 'harvest/deposits',
-    getClaims: 'harvest/claims'
+    getParams: '/hard/parameters',
+    getModAccounts: 'hard/accounts',
+    getDeposits: 'hard/deposits',
+    getClaims: 'hard/claims'
   };
 
-class Harvest {
+class Hard {
 
   /**
    * @param {Object} kavaClient
    */
   constructor(kavaClient) {
-    if (!Harvest.instance) {
+    if (!Hard.instance) {
       this.kavaClient = kavaClient;
-      Harvest.instance = this;
+      Hard.instance = this;
     }
-    return Harvest.instance;
+    return Hard.instance;
   }
 
   /**
-   * Get the params of the harvest module
+   * Get the params of the hard module
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
@@ -36,8 +36,8 @@ class Harvest {
   }
 
   /**
-   * Get module accounts associated with the harvest module
-   * @param {Object} args optional arguments {name: "harvest"|"harvest_lp_distribution"}
+   * Get module accounts associated with the hard module
+   * @param {Object} args optional arguments {name: "hard"|"hard_lp_distribution"}
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
@@ -49,7 +49,7 @@ class Harvest {
   }
 
   /**
-   * Get harvest deposits
+   * Get hard deposits
    * @param {Object} args optional arguments {deposit_denom: "btc", deposit_type: "btc-a", owner: "kava1l0xsq2z7gqd7yly0g40y5836g0appumark77ny"}
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
@@ -62,7 +62,7 @@ class Harvest {
   }
 
   /**
-   * Get harvest deposits
+   * Get hard deposits
    * @param {Object} args optional arguments {deposit_denom: "btc", deposit_type: "btc-a", owner: "kava1l0xsq2z7gqd7yly0g40y5836g0appumark77ny"}
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
@@ -83,7 +83,7 @@ class Harvest {
    * @return {Promise}
    */
   async deposit(amount, depositType, gas = DEFAULT_GAS, sequence = null) {
-    const msgDeposit = msg.harvest.newMsgDeposit(
+    const msgDeposit = msg.hard.newMsgDeposit(
       this.kavaClient.wallet.address,
       amount,
       depositType,
@@ -101,7 +101,7 @@ class Harvest {
    * @return {Promise}
    */
   async withdraw(amount, depositType, gas = DEFAULT_GAS, sequence = null) {
-    const msgWithdraw = msg.harvest.newMsgWithdraw(
+    const msgWithdraw = msg.hard.newMsgWithdraw(
       this.kavaClient.wallet.address,
       amount,
       depositType,
@@ -121,7 +121,7 @@ class Harvest {
    * @return {Promise}
    */
   async claim(receiver, depositDenom, depositType, multiplier, gas = DEFAULT_GAS, sequence = null) {
-    const msgClaimReward = msg.harvest.newMsgClaimReward(
+    const msgClaimReward = msg.hard.newMsgClaimReward(
       this.kavaClient.wallet.address,
       receiver,
       depositDenom,
@@ -133,4 +133,4 @@ class Harvest {
   }
 }
 
-module.exports.Harvest = Harvest;
+module.exports.Hard = Hard;

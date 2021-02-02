@@ -2,7 +2,7 @@ const sig = require('@kava-labs/sig');
 const _ = require('lodash');
 const tx = require('../tx').tx;
 const msg = require('../msg').msg;
-const Harvest = require('./harvest').Harvest;
+const Hard = require('./hard').Hard;
 
 const KAVA_PREFIX = 'kava';
 const DERIVATION_PATH = "m/44'/459'/0'/0/0";
@@ -63,7 +63,7 @@ class KavaClient {
     }
     this.baseURI = server;
     this.broadcastMode = 'sync'; // default broadcast mode
-    this.harvest = new Harvest(this);
+    this.hard = new Hard(this);
   }
 
   /**
