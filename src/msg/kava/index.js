@@ -128,6 +128,17 @@ function newMsgRepayDebt(sender, collateralType, payment) {
   };
 }
 
+function newMsgLiquidate(keeper, borrower, collateralType) {
+  return {
+    type: 'cdp/MsgLiquidate',
+    value: {
+      keeper: keeper,
+      borrower: borrower,
+      collateral_type: collateralType,
+    },
+  };
+}
+
 /***************************************************
  *                   Committee
  ***************************************************/
@@ -253,7 +264,6 @@ function newMsgPostPrice(from, marketID, price, expiry) {
   };
 }
 
-
 module.exports.kava = {
   newMsgPlaceBid,
   newMsgCreateAtomicSwap,
@@ -264,6 +274,7 @@ module.exports.kava = {
   newMsgWithdraw,
   newMsgDrawDebt,
   newMsgRepayDebt,
+  newMsgLiquidate,
   newMsgSubmitProposal,
   newMsgVote,
   newMsgClaimUSDXMintingReward,

@@ -10,7 +10,6 @@ const api = {
     getTotalDeposited: 'hard/total-deposited',
     getBorrows: 'hard/borrows',
     getTotalBorrowed: 'hard/total-borrowed',
-    getClaims: 'hard/claims' // FIXME
   };
 
 class Hard {
@@ -104,31 +103,16 @@ class Hard {
   }
 
   /**
-   * Get hard claims
-   * @param {Object} args optional arguments {deposit_denom: "btc", deposit_type: "btc-a", owner: "kava1l0xsq2z7gqd7yly0g40y5836g0appumark77ny"}
-   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
-   * @return {Promise}
-   */
-  async getClaims(args = {}, timeout = 2000) {
-    const res = await tx.getTx(api.getClaims, this.kavaClient.baseURI, timeout, args);
-    if (res && res.data) {
-      return res.data.result;
-    }
-  }
-
-  /**
    * Deposit funds to a liquidity pool
    * @param {Object} amount the coins to be deposited
-   * @param {String} depositType type of deposit {"lp" | "stake"}
    * @param {Number} gas optional gas amount
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async deposit(amount, depositType, gas = DEFAULT_GAS, sequence = null) {
+  async deposit(amount, gas = DEFAULT_GAS, sequence = null) {
     const msgDeposit = msg.hard.newMsgDeposit(
       this.kavaClient.wallet.address,
       amount,
-      depositType,
     );
     const fee = { amount: [], gas: String(gas) };
     return await this.kavaClient.sendTx([msgDeposit], fee, sequence);
@@ -137,41 +121,65 @@ class Hard {
   /**
    * Withdraw funds from a liquidity pool
    * @param {Object} amount the coins to be deposited
-   * @param {String} depositType type of deposit {"lp" | "stake"}
    * @param {Number} gas optional gas amount
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async withdraw(amount, depositType, gas = DEFAULT_GAS, sequence = null) {
+  async withdraw(amount, gas = DEFAULT_GAS, sequence = null) {
     const msgWithdraw = msg.hard.newMsgWithdraw(
       this.kavaClient.wallet.address,
       amount,
-      depositType,
     );
     const fee = { amount: [], gas: String(gas) };
     return await this.kavaClient.sendTx([msgWithdraw], fee, sequence);
   }
 
   /**
-   * Claim a reward by denom and type
-   * @param {String} receiver the recipient's Kava address
-   * @param {String} depositDenom the denom of the asset to be claimed
-   * @param {String} depositType type of deposit {"lp" | "stake"}
-   * @param {String} multiplier the multiplier to apply {"high" | "medium" | "low"}
+   * Borrow available funds from a liquidity pool
+   * @param {Object} amount the coins to be deposited
    * @param {Number} gas optional gas amount
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async claim(receiver, depositDenom, depositType, multiplier, gas = DEFAULT_GAS, sequence = null) {
-    const msgClaimReward = msg.hard.newMsgClaimReward(
+  async borrow(amount, gas = DEFAULT_GAS, sequence = null) {
+    const msgBorrow = msg.hard.newMsgBorrow(
       this.kavaClient.wallet.address,
-      receiver,
-      depositDenom,
-      multiplier,
-      depositType
+      amount,
     );
     const fee = { amount: [], gas: String(gas) };
-    return await this.kavaClient.sendTx([msgClaimReward], fee, sequence);
+    return await this.kavaClient.sendTx([msgBorrow], fee, sequence);
+  }
+
+  /**
+   * Repay funds borrowed from a liquidity pool
+   * @param {Object} amount the coins to be deposited
+   * @param {Number} gas optional gas amount
+   * @param {String} sequence optional account sequence
+   * @return {Promise}
+   */
+  async repay(amount, gas = DEFAULT_GAS, sequence = null) {
+    const msgRepay = msg.hard.newMsgRepay(
+      this.kavaClient.wallet.address,
+      amount,
+    );
+    const fee = { amount: [], gas: String(gas) };
+    return await this.kavaClient.sendTx([msgRepay], fee, sequence);
+  }
+
+  /**
+   * Attempt to liquidate a borrower that's over their loan-to-value ratio
+   * @param {String} borrower the borrower to be liquidated
+   * @param {Number} gas optional gas amount
+   * @param {String} sequence optional account sequence
+   * @return {Promise}
+   */
+  async liquidate(borrower, gas = DEFAULT_GAS, sequence = null) {
+    const msgLiquidate = msg.hard.newMsgLiquidate(
+      this.kavaClient.wallet.address,
+      borrower,
+    );
+    const fee = { amount: [], gas: String(gas) };
+    return await this.kavaClient.sendTx([msgLiquidate], fee, sequence);
   }
 }
 
