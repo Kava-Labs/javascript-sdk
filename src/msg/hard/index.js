@@ -28,11 +28,12 @@ function newMsgBorrow(borrower, amount) {
   };
 };
 
-function newMsgRepay(sender, amount) {
+function newMsgRepay(sender, owner, amount) {
   return {
     type: 'hard/MsgRepay',
     value: {
       sender: sender,
+      owner: owner,
       amount: amount
     },
   };
