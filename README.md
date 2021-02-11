@@ -46,7 +46,7 @@ var main = async () => {
   const testnetUrl = "https://kava-testnet-8000.kava.io"; // testnet REST api endpoint
 
   // Declare a new Kava client, set wallet, and initialize
-  let client = new Kava.client(testnetUrl);
+  let client = new Kava.KavaClient(testnetUrl);
   client.setWallet(mnemonic);
   client.setBroadcastMode("async");
   await client.initChain();

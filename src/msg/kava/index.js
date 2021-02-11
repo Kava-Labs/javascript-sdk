@@ -1,82 +1,4 @@
 /***************************************************
- *                   Pricefeed
- ***************************************************/
-
-function newMsgPostPrice(from, marketID, price, expiry) {
-  return {
-    type: 'pricefeed/MsgPostPrice',
-    value: {
-      from: from,
-      market_id: marketID,
-      price: price,
-      expiry: expiry,
-    },
-  };
-}
-
-/***************************************************
- *                       CDP
- ***************************************************/
-
-function newMsgCreateCDP(sender, principal, collateral, collateralType) {
-  return {
-    type: 'cdp/MsgCreateCDP',
-    value: {
-      sender: sender,
-      principal: principal,
-      collateral: collateral,
-      collateral_type: collateralType,
-    },
-  };
-}
-
-function newMsgDeposit(owner, depositor, collateral, collateralType) {
-  return {
-    type: 'cdp/MsgDeposit',
-    value: {
-      owner: owner,
-      depositor: depositor,
-      collateral: collateral,
-      collateral_type: collateralType,
-    },
-  };
-}
-
-function newMsgWithdraw(owner, depositor, collateral, collateralType) {
-  return {
-    type: 'cdp/MsgWithdraw',
-    value: {
-      owner: owner,
-      depositor: depositor,
-      collateral: collateral,
-      collateral_type: collateralType,
-    },
-  };
-}
-
-function newMsgDrawDebt(sender, collateralType, principal) {
-  return {
-    type: 'cdp/MsgDrawDebt',
-    value: {
-      sender: sender,
-      collateral_type: collateralType,
-      principal: principal,
-    },
-  };
-}
-
-function newMsgRepayDebt(sender, collateralType, payment) {
-  return {
-    type: 'cdp/MsgRepayDebt',
-    value: {
-      sender: sender,
-      collateral_type: collateralType,
-      payment: payment,
-    },
-  };
-}
-
-/***************************************************
  *                   Auction
  ***************************************************/
 
@@ -145,16 +67,74 @@ function newMsgRefundAtomicSwap(sender, swapID) {
 }
 
 /***************************************************
- *                   Incentive
+ *                       CDP
  ***************************************************/
 
-function newMsgClaimReward(sender, collateralType, multiplierName) {
+function newMsgCreateCDP(sender, principal, collateral, collateralType) {
   return {
-    type: 'incentive/MsgClaimReward',
+    type: 'cdp/MsgCreateCDP',
+    value: {
+      sender: sender,
+      principal: principal,
+      collateral: collateral,
+      collateral_type: collateralType,
+    },
+  };
+}
+
+function newMsgDeposit(owner, depositor, collateral, collateralType) {
+  return {
+    type: 'cdp/MsgDeposit',
+    value: {
+      owner: owner,
+      depositor: depositor,
+      collateral: collateral,
+      collateral_type: collateralType,
+    },
+  };
+}
+
+function newMsgWithdraw(owner, depositor, collateral, collateralType) {
+  return {
+    type: 'cdp/MsgWithdraw',
+    value: {
+      owner: owner,
+      depositor: depositor,
+      collateral: collateral,
+      collateral_type: collateralType,
+    },
+  };
+}
+
+function newMsgDrawDebt(sender, collateralType, principal) {
+  return {
+    type: 'cdp/MsgDrawDebt',
     value: {
       sender: sender,
       collateral_type: collateralType,
-      multiplier_name: multiplierName
+      principal: principal,
+    },
+  };
+}
+
+function newMsgRepayDebt(sender, collateralType, payment) {
+  return {
+    type: 'cdp/MsgRepayDebt',
+    value: {
+      sender: sender,
+      collateral_type: collateralType,
+      payment: payment,
+    },
+  };
+}
+
+function newMsgLiquidate(keeper, borrower, collateralType) {
+  return {
+    type: 'cdp/MsgLiquidate',
+    value: {
+      keeper: keeper,
+      borrower: borrower,
+      collateral_type: collateralType,
     },
   };
 }
@@ -182,6 +162,31 @@ function newMsgVote(proposalID, voter) {
       voter: voter,
     },
   };
+}
+
+
+/***************************************************
+ *                   Incentive
+ ***************************************************/
+
+function newMsgClaimUSDXMintingReward(sender, multiplierName) {
+  return {
+    type: 'incentive/MsgClaimUSDXMintingReward',
+    value: {
+      sender: sender,
+      multiplier_name: multiplierName
+    }
+  }
+}
+
+function newMsgClaimHardLiquidityProviderReward(sender, multiplierName) {
+  return {
+    type: 'incentive/MsgClaimHardLiquidityProviderReward',
+    value: {
+      sender: sender,
+      multiplier_name: multiplierName
+    }
+  }
 }
 
 /***************************************************
@@ -242,23 +247,42 @@ function newMsgSetPauseStatus(sender, denom, status) {
   };
 }
 
+
+/***************************************************
+ *                   Pricefeed
+ ***************************************************/
+
+function newMsgPostPrice(from, marketID, price, expiry) {
+  return {
+    type: 'pricefeed/MsgPostPrice',
+    value: {
+      from: from,
+      market_id: marketID,
+      price: price,
+      expiry: expiry,
+    },
+  };
+}
+
 module.exports.kava = {
-  newMsgPostPrice,
+  newMsgPlaceBid,
+  newMsgCreateAtomicSwap,
+  newMsgClaimAtomicSwap,
+  newMsgRefundAtomicSwap,
   newMsgCreateCDP,
   newMsgDeposit,
   newMsgWithdraw,
   newMsgDrawDebt,
   newMsgRepayDebt,
-  newMsgPlaceBid,
-  newMsgCreateAtomicSwap,
-  newMsgClaimAtomicSwap,
-  newMsgRefundAtomicSwap,
-  newMsgClaimReward,
+  newMsgLiquidate,
   newMsgSubmitProposal,
   newMsgVote,
+  newMsgClaimUSDXMintingReward,
+  newMsgClaimHardLiquidityProviderReward,
   newMsgIssueTokens,
   newMsgRedeemTokens,
   newMsgBlockAddress,
   newMsgUnblockAddress,
-  newMsgSetPauseStatus
+  newMsgSetPauseStatus,
+  newMsgPostPrice
 };

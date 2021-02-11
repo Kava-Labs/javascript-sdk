@@ -2,7 +2,7 @@ const sig = require('@kava-labs/sig');
 const _ = require('lodash');
 const tx = require('../tx').tx;
 const msg = require('../msg').msg;
-const Harvest = require('./harvest').Harvest;
+const Hard = require('./hard').Hard;
 
 const KAVA_PREFIX = 'kava';
 const DERIVATION_PATH = "m/44'/459'/0'/0/0";
@@ -39,12 +39,9 @@ const api = {
   getCDPsByCollateralType: '/cdp/cdps/collateralType',
   getCDPsRatio: '/cdp/cdps/ratio',
   getDeposits: '/cdp/cdps/deposits',
-  getSavingsRateDistributed: '/cdp/savingsRateDist',
   getAuction: '/auction/auctions',
   getAuctions: '/auction/auctions',
-  getClaims: '/incentive/claims',
-  getRewardPeriods: '/incentive/rewardperiods',
-  getClaimPeriods: '/incentive/claimperiods',
+  getRewards: '/incentive/rewards',
   getCommittee: '/committee/committees', // endpoint also used by getCommitteeProposals
   getCommittees: '/committee/committees',
   getProposal: '/committee/proposals', // endpoint also used by getProposer, getProposalTally, getProposalVotes
@@ -63,7 +60,7 @@ class KavaClient {
     }
     this.baseURI = server;
     this.broadcastMode = 'sync'; // default broadcast mode
-    this.harvest = new Harvest(this);
+    this.hard = new Hard(this);
   }
 
   /**
@@ -584,18 +581,6 @@ class KavaClient {
   }
 
   /**
-   * Get the total amount of USDX distributed via the savings rate mechanism
-   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
-   * @return {Promise}
-   */
-  async getSavingsRateDistributed(timeout = 2000) {
-    const res = await tx.getTx(api.getSavingsRateDistributed, this.baseURI, timeout);
-    if (res && res.data) {
-      return res.data.result;
-    }
-  }
-
-  /**
    * Create a collateralized debt position
    * @param {String} principal the coins that will be drawn as debt
    * @param {String} collateral the coins that will be held as collateral
@@ -689,6 +674,24 @@ class KavaClient {
     );
     const fee = { amount: [], gas: String(gas) };
     return await this.sendTx([msgRepayDebt], fee, sequence);
+  }
+
+  /**
+   * Attempt to liquidate a borrower that's over their loan-to-value ratio
+   * @param {String} borrower the borrower to be liquidated
+   * @param {String} collateralType the collateral type to be liquidated
+   * @param {Number} gas optional gas amount
+   * @param {String} sequence optional account sequence
+   * @return {Promise}
+   */
+  async liquidate(borrower, gas = DEFAULT_GAS, sequence = null) {
+    const msgLiquidate = msg.kava.newMsgLiquidate(
+      this.kavaClient.wallet.address,
+      borrower,
+      collateralType,
+    );
+    const fee = { amount: [], gas: String(gas) };
+    return await this.kavaClient.sendTx([msgLiquidate], fee, sequence);
   }
 
   /***************************************************
@@ -848,57 +851,48 @@ class KavaClient {
 
   /**
    * Get the claims of an address for a specific denom
-   * @param {String} address the address to be queried
-   * @param {String} denom name of the asset to be queried
+   * @param {Number} args query arguments
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getClaims(address, denom, timeout = 2000) {
-    const path = api.getClaims + '/' + address + '/' + denom;
-    const res = await tx.getTx(path, this.baseURI, timeout);
+  async getRewards(args = {}, timeout = 2000) {
+    const path = api.getRewards;
+    const res = await tx.getTx(path, this.baseURI, timeout, args);
     if (res && res.data) {
       return res.data.result;
     }
   }
 
   /**
-   * Get all incentive reward periods
-   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
-   * @return {Promise}
-   */
-  async getRewardPeriods(timeout = 2000) {
-    const res = await tx.getTx(api.getRewardPeriods, this.baseURI, timeout);
-    if (res && res.data) {
-      return res.data.result;
-    }
-  }
-
-  /**
-   * Get all incentive claim periods
-   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
-   * @return {Promise}
-   */
-  async getClaimPeriods(timeout = 2000) {
-    const res = await tx.getTx(api.getClaimPeriods, this.baseURI, timeout);
-    if (res && res.data) {
-      return res.data.result;
-    }
-  }
-
-  /**
-   * Claim a reward by denom
-   * @param {String} denom the name of the asset to be claimed
+   * Claim USDX minting reward using a specific multiplier
+   * @param {String} multiplierName the multiplier to claim with, such as 'small' or 'large'
    * @param {Number} gas optional gas amount
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async claimReward(denom, gas = DEFAULT_GAS, sequence = null) {
-    const msgClaimReward = msg.kava.newMsgClaimReward(
+  async claimUSDXMintingReward(multiplierName, gas = DEFAULT_GAS, sequence = null) {
+    const msgClaimUSDXMintingReward = msg.kava.newMsgClaimUSDXMintingReward(
       this.wallet.address,
-      denom
+      multiplierName
     );
     const fee = { amount: [], gas: String(gas) };
-    return await this.sendTx([msgClaimReward], fee, sequence);
+    return await this.sendTx([msgClaimUSDXMintingReward], fee, sequence);
+  }
+
+  /**
+   * Claim Hard protocol reward using a specific multiplier
+   * @param {String} multiplierName the multiplier to claim with, such as 'small' or 'large'
+   * @param {Number} gas optional gas amount
+   * @param {String} sequence optional account sequence
+   * @return {Promise}
+   */
+  async claimHardLiquidityProviderReward(multiplierName, gas = DEFAULT_GAS, sequence = null) {
+    const msgClaimHardLiquidityProviderReward = msg.kava.newMsgClaimHardLiquidityProviderReward(
+      this.wallet.address,
+      multiplierName
+    );
+    const fee = { amount: [], gas: String(gas) };
+    return await this.sendTx([msgClaimHardLiquidityProviderReward], fee, sequence);
   }
 
  /***************************************************

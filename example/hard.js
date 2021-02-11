@@ -8,25 +8,25 @@ var main = async () => {
     kavaClient.setWallet(Env.KavaAccount.Testnet.Mnemonic);
     await kavaClient.initChain();
 
-    // Deposit coins into harvest's BNB liquidity pool
-    const despoitCoins = kavaUtils.formatCoin(100, "bnb");
-    const depositRes = await kavaClient.harvest.deposit(despoitCoins, "lp");
+    // Deposit coins into hard's BNB pool
+    const despoitCoins = kavaUtils.formatCoins(100, "bnb");
+    const depositRes = await kavaClient.hard.deposit(despoitCoins);
     console.log("Deposit tx:", depositRes);
 
     await sleep(5000); // Wait 5 seconds
 
-    // Withdraw coins from harvest's BNB liquidity pool
-    const withdrawCoins = kavaUtils.formatCoin(20, "bnb");
-    const withdrawRes = await kavaClient.harvest.withdraw(withdrawCoins, "lp");
+    // Withdraw coins from hard's BNB pool
+    const withdrawCoins = kavaUtils.formatCoins(20, "bnb");
+    const withdrawRes = await kavaClient.hard.withdraw(withdrawCoins);
     console.log("Withdraw tx:", withdrawRes);
 
     await sleep(5000); // Wait 5 seconds
 
-    // Claim harvest rewards
-    const args = {"owner": Env.KavaAccount.Testnet.Address, "deposit_denom": "bnb"};
-    const claim = await kavaClient.harvest.getClaims(args);
+    // Claim hard rewards
+    const args = {"owner": Env.KavaAccount.Testnet.Address, "type": "hard"};
+    const claim = await kavaClient.getRewards(args);
     if(claim) {
-        const claimRes = await kavaClient.harvest.claim(Env.KavaAccount.Testnet.Address, "bnb", "lp", "small");
+        const claimRes = await kavaClient.claimHardLiquidityProviderReward('small')
         console.log("Claim tx:", claimRes);
     }
 }
