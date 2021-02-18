@@ -7,8 +7,7 @@ const Hard = require('./hard').Hard;
 const KAVA_PREFIX = 'kava';
 const DERIVATION_PATH = "m/44'/459'/0'/0/0";
 const DERIVATION_PATH_LEGACY = "m/44'/118'/0'/0/0";
-const DEFAULT_GAS = 300000;
-const DEFAULT_FEE = { amount: [], gas: String(DEFAULT_GAS) }
+const DEFAULT_FEE = { amount: [], gas: String(300000) }
 const DEFAULT_CDP_FEE = { amount: [], gas: String(650000) }
 
 
