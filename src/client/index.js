@@ -7,7 +7,9 @@ const Hard = require('./hard').Hard;
 const KAVA_PREFIX = 'kava';
 const DERIVATION_PATH = "m/44'/459'/0'/0/0";
 const DERIVATION_PATH_LEGACY = "m/44'/118'/0'/0/0";
-const DEFAULT_GAS = 300000;
+const DEFAULT_FEE = { amount: [], gas: String(300000) }
+const DEFAULT_CDP_FEE = { amount: [], gas: String(650000) }
+
 
 const api = {
   txs: '/txs',
@@ -334,12 +336,11 @@ class KavaClient {
    * Sends coins to an address
    * @param {String} recipient address that will receive coins
    * @param {String} coins amount of coins to send
-   * @param {Number} gas optional gas amount
+   * @param {Object} fee optional fee consisting of { amount: [Coins], gas: String(Number) }
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async transfer(recipient, coins, gas = DEFAULT_GAS, sequence = null) {
-    const fee = { amount: [], gas: String(gas) };
+  async transfer(recipient, coins, fee = DEFAULT_FEE, sequence = null) {
     const msgSend = msg.cosmos.newMsgSend(this.wallet.address, recipient, coins);
     return await this.sendTx([msgSend], fee, sequence);
   }
@@ -418,12 +419,11 @@ class KavaClient {
    * @param {String} marketID the asset's on chain market ID, such as 'btc:usd'
    * @param {String} price the asset's price
    * @param {String} expiry time duration that this price is valid for
-   * @param {Number} gas optional gas amount
+   * @param {Object} fee optional fee consisting of { amount: [Coins], gas: String(Number) }
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async postPrice(marketID, price, expiry, gas = DEFAULT_GAS, sequence = null) {
-    const fee = { amount: [], gas: String(gas) };
+  async postPrice(marketID, price, expiry, fee = DEFAULT_FEE, sequence = null) {
     const msgPostPrice = msg.kava.newMsgPostPrice(
       this.wallet.address,
       marketID,
@@ -479,12 +479,11 @@ class KavaClient {
    * Place a bid on an auction
    * @param {String} auctionID the unique ID of the auction
    * @param {String} amount the coins amount to bid
-   * @param {Number} gas optional gas amount
+   * @param {Object} fee optional fee consisting of { amount: [Coins], gas: String(Number) }
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async placeBid(auctionID, amount, gas = DEFAULT_GAS, sequence = null) {
-    const fee = { amount: [], gas: String(gas) };
+  async placeBid(auctionID, amount, fee = DEFAULT_FEE, sequence = null) {
     const msgPlaceBid = msg.kava.newMsgPlaceBid(
       auctionID,
       this.wallet.address,
@@ -585,18 +584,17 @@ class KavaClient {
    * @param {String} principal the coins that will be drawn as debt
    * @param {String} collateral the coins that will be held as collateral
    * @param {String} collateralType the CDP's collateral type
-   * @param {Number} gas optional gas amount
+   * @param {Object} fee optional fee consisting of { amount: [Coins], gas: String(Number) }
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async createCDP(principal, collateral, collateralType, gas = DEFAULT_GAS, sequence = null) {
+  async createCDP(principal, collateral, collateralType, fee = DEFAULT_CDP_FEE, sequence = null) {
     const msgCreateCDP = msg.kava.newMsgCreateCDP(
       this.wallet.address,
       principal,
       collateral,
       collateralType
     );
-    const fee = { amount: [], gas: String(gas) };
     return await this.sendTx([msgCreateCDP], fee, sequence);
   }
 
@@ -605,18 +603,17 @@ class KavaClient {
    * @param {String} owner the owner of the CDP
    * @param {String} collateral the coins that will deposited as additional collateral
    * @param {String} collateralType the CDP's collateral type
-   * @param {Number} gas optional gas amount
+   * @param {Object} fee optional fee consisting of { amount: [Coins], gas: String(Number) }
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async deposit(owner, collateral, collateralType, gas = DEFAULT_GAS, sequence = null) {
+  async deposit(owner, collateral, collateralType, fee = DEFAULT_CDP_FEE, sequence = null) {
     const msgDeposit = msg.kava.newMsgDeposit(
       owner,
       this.wallet.address,
       collateral,
       collateralType
     );
-    const fee = { amount: [], gas: String(gas) };
     return await this.sendTx([msgDeposit], fee, sequence);
   }
 
@@ -625,18 +622,17 @@ class KavaClient {
    * @param {String} owner the owner of the CDP
    * @param {String} collateral the coins that will withdrawn from existing collateral
    * @param {String} collateralType the CDP's collateral type
-   * @param {Number} gas optional gas amount
+   * @param {Object} fee optional fee consisting of { amount: [Coins], gas: String(Number) }
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async withdraw(owner, collateral, collateralType, gas = DEFAULT_GAS, sequence = null) {
+  async withdraw(owner, collateral, collateralType, fee = DEFAULT_CDP_FEE, sequence = null) {
     const msgWithdraw = msg.kava.newMsgWithdraw(
       owner,
       this.wallet.address,
       collateral,
       collateralType
     );
-    const fee = { amount: [], gas: String(gas) };
     return await this.sendTx([msgWithdraw], fee, sequence);
   }
 
@@ -644,17 +640,16 @@ class KavaClient {
    * Draw additional debt from a collateralized debt position
    * @param {String} collateralType the CDP's collateral type
    * @param {String} principal the coins that will be drawn as additional principal
-   * @param {Number} gas optional gas amount
+   * @param {Object} fee optional fee consisting of { amount: [Coins], gas: String(Number) }
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async drawDebt(collateralType, principal, gas = DEFAULT_GAS, sequence = null) {
+  async drawDebt(collateralType, principal, fee = DEFAULT_CDP_FEE, sequence = null) {
     const msgDrawDebt = msg.kava.newMsgDrawDebt(
       this.wallet.address,
       collateralType,
       principal
     );
-    const fee = { amount: [], gas: String(gas) };
     return await this.sendTx([msgDrawDebt], fee, sequence);
   }
 
@@ -662,17 +657,16 @@ class KavaClient {
    * Repay debt by returning principal to a collateralized debt position
    * @param {String} collateralType the CDP's collateral type
    * @param {String} payment the amount of pricipal to be repaid
-   * @param {Number} gas optional gas amount
+   * @param {Object} fee optional fee consisting of { amount: [Coins], gas: String(Number) }
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async repayDebt(collateralType, payment, gas = DEFAULT_GAS, sequence = null) {
+  async repayDebt(collateralType, payment, fee = DEFAULT_CDP_FEE, sequence = null) {
     const msgRepayDebt = msg.kava.newMsgRepayDebt(
       this.wallet.address,
       collateralType,
       payment
     );
-    const fee = { amount: [], gas: String(gas) };
     return await this.sendTx([msgRepayDebt], fee, sequence);
   }
 
@@ -680,17 +674,16 @@ class KavaClient {
    * Attempt to liquidate a borrower that's over their loan-to-value ratio
    * @param {String} borrower the borrower to be liquidated
    * @param {String} collateralType the collateral type to be liquidated
-   * @param {Number} gas optional gas amount
+   * @param {Object} fee optional fee consisting of { amount: [Coins], gas: String(Number) }
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async liquidate(borrower, gas = DEFAULT_GAS, sequence = null) {
+  async liquidate(borrower, fee = DEFAULT_CDP_FEE, sequence = null) {
     const msgLiquidate = msg.kava.newMsgLiquidate(
       this.kavaClient.wallet.address,
       borrower,
       collateralType,
     );
-    const fee = { amount: [], gas: String(gas) };
     return await this.kavaClient.sendTx([msgLiquidate], fee, sequence);
   }
 
@@ -771,7 +764,7 @@ class KavaClient {
    * @param {String} timestamp the timestamp in unix, must be within 15-30 minutes of current time
    * @param {String} amount the amount in coins to be transferred
    * @param {String} heightSpan the number of blocks that this swap will be active/claimable
-   * @param {Number} gas optional gas amount
+   * @param {Object} fee optional fee consisting of { amount: [Coins], gas: String(Number) }
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
@@ -783,7 +776,7 @@ class KavaClient {
     timestamp,
     amount,
     heightSpan,
-    gas = DEFAULT_GAS,
+    fee = DEFAULT_FEE,
     sequence = null
   ) {
     const msgCreateAtomicSwap = msg.kava.newMsgCreateAtomicSwap(
@@ -796,7 +789,6 @@ class KavaClient {
       amount,
       heightSpan
     );
-    const fee = { amount: [], gas: String(gas) };
     return await this.sendTx([msgCreateAtomicSwap], fee, sequence);
   }
 
@@ -804,33 +796,32 @@ class KavaClient {
    * Claim an atomic swap
    * @param {String} swapID the swap's unique identifier
    * @param {String} randomNumber the secret random number used to generate this swap's random number hash
-   * @param {Number} gas optional gas amount
+   * @param {Object} fee optional fee consisting of { amount: [Coins], gas: String(Number) }
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async claimSwap(swapID, randomNumber, gas = DEFAULT_GAS, sequence = null) {
+  async claimSwap(swapID, randomNumber, fee = DEFAULT_FEE, sequence = null) {
     const msgClaimAtomicSwap = msg.kava.newMsgClaimAtomicSwap(
       this.wallet.address,
       swapID.toUpperCase(),
       randomNumber.toUpperCase()
     );
-    const fee = { amount: [], gas: String(gas) };
     return await this.sendTx([msgClaimAtomicSwap], fee, sequence);
   }
 
   /**
    * Refund an atomic swap
    * @param {String} swapID the swap's unique identifier
-   * @param {Number} gas optional gas amount
+   * @param {Object} fee optional fee consisting of { amount: [Coins], gas: String(Number) }
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async refundSwap(swapID, gas = DEFAULT_GAS, sequence = null) {
+  async refundSwap(swapID, fee = DEFAULT_FEE, sequence = null) {
+    console.log(fee)
     const msgRefundAtomicSwap = msg.kava.newMsgRefundAtomicSwap(
       this.wallet.address,
       swapID.toUpperCase()
     );
-    const fee = { amount: [], gas: String(gas) };
     return await this.sendTx([msgRefundAtomicSwap], fee, sequence);
   }
 
@@ -866,32 +857,30 @@ class KavaClient {
   /**
    * Claim USDX minting reward using a specific multiplier
    * @param {String} multiplierName the multiplier to claim with, such as 'small' or 'large'
-   * @param {Number} gas optional gas amount
+   * @param {Object} fee optional fee consisting of { amount: [Coins], gas: String(Number) }
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async claimUSDXMintingReward(multiplierName, gas = DEFAULT_GAS, sequence = null) {
+  async claimUSDXMintingReward(multiplierName, fee = DEFAULT_FEE, sequence = null) {
     const msgClaimUSDXMintingReward = msg.kava.newMsgClaimUSDXMintingReward(
       this.wallet.address,
       multiplierName
     );
-    const fee = { amount: [], gas: String(gas) };
     return await this.sendTx([msgClaimUSDXMintingReward], fee, sequence);
   }
 
   /**
    * Claim Hard protocol reward using a specific multiplier
    * @param {String} multiplierName the multiplier to claim with, such as 'small' or 'large'
-   * @param {Number} gas optional gas amount
+   * @param {Object} fee optional fee consisting of { amount: [Coins], gas: String(Number) }
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async claimHardLiquidityProviderReward(multiplierName, gas = DEFAULT_GAS, sequence = null) {
+  async claimHardLiquidityProviderReward(multiplierName, fee = DEFAULT_FEE, sequence = null) {
     const msgClaimHardLiquidityProviderReward = msg.kava.newMsgClaimHardLiquidityProviderReward(
       this.wallet.address,
       multiplierName
     );
-    const fee = { amount: [], gas: String(gas) };
     return await this.sendTx([msgClaimHardLiquidityProviderReward], fee, sequence);
   }
 
@@ -1010,33 +999,31 @@ class KavaClient {
    * Submit a public proposal by a selected committee (must be a member)
    * @param {String} proposal the proposal to be submitted
    * @param {String} committeeID the unique identifier of the committee
-   * @param {Number} gas optional gas amount
+   * @param {Object} fee optional fee consisting of { amount: [Coins], gas: String(Number) }
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async submitCommitteeProposal(proposal, committeeID, gas = DEFAULT_GAS, sequence = null) {
+  async submitCommitteeProposal(proposal, committeeID, fee = DEFAULT_FEE, sequence = null) {
     const msgSubmitProposal = msg.kava.newMsgSubmitProposal(
       proposal,
       this.wallet.address,
       committeeID
     );
-    const fee = { amount: [], gas: String(gas) };
     return await this.sendTx([msgSubmitProposal], fee, sequence);
   }
 
   /**
    * Vote on a public proposal by ID
    * @param {String} proposalID the unique identifier of the proposal
-   * @param {Number} gas optional gas amount
+   * @param {Object} fee optional fee consisting of { amount: [Coins], gas: String(Number) }
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async voteOnCommitteeProposal(proposalID,  gas = DEFAULT_GAS, sequence = null) {
+  async voteOnCommitteeProposal(proposalID,  fee = DEFAULT_FEE, sequence = null) {
     const msgVote = msg.kava.newMsgVote(
       proposalID,
       this.wallet.address
     );
-    const fee = { amount: [], gas: String(gas) };
     return await this.sendTx([msgVote], fee, sequence);
   }
 
@@ -1059,33 +1046,31 @@ class KavaClient {
    * Issues (mints) coins to a recipient address
    * @param {String} tokens coins to be issued
    * @param {String} receiver the recipient of the newly issued coins
-   * @param {Number} gas optional gas amount
+   * @param {Object} fee optional fee consisting of { amount: [Coins], gas: String(Number) }
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async issueTokens(tokens, receiver, gas = DEFAULT_GAS, sequence = null) {
+  async issueTokens(tokens, receiver, fee = DEFAULT_FEE, sequence = null) {
     const msgIssueTokens = msg.kava.newMsgIssueTokens(
       this.wallet.address,
       tokens,
       receiver
     );
-    const fee = { amount: [], gas: String(gas) };
     return await this.sendTx([msgIssueTokens], fee, sequence);
   }
 
   /**
    * Redeems tokens
    * @param {String} tokens coins to be redeemed
-   * @param {Number} gas optional gas amount
+   * @param {Object} fee optional fee consisting of { amount: [Coins], gas: String(Number) }
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async redeemTokens(tokens, gas = DEFAULT_GAS, sequence = null) {
+  async redeemTokens(tokens, fee = DEFAULT_FEE, sequence = null) {
     const msgRedeemTokens = msg.kava.newMsgRedeemTokens(
       this.wallet.address,
       tokens
     );
-    const fee = { amount: [], gas: String(gas) };
     return await this.sendTx([msgRedeemTokens], fee, sequence);
   }
 
@@ -1093,17 +1078,16 @@ class KavaClient {
    * Blocks an address from interacting with a specific token denom
    * @param {String} denom the asset denom the address will be blocked from using
    * @param {String} blockedAddress the address to be blocked
-   * @param {Number} gas optional gas amount
+   * @param {Object} fee optional fee consisting of { amount: [Coins], gas: String(Number) }
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async blockAddress(denom, blockedAddress, gas = DEFAULT_GAS, sequence = null) {
+  async blockAddress(denom, blockedAddress, fee = DEFAULT_FEE, sequence = null) {
     const msgBlockAddress = msg.kava.newMsgBlockAddress(
       this.wallet.address,
       denom,
       blockedAddress
     );
-    const fee = { amount: [], gas: String(gas) };
     return await this.sendTx([msgBlockAddress], fee, sequence);
   }
 
@@ -1111,17 +1095,16 @@ class KavaClient {
    * Unblocks an address that's blocked from interacting with a specific token denom
    * @param {String} denom the asset denom the address will be unblocked from using
    * @param {String} address the address to be unblocked
-   * @param {Number} gas optional gas amount
+   * @param {Object} fee optional fee consisting of { amount: [Coins], gas: String(Number) }
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async unblockAddress(denom, blockedAddress, gas = DEFAULT_GAS, sequence = null) {
+  async unblockAddress(denom, blockedAddress, fee = DEFAULT_FEE, sequence = null) {
     const msgUnblockAddress = msg.kava.newMsgUnblockAddress(
       this.wallet.address,
       denom,
       blockedAddress
     );
-    const fee = { amount: [], gas: String(gas) };
     return await this.sendTx([msgUnblockAddress], fee, sequence);
   }
 
@@ -1129,17 +1112,16 @@ class KavaClient {
    * Updates the paused/unpaused status for a specific token denom
    * @param {String} denom the asset denom whose status will be updated
    * @param {String} status bool representing the token's new active/inactive status
-   * @param {Number} gas optional gas amount
+   * @param {Object} fee optional fee consisting of { amount: [Coins], gas: String(Number) }
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async setPauseStatus(denom, status, gas = DEFAULT_GAS, sequence = null) {
+  async setPauseStatus(denom, status, fee = DEFAULT_FEE, sequence = null) {
     const msgSetPauseStatus = msg.kava.newMsgSetPauseStatus(
       this.wallet.address,
       denom,
       status
     );
-    const fee = { amount: [], gas: String(gas) };
     return await this.sendTx([msgSetPauseStatus], fee, sequence);
   }
 }
