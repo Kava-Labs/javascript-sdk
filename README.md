@@ -42,7 +42,7 @@ The client requires an address mnemonic and the url of Kava's REST api endpoint.
 const Kava = require("@kava-labs/javascript-sdk");
 
 var main = async () => {
-  const mnemonic = "secret words that unlock a kava address";
+  const mnemonic = "secret words that unlock a kava address" || Kava.crypto.generateMnemonic();
   const testnetUrl = "https://kava-testnet-8000.kava.io"; // testnet REST api endpoint
 
   // Declare a new Kava client, set wallet, and initialize
