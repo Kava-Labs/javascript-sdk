@@ -16,39 +16,55 @@ Install the package via npm.
 npm install @kava-labs/javascript-sdk
 ```
 
-## Network Information
+## Mainnet Network Information
 
-### Mainnet
+### Kava
 
-- Chain ID: kava-3
-- REST API endpoint: https://kava3.data.kava.io
-- BEP3 deputy's Kava address: kava1r4v2zdhdalfj2ydazallqvrus9fkphmglhn6u6
-- BEP3 deputy's Binance Chain address: bnb1jh7uv2rm6339yue8k4mj9406k3509kr4wt5nxn
+- Chain ID: kava-4
+- REST API endpoint: https://kava4.data.kava.io
+
+### Binance Chain
+
+- Chain ID: Binance-Chain-Tigris
 - Binance Chain mainnet REST API endpoint: https://dex.binance.org/
 
-### Testnet
+### Deputy Addresses
 
-- Chain ID: kava-testnet-8000
-- REST API endpoint: https://kava-testnet-8000.kava.io
-- BEP3 deputy's Kava address: kava1tfvn5t8qwngqd2q427za2mel48pcus3z9u73fl
-- BEP3 deputy's Binance Chain testnet address: tbnb1mdvtph9y0agm4nx7dcl86t7nuvt5mtcul8zld6
-- Binance Chain testnet REST API endpoint: https://testnet-dex.binance.org/
+**BNB**
+
+- bnb1jh7uv2rm6339yue8k4mj9406k3509kr4wt5nxn
+- kava1r4v2zdhdalfj2ydazallqvrus9fkphmglhn6u6
+
+**BTCB**
+
+- bnb1xz3xqf4p2ygrw9lhp5g5df4ep4nd20vsywnmpr
+- kava14qsmvzprqvhwmgql9fr0u3zv9n2qla8zhnm5pc
+
+**BUSD**
+
+- bnb10zq89008gmedc6rrwzdfukjk94swynd7dl97w8
+- kava1hh4x3a4suu5zyaeauvmv7ypf7w9llwlfufjmuu
+
+**XRPB**
+
+- bnb15jzuvvg2kf0fka3fl2c8rx0kc3g6wkmvsqhgnh
+- kava1c0ju5vnwgpgxnrktfnkccuth9xqc68dcdpzpas
 
 ## Client Setup
 
 The client requires an address mnemonic and the url of Kava's REST api endpoint.
 
 ```javascript
-const Kava = require("@kava-labs/javascript-sdk");
+const Kava = require('@kava-labs/javascript-sdk');
 
 var main = async () => {
-  const mnemonic = "secret words that unlock a kava address";
-  const testnetUrl = "https://kava-testnet-8000.kava.io"; // testnet REST api endpoint
+  const mnemonic = 'secret words that unlock a kava address';
+  const mainnetUrl = 'https://kava4.data.kava.io'; // testnet REST api endpoint
 
   // Declare a new Kava client, set wallet, and initialize
-  let client = new Kava.KavaClient(testnetUrl);
+  let client = new Kava.KavaClient(mainnetUrl);
   client.setWallet(mnemonic);
-  client.setBroadcastMode("async");
+  client.setBroadcastMode('async');
   await client.initChain();
 
   // ...transfer coins, bid on an auction, create a CDP, etc.
@@ -65,8 +81,8 @@ The following selected examples demonstrate basic client usage. Detailed example
 // Import Kava and initialize client...
 
 // Load coins and transfer to recipient's address
-const coins = Kava.utils.formatCoins(1, "kava");
-const recipient = "kava1c84ezutjcgrsxarjq5mzsxxz2k9znn94zxmqjz";
+const coins = Kava.utils.formatCoins(1, 'kava');
+const recipient = 'kava1c84ezutjcgrsxarjq5mzsxxz2k9znn94zxmqjz';
 const txHash = await client.transfer(recipient, coins);
 
 // Check the resulting tx hash
@@ -89,13 +105,13 @@ const principalAmount = 10 * USDX_CONVERSION_FACTOR;
 const collateralAmount = 2 * BNB_CONVERSION_FACTOR;
 
 // Load principal, collateral as formatted coins and set up collateral type
-const principal = Kava.utils.formatCoin(principalAmount, "usdx");
-const collateral = Kava.utils.formatCoin(collateralAmount, "bnb");
-const collateralType = "bnb-a";
+const principal = Kava.utils.formatCoin(principalAmount, 'usdx');
+const collateral = Kava.utils.formatCoin(collateralAmount, 'bnb');
+const collateralType = 'bnb-a';
 
 // Send create CDP tx using Kava client
 const txHashCDP = await client.createCDP(principal, collateral, collateralType);
-console.log("Create CDP tx hash (Kava): ".concat(txHashCDP));
+console.log('Create CDP tx hash (Kava): '.concat(txHashCDP));
 
 // Check the tx hash
 const txRes = await client.checkTxHash(txHashCDP, 15000);
@@ -109,10 +125,11 @@ Kava supports secure transfers of BNB from Binance Chain to Kava and back via at
 Swaps use a simple secret sharing scheme. A secret random number is generated on the client and hashed with a timestamp in order to create a random number hash that's stored with the swap. The swap can be securely claimed on the opposite chain using the secret random number. Swaps expire after n blocks, a duration that can be modified via the height span parameter. Once expired, the swap can be refunded.
 
 BEP3 transfer user steps
+
 1. Create an atomic swap on Binance Chain (note: atomic swaps are called HTLTs on Binance Chain)
-The deputy will automatically relay the swap from Kava to Binance Chain
-2a. Claim the atomic swap on Kava within swap's height span. Users have about 30 minutes to claim a swap after it is created.
-2b. Refund the atomic swap on Kava after the swap's height span - this happens if the swap is not claimed in time.
+   The deputy will automatically relay the swap from Kava to Binance Chain
+   2a. Claim the atomic swap on Kava within swap's height span. Users have about 30 minutes to claim a swap after it is created.
+   2b. Refund the atomic swap on Kava after the swap's height span - this happens if the swap is not claimed in time.
 
 ### Create swap
 
@@ -125,15 +142,15 @@ Users create outgoing swaps on Kava by entering the deputy's Kava address in the
 const utils = kava.utils;
 
 // Declare addresses involved in the swap
-const recipient = "kava1tfvn5t8qwngqd2q427za2mel48pcus3z9u73fl"; // deputy's address on kava testnet
-const recipientOtherChain = "tbnb1hc0gvpxgw78ky9ay6xfql8jw9lry9ftc5g7ddj"; // user's address on bnbchain testnet
-const senderOtherChain = "tbnb1mdvtph9y0agm4nx7dcl86t7nuvt5mtcul8zld6"; // deputy's address on bnbchain testnet
+const recipient = 'kava1tfvn5t8qwngqd2q427za2mel48pcus3z9u73fl'; // deputy's address on kava testnet
+const recipientOtherChain = 'tbnb1hc0gvpxgw78ky9ay6xfql8jw9lry9ftc5g7ddj'; // user's address on bnbchain testnet
+const senderOtherChain = 'tbnb1mdvtph9y0agm4nx7dcl86t7nuvt5mtcul8zld6'; // deputy's address on bnbchain testnet
 
 // Set up swap parameters
 const amount = 1000000;
-const asset = "bnb";
+const asset = 'bnb';
 const coins = utils.formatCoins(amount, asset);
-const heightSpan = "250";
+const heightSpan = '250';
 
 // Generate random number hash from timestamp and hex-encoded random number
 const randomNumber = utils.generateRandomNumber();
@@ -142,7 +159,7 @@ const randomNumberHash = utils.calculateRandomNumberHash(
   randomNumber,
   timestamp
 );
-console.log("\nSecret random number:", randomNumber.toUpperCase());
+console.log('\nSecret random number:', randomNumber.toUpperCase());
 
 // Calculate the expected swap ID on Kava
 const kavaSwapID = utils.calculateSwapID(
@@ -150,18 +167,18 @@ const kavaSwapID = utils.calculateSwapID(
   client.wallet.address,
   senderOtherChain
 );
-console.log("Expected Kava swap ID:", kavaSwapID);
+console.log('Expected Kava swap ID:', kavaSwapID);
 
 // Calculate the expected swap ID on Bnbchain
 const bnbchainSwapID = utils.calculateSwapID(
-    randomNumberHash,
-    senderOtherChain,
-    client.wallet.address
-  );
-console.log("Expected Bnbchain swap ID:", bnbchainSwapID);
+  randomNumberHash,
+  senderOtherChain,
+  client.wallet.address
+);
+console.log('Expected Bnbchain swap ID:', bnbchainSwapID);
 
 // Create the swap
-console.log("Sending createSwap transaction...");
+console.log('Sending createSwap transaction...');
 const txHash = await client.createSwap(
   recipient,
   recipientOtherChain,
@@ -186,9 +203,9 @@ Only active swaps can be claimed. Anyone can send the claim request, but funds w
 ```javascript
 // Use the secret random number from swap creation
 const randomNumber =
-  "e8eae926261ab77d018202434791a335249b470246a7b02e28c3b2fb6ffad8f3";
+  'e8eae926261ab77d018202434791a335249b470246a7b02e28c3b2fb6ffad8f3';
 const swapID =
-  "e897e4ee12b4d6ec4776a5d30300a7e3bb1f62b0c49c3e05ad2e6aae1279c940";
+  'e897e4ee12b4d6ec4776a5d30300a7e3bb1f62b0c49c3e05ad2e6aae1279c940';
 
 const txHash = await client.claimSwap(swapID, randomNumber);
 ```
@@ -199,7 +216,7 @@ Only expired swaps can be refunded. Anyone can send the refund request, but fund
 
 ```javascript
 const swapID =
-  "e897e4ee12b4d6ec4776a5d30300a7e3bb1f62b0c49c3e05ad2e6aae1279c940";
+  'e897e4ee12b4d6ec4776a5d30300a7e3bb1f62b0c49c3e05ad2e6aae1279c940';
 
 const txHash = await client.refundSwap(swapID);
 ```
