@@ -179,9 +179,9 @@ function newMsgClaimUSDXMintingReward(sender, multiplierName) {
   }
 }
 
-function newMsgClaimHardLiquidityProviderReward(sender, multiplierName) {
+function newMsgClaimHardReward(sender, multiplierName) {
   return {
-    type: 'incentive/MsgClaimHardLiquidityProviderReward',
+    type: 'incentive/MsgClaimHardReward',
     value: {
       sender: sender,
       multiplier_name: multiplierName
@@ -278,7 +278,7 @@ module.exports.kava = {
   newMsgSubmitProposal,
   newMsgVote,
   newMsgClaimUSDXMintingReward,
-  newMsgClaimHardLiquidityProviderReward,
+  newMsgClaimHardReward,
   newMsgIssueTokens,
   newMsgRedeemTokens,
   newMsgBlockAddress,

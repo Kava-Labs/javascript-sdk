@@ -876,12 +876,12 @@ class KavaClient {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async claimHardLiquidityProviderReward(multiplierName, fee = DEFAULT_FEE, sequence = null) {
-    const msgClaimHardLiquidityProviderReward = msg.kava.newMsgClaimHardLiquidityProviderReward(
+  async claimHardReward(multiplierName, fee = DEFAULT_FEE, sequence = null) {
+    const msgClaimHardReward = msg.kava.newMsgClaimHardReward(
       this.wallet.address,
       multiplierName
     );
-    return await this.sendTx([msgClaimHardLiquidityProviderReward], fee, sequence);
+    return await this.sendTx([msgClaimHardReward], fee, sequence);
   }
 
  /***************************************************
