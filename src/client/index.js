@@ -680,11 +680,11 @@ class KavaClient {
    */
   async liquidate(borrower, fee = DEFAULT_CDP_FEE, sequence = null) {
     const msgLiquidate = msg.kava.newMsgLiquidate(
-      this.kavaClient.wallet.address,
+      this.wallet.address,
       borrower,
       collateralType,
     );
-    return await this.kavaClient.sendTx([msgLiquidate], fee, sequence);
+    return await this.sendTx([msgLiquidate], fee, sequence);
   }
 
   /***************************************************
