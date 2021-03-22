@@ -678,7 +678,7 @@ class KavaClient {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async liquidate(borrower, fee = DEFAULT_CDP_FEE, sequence = null) {
+  async liquidate(borrower, collateralType, fee = DEFAULT_CDP_FEE, sequence = null) {
     const msgLiquidate = msg.kava.newMsgLiquidate(
       this.wallet.address,
       borrower,
