@@ -21,7 +21,7 @@ npm install @kava-labs/javascript-sdk
 ### Mainnet
 
 - Chain ID: kava-7
-- REST API endpoint:  https://api.kava.io
+- REST API endpoint: https://api.kava.io
 - Binance Chain mainnet REST API endpoint: https://dex.binance.org/
 
 
