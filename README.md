@@ -20,19 +20,45 @@ npm install @kava-labs/javascript-sdk
 
 ### Mainnet
 
-- Chain ID: kava-3
-- REST API endpoint: https://kava3.data.kava.io
-- BEP3 deputy's Kava address: kava1r4v2zdhdalfj2ydazallqvrus9fkphmglhn6u6
-- BEP3 deputy's Binance Chain address: bnb1jh7uv2rm6339yue8k4mj9406k3509kr4wt5nxn
+- Chain ID: kava-7
+- REST API endpoint: https://api.kava.io
 - Binance Chain mainnet REST API endpoint: https://dex.binance.org/
+
 
 ### Testnet
 
-- Chain ID: kava-testnet-8000
-- REST API endpoint: https://kava-testnet-8000.kava.io
-- BEP3 deputy's Kava address: kava1tfvn5t8qwngqd2q427za2mel48pcus3z9u73fl
-- BEP3 deputy's Binance Chain testnet address: tbnb1mdvtph9y0agm4nx7dcl86t7nuvt5mtcul8zld6
+- Chain ID: kava-testnet-12000
+- REST API endpoint: https://api.data-testnet-12000.kava.io
 - Binance Chain testnet REST API endpoint: https://testnet-dex.binance.org/
+
+
+### Binance Chain
+
+- Chain ID: Binance-Chain-Tigris
+- Binance Chain mainnet REST API endpoint: https://dex.binance.org/
+
+### Deputy Addresses
+
+**BNB**
+
+- bnb1jh7uv2rm6339yue8k4mj9406k3509kr4wt5nxn
+- kava1r4v2zdhdalfj2ydazallqvrus9fkphmglhn6u6
+
+**BTCB**
+
+- bnb1xz3xqf4p2ygrw9lhp5g5df4ep4nd20vsywnmpr
+- kava14qsmvzprqvhwmgql9fr0u3zv9n2qla8zhnm5pc
+
+**BUSD**
+
+- bnb10zq89008gmedc6rrwzdfukjk94swynd7dl97w8
+- kava1hh4x3a4suu5zyaeauvmv7ypf7w9llwlfufjmuu
+
+**XRPB**
+
+- bnb15jzuvvg2kf0fka3fl2c8rx0kc3g6wkmvsqhgnh
+- kava1c0ju5vnwgpgxnrktfnkccuth9xqc68dcdpzpas
+
 
 ## Client Setup
 
@@ -43,7 +69,7 @@ const Kava = require("@kava-labs/javascript-sdk");
 
 var main = async () => {
   const mnemonic = "secret words that unlock a kava address";
-  const testnetUrl = "https://kava-testnet-8000.kava.io"; // testnet REST api endpoint
+  const testnetUrl = "https://api.data-testnet-12000.kava.io"; // testnet REST api endpoint
 
   // Declare a new Kava client, set wallet, and initialize
   let client = new Kava.KavaClient(testnetUrl);
