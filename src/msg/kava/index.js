@@ -179,12 +179,82 @@ function newMsgClaimUSDXMintingReward(sender, multiplierName) {
   }
 }
 
-function newMsgClaimHardReward(sender, multiplierName) {
+function newMsgClaimUSDXMintingRewardVVesting(sender, receiver, multiplierName) {
+  return {
+    type: 'incentive/MsgClaimUSDXMintingRewardVVesting',
+    value: {
+      sender: sender,
+      receiver: receiver,
+      multiplierName: multiplierName
+    }
+  }
+}
+
+function newMsgClaimHardReward(sender, multiplierName, denomsToClaim) {
   return {
     type: 'incentive/MsgClaimHardReward',
     value: {
       sender: sender,
-      multiplier_name: multiplierName
+      multiplier_name: multiplierName,
+      denoms_to_claim: denomsToClaim
+    }
+  }
+}
+
+function newMsgClaimHardRewardVVesting(sender, receiver, multiplierName, denomsToClaim) {
+  return {
+    type: 'incentive/MsgClaimHardRewardVVesting',
+    value: {
+      sender: sender,
+      receiver: receiver,
+      multiplier_name: multiplierName,
+      denoms_to_claim: denomsToClaim
+    }
+  }
+}
+
+function newMsgClaimDelegatorReward(sender, multiplierName, denomsToClaim) {
+  return {
+    type: 'incentive/MsgClaimDelegatorReward',
+    value: {
+      sender: sender,
+      multiplier_name: multiplierName,
+      denoms_to_claim: denomsToClaim
+    }
+  }
+}
+
+function newMsgClaimDelegatorRewardVVesting(sender, receiver, multiplierName, denomsToClaim) {
+  return {
+    type: 'incentive/MsgClaimDelegatorRewardVVesting',
+    value: {
+      sender: sender,
+      receiver: receiver,
+      multiplier_name: multiplierName,
+      denoms_to_claim: denomsToClaim
+    }
+  }
+}
+
+function newMsgClaimSwapReward(sender, multiplierName, denomsToClaim) {
+  return {
+    type: 'incentive/MsgClaimSwapReward',
+    value: {
+      sender: sender,
+      multiplier_name: multiplierName,
+      denoms_to_claim: denomsToClaim
+    }
+  }
+}
+
+function newMsgClaimSwapRewardVVesting(sender, receiver, multiplierName, denomsToClaim) {
+  return {
+    type: 'incentive/MsgClaimSwapRewardVVesting',
+    value: {
+      sender: sender,
+      receiver: receiver,
+      multiplier_name: multiplierName,
+      denoms_to_claim: denomsToClaim
     }
   }
 }
@@ -278,7 +348,13 @@ module.exports.kava = {
   newMsgSubmitProposal,
   newMsgVote,
   newMsgClaimUSDXMintingReward,
+  newMsgClaimUSDXMintingRewardVVesting,
   newMsgClaimHardReward,
+  newMsgClaimHardRewardVVesting,
+  newMsgClaimDelegatorReward,
+  newMsgClaimDelegatorRewardVVesting,
+  newMsgClaimSwapReward,
+  newMsgClaimSwapRewardVVesting,
   newMsgIssueTokens,
   newMsgRedeemTokens,
   newMsgBlockAddress,

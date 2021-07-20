@@ -5,11 +5,11 @@ const DEFAULT_GAS = 300000;
 
 const api = {
     getParams: '/hard/parameters',
-    getModAccounts: 'hard/accounts',
-    getDeposits: 'hard/deposits',
-    getTotalDeposited: 'hard/total-deposited',
-    getBorrows: 'hard/borrows',
-    getTotalBorrowed: 'hard/total-borrowed',
+    getModAccounts: '/hard/accounts',
+    getDeposits: '/hard/deposits',
+    getTotalDeposited: '/hard/total-deposited',
+    getBorrows: '/hard/borrows',
+    getTotalBorrowed: '/hard/total-borrowed',
   };
 
 class Hard {
