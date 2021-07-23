@@ -1,6 +1,6 @@
 function newMsgDeposit(despositor, tokenA, tokenB, slippage, deadline) {
   return {
-    type: 'swap/MsgDeposit'.
+    type: 'swap/MsgDeposit',
     value: {
       depositor: depositor,
       token_a: tokenA,
@@ -24,14 +24,14 @@ function newMsgWithdraw(from, shares, minTokenA, minTokenB, deadline) {
   }
 }
 
-function newMsgSwapExactForTokens(requester, extactTokenA, tokenB, slippage, deadline) {
+function newMsgSwapExactForTokens(requester, exactTokenA, tokenB, slippage, deadline) {
   return {
     type: 'swap/MsgSwapExactForTokens',
     value: {
       requester: requester,
-      extact_token_a: extactTokenA,
+      exact_token_a: exactTokenA,
       token_b: tokenB,
-      slippage: slippate,
+      slippage: slippage,
       deadline: deadline
     }
   }
@@ -43,8 +43,8 @@ function newMsgSwapForExactTokens(requester, tokenA, exactTokenB, slippage, dead
     value: {
       requester: requester,
       token_a: tokenA,
-      extact_token_b: extactTokenB,
-      slippage: slippate,
+      exact_token_b: exactTokenB,
+      slippage: slippage,
       deadline: deadline
     }
   }

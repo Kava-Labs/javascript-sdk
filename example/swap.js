@@ -3,13 +3,6 @@ const KavaClient = require("../src/client").KavaClient;
 const kavaUtils = require('../src/utils').utils;
 
 var main = async () => {
-    /** For the purpose of the examples, current unix time will be assumed to be:
-     *  1626821962  => Tue Jul 20 2021 22:59:22 GMT+0000
-     *
-     *  deadline for the transaciton to be processed will be set to 30 seconds
-     *  from this time:
-     *  1626821992  => Tue Jul 20 2021 22:59:52 GMT+0000
-     */
     // Start new Kava client
     kavaClient = new KavaClient(Env.KavaEndpoints.Testnet);
     kavaClient.setWallet(Env.KavaAccount.Testnet.Mnemonic);
@@ -19,7 +12,9 @@ var main = async () => {
     const tokenA = kavaUtils.formatCoins(20, "bnb");
     const tokenB = kavaUtils.formatCoins(10, "usdx");
     const slippage = 0.01;
-    const deadline = 1626821992;
+    // create a deadline of 30 minutes from now for the max amount of time to wait
+    // for the transaction to be processed
+    const deadline = kavaUtils.calculateUnixTime(30);
     const depositRes = await kavaClient.swap.deposit(
         tokenA,
         tokenB,
