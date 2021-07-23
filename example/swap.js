@@ -8,7 +8,7 @@ var main = async () => {
     kavaClient.setWallet(Env.KavaAccount.Testnet.Mnemonic);
     await kavaClient.initChain();
 
-    // depsosit coins to the swap bnb:usdx pool
+    // deposit coins to the swap bnb:usdx pool
     const tokenA = kavaUtils.formatCoins(20, "bnb");
     const tokenB = kavaUtils.formatCoins(10, "usdx");
     const slippage = 0.01;
@@ -39,7 +39,7 @@ var main = async () => {
 
     await sleep(5000); // Wait 5 seconds
 
-    // Attempt a swap to a valid tradeable pool with an exact tokenA
+    // Attempt a swap to a valid tradable pool with an exact tokenA
     // coins to deposit to the pool
     const exactTokenA = kavaUtils.formatCoins(100, "bnb");
     // coins to withdraw from the pool
@@ -58,7 +58,7 @@ var main = async () => {
 
     await sleep(5000); // Wait 5 seconds
 
-    // Attempt a swap to a valid tradeable pool with an exact tokenB
+    // Attempt a swap to a valid tradable pool with an exact tokenB
     // coins to deposit to the pool
     const tokenA = kavaUtils.formatCoins(100, "bnb");
     // coins to withdraw from the pool
