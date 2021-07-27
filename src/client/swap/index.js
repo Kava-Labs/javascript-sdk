@@ -77,8 +77,8 @@ class Swap {
    * Deposit funds to a liquidity pool
    * @param {Object} amount of token a coins to be deposited
    * @param {Object} amount of token b coins to be deposited
-   * @param {decimal} max slippage you're willing to accept
-   * @param {number} deadline time to complete the transaction (unix timestamp seconds, UTC timezone)
+   * @param {string} max slippage you're willing to accept
+   * @param {string} deadline time to complete the transaction (unix timestamp seconds, UTC timezone)
    * @param {Number} gas optional gas amount
    * @param {String} sequence optional account sequence
    * @return {Promise}
@@ -101,7 +101,7 @@ class Swap {
    * @param {Number} number of shares to be withdrawn
    * @param {Object} min amount of token a coins to be withdrawn
    * @param {Object} min amount of token b coins to be withdrawn
-   * @param {number} deadline time to complete the transaction (unix timestamp seconds, UTC timezone)
+   * @param {string} deadline time to complete the transaction (unix timestamp seconds, UTC timezone)
    * @param {Number} gas optional gas amount
    * @param {String} sequence optional account sequence
    * @return {Promise}
@@ -122,8 +122,8 @@ class Swap {
    * Swap an exact number of token a for an estimated amount of token b
    * @param {Object} amount of tokens to be be put into the system
    * @param {Object} expected amount of coins to be returned
-   * @param {decimal} max slippage you're willing to accept
-   * @param {number} deadline time to complete the transaction (unix timestamp seconds, UTC timezone)
+   * @param {string} max slippage you're willing to accept
+   * @param {string} deadline time to complete the transaction (unix timestamp seconds, UTC timezone)
    * @param {Number} gas optional gas amount
    * @param {String} sequence optional account sequence
    * @return {Promise}
@@ -144,8 +144,8 @@ class Swap {
    * Swap an exact number of token b to be returned for an for an estimated amount of token a to input
    * @param {Object} expected amount of coins to be put into the system
    * @param {Object} amount of tokens to be returned from the system
-   * @param {decimal} max slippage you're willing to accept
-   * @param {number} deadline time to complete the transaction (unix timestamp seconds, UTC timezone)
+   * @param {string} max slippage you're willing to accept
+   * @param {string} deadline time to complete the transaction (unix timestamp seconds, UTC timezone)
    * @param {Number} gas optional gas amount
    * @param {String} sequence optional account sequence
    * @return {Promise}

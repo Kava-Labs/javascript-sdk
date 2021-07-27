@@ -11,8 +11,8 @@ var main = async () => {
     // deposit coins to the swap bnb:usdx pool
     const tokenA = kavaUtils.formatCoins(20, "bnb");
     const tokenB = kavaUtils.formatCoins(10, "usdx");
-    const slippage = 0.01;
-    // create a deadline of 30 minutes from now for the max amount of time to wait
+    const slippage = "0.010000000000000000";
+    // create a deadline of 30 seconds from now for the max amount of time to wait
     // for the transaction to be processed
     const deadline = kavaUtils.calculateUnixTime(30);
     const depositRes = await kavaClient.swap.deposit(
@@ -29,7 +29,7 @@ var main = async () => {
     const shares = 100;
     const minTokenA = kavaUtils.formatCoins(20, "bnb");
     const minTokenB = kavaUtils.formatCoins(10, "usdx");
-    const deadline = 1626821992;
+    const deadline = kavaUtils.calculateUnixTime(30);
     const withdrawRes = await kavaClient.swap.withdraw(
         tokenA,
         tokenB,
@@ -44,8 +44,8 @@ var main = async () => {
     const exactTokenA = kavaUtils.formatCoins(100, "bnb");
     // coins to withdraw from the pool
     const tokenB = kavaUtils.formatCoins(10, "usdx");
-    const slippage = 0.01;
-    const deadline = 1626821992;
+    const slippage = "0.010000000000000000";
+    const deadline = kavaUtils.calculateUnixTime(30);
 
 
     const swapExactForRes = await kavaClient.swap.newMsgSwapExactForTokens(
@@ -63,8 +63,8 @@ var main = async () => {
     const tokenA = kavaUtils.formatCoins(100, "bnb");
     // coins to withdraw from the pool
     const exactTokenB = kavaUtils.formatCoins(10, "usdx");
-    const slippage = 0.01;
-    const deadline = 1626821992;
+    const slippage = "0.010000000000000000";
+    const deadline = kavaUtils.calculateUnixTime(30);
 
 
     const swapForExactRes = await kavaClient.swap.newMsgSwapForExactTokens(
