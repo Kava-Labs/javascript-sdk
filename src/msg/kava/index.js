@@ -154,12 +154,13 @@ function newMsgSubmitProposal(proposal, proposer, committeeID) {
   };
 }
 
-function newMsgVote(proposalID, voter) {
+function newMsgVote(proposalID, voter, voteType) {
   return {
     type: 'kava/MsgVote',
     value: {
       proposal_id: String(proposalID),
       voter: voter,
+      vote_type: voteType
     },
   };
 }

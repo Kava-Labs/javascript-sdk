@@ -1129,10 +1129,11 @@ class KavaClient {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async voteOnCommitteeProposal(proposalID,  fee = DEFAULT_FEE, sequence = null) {
+  async voteOnCommitteeProposal(proposalID, voteType, fee = DEFAULT_FEE, sequence = null) {
     const msgVote = msg.kava.newMsgVote(
       proposalID,
-      this.wallet.address
+      this.wallet.address,
+      voteType
     );
     return await this.sendTx([msgVote], fee, sequence);
   }
