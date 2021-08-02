@@ -157,10 +157,23 @@ const formatMultiCoins = (amounts, denoms) => {
   return coins;
 };
 
+/**
+ * Takes current day and adds desired amount of seconds and converts to unix time
+ * @param {number} seconds for the transaction to process
+ * @return {object} resulting in a unix timestring, defaulting to 1 day
+ */
+
+const calculateUnixTime = (seconds = 86400) => {
+  var myDate = new Date(2021, 6, 20, 14, 30, 15);
+  myDate.setSeconds(myDate.getSeconds() + seconds);
+  return String(Math.floor(new Date(myDate).getTime() / 1000))
+}
+
 module.exports.utils = {
   generateRandomNumber,
   calculateRandomNumberHash,
   calculateSwapID,
+  calculateUnixTime,
   convertCoinDecimals,
   formatCoin,
   formatCoins,
