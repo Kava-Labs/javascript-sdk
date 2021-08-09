@@ -191,70 +191,64 @@ function newMsgClaimUSDXMintingRewardVVesting(sender, receiver, multiplierName) 
   }
 }
 
-function newMsgClaimHardReward(sender, multiplierName, denomsToClaim) {
+function newMsgClaimHardReward(sender, denomsToClaim) {
   return {
     type: 'incentive/MsgClaimHardReward',
     value: {
       sender: sender,
-      multiplier_name: multiplierName,
       denoms_to_claim: denomsToClaim
     }
   }
 }
 
-function newMsgClaimHardRewardVVesting(sender, receiver, multiplierName, denomsToClaim) {
+function newMsgClaimHardRewardVVesting(sender, receiver, denomsToClaim) {
   return {
     type: 'incentive/MsgClaimHardRewardVVesting',
     value: {
       sender: sender,
       receiver: receiver,
-      multiplier_name: multiplierName,
       denoms_to_claim: denomsToClaim
     }
   }
 }
 
-function newMsgClaimDelegatorReward(sender, multiplierName, denomsToClaim) {
+function newMsgClaimDelegatorReward(sender, denomsToClaim) {
   return {
     type: 'incentive/MsgClaimDelegatorReward',
     value: {
       sender: sender,
-      multiplier_name: multiplierName,
       denoms_to_claim: denomsToClaim
     }
   }
 }
 
-function newMsgClaimDelegatorRewardVVesting(sender, receiver, multiplierName, denomsToClaim) {
+function newMsgClaimDelegatorRewardVVesting(sender, receiver, denomsToClaim) {
   return {
     type: 'incentive/MsgClaimDelegatorRewardVVesting',
     value: {
       sender: sender,
       receiver: receiver,
-      multiplier_name: multiplierName,
       denoms_to_claim: denomsToClaim
     }
   }
 }
 
-function newMsgClaimSwapReward(sender, multiplierName, denomsToClaim) {
+function newMsgClaimSwapReward(sender, denomsToClaim) {
   return {
     type: 'incentive/MsgClaimSwapReward',
     value: {
       sender: sender,
-      multiplier_name: multiplierName,
       denoms_to_claim: denomsToClaim
     }
   }
 }
 
-function newMsgClaimSwapRewardVVesting(sender, receiver, multiplierName, denomsToClaim) {
+function newMsgClaimSwapRewardVVesting(sender, receiver, denomsToClaim) {
   return {
     type: 'incentive/MsgClaimSwapRewardVVesting',
     value: {
       sender: sender,
       receiver: receiver,
-      multiplier_name: multiplierName,
       denoms_to_claim: denomsToClaim
     }
   }
