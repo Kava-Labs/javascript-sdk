@@ -1,4 +1,4 @@
-function newMsgDeposit(despositor, tokenA, tokenB, slippage, deadline) {
+function newMsgDeposit(depositor, tokenA, tokenB, slippage, deadline) {
   return {
     type: 'swap/MsgDeposit',
     value: {

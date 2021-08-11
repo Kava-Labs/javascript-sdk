@@ -888,16 +888,16 @@ class KavaClient {
 
   /**
    * Claim Hard protocol reward using a specific multiplier and denoms
-   * @param {String} multiplierName the multiplier to claim with, such as 'small' or 'large'
    * @params {Array} choose which denom(s) of your rewards that you would like to claim
+   * and at which multiplier you claim them
+   * [{ denom: 'hard', multiplierName: 'large'}, { denom: 'ukava', multiplierName: 'small' }]
    * @param {Object} fee optional fee consisting of { amount: [Coins], gas: String(Number) }
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async claimHardReward(multiplierName, denomsToClaim, fee = DEFAULT_FEE, sequence = null) {
+  async claimHardReward(denomsToClaim, fee = DEFAULT_FEE, sequence = null) {
     const msgClaimHardReward = msg.kava.newMsgClaimHardReward(
       this.wallet.address,
-      multiplierName,
       denomsToClaim
     );
     return await this.sendTx([msgClaimHardReward], fee, sequence);
@@ -906,17 +906,17 @@ class KavaClient {
   /**
    * Claim  Hard protocol validator vesting reward using a specific multiplier
    * @param {String} address to receive the rewards
-   * @param {String} multiplierName the multiplier to claim with, such as 'small' or 'large'
    * @params {Array} choose which denom(s) of your rewards that you would like to claim
+   * and at which multiplier you claim them
+   * [{ denom: 'hard', multiplierName: 'large'}, { denom: 'ukava', multiplierName: 'small' }]
    * @param {Object} fee optional fee consisting of { amount: [Coins], gas: String(Number) }
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async claimHardRewardVVesting(receiver, multiplierName, denomToClaim, fee = DEFAULT_FEE, sequence = null) {
+  async claimHardRewardVVesting(receiver, denomToClaim, fee = DEFAULT_FEE, sequence = null) {
     const msgClaimHardRewardVVesting = msg.kava.newMsgClaimHardRewardVVesting(
       this.wallet.address,
       receiver,
-      multiplierName,
       denomToClaim
     );
     return await this.sendTx([msgClaimHardRewardVVesting], fee, sequence);
@@ -924,16 +924,16 @@ class KavaClient {
 
   /**
    * Claim Delegator reward using a specific multiplier and denoms
-   * @param {String} multiplierName the multiplier to claim with, such as 'small' or 'large'
    * @params {Array} choose which denom(s) of your rewards that you would like to claim
+   * and at which multiplier you claim them
+   * [{ denom: 'hard', multiplierName: 'large'}, { denom: 'ukava', multiplierName: 'small' }]
    * @param {Object} fee optional fee consisting of { amount: [Coins], gas: String(Number) }
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async claimDelegatorReward(multiplierName, denomsToClaim, fee = DEFAULT_FEE, sequence = null) {
+  async claimDelegatorReward(denomsToClaim, fee = DEFAULT_FEE, sequence = null) {
     const msgClaimDelegatorReward = msg.kava.newMsgClaimDelegatorReward(
       this.wallet.address,
-      multiplierName,
       denomsToClaim
     );
     return await this.sendTx([msgClaimDelegatorReward], fee, sequence);
@@ -942,17 +942,17 @@ class KavaClient {
   /**
    * Claim delegator validator vesting reward using a specific multiplier
    * @param {String} address to receive the rewards
-   * @param {String} multiplierName the multiplier to claim with, such as 'small' or 'large'
    * @params {Array} choose which denom(s) of your rewards that you would like to claim
+   * and at which multiplier you claim them
+   * [{ denom: 'hard', multiplierName: 'large'}, { denom: 'ukava', multiplierName: 'small' }]
    * @param {Object} fee optional fee consisting of { amount: [Coins], gas: String(Number) }
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async claimDelegatorRewardVVesting(receiver, multiplierName, denomToClaim, fee = DEFAULT_FEE, sequence = null) {
+  async claimDelegatorRewardVVesting(receiver, denomToClaim, fee = DEFAULT_FEE, sequence = null) {
     const msgClaimDelegatorRewardVVesting = msg.kava.newMsgClaimDelegatorRewardVVesting(
       this.wallet.address,
       receiver,
-      multiplierName,
       denomToClaim
     );
     return await this.sendTx([msgClaimDelegatorRewardVVesting], fee, sequence);
@@ -960,16 +960,16 @@ class KavaClient {
 
   /**
    * Claim swap reward using a specific multiplier and denoms
-   * @param {String} multiplierName the multiplier to claim with, such as 'small' or 'large'
    * @params {Array} choose which denom(s) of your rewards that you would like to claim
+   * and at which multiplier you claim them
+   * [{ denom: 'hard', multiplierName: 'large'}, { denom: 'ukava', multiplierName: 'small' }]
    * @param {Object} fee optional fee consisting of { amount: [Coins], gas: String(Number) }
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async claimSwapReward(multiplierName, denomsToClaim, fee = DEFAULT_FEE, sequence = null) {
+  async claimSwapReward(denomsToClaim, fee = DEFAULT_FEE, sequence = null) {
     const msgClaimSwapReward = msg.kava.newMsgClaimSwapReward(
       this.wallet.address,
-      multiplierName,
       denomsToClaim
     );
     return await this.sendTx([msgClaimSwapReward], fee, sequence);
@@ -978,17 +978,17 @@ class KavaClient {
   /**
    * Claim swap validator vesting reward using a specific multiplier
    * @param {String} address to receive the rewards
-   * @param {String} multiplierName the multiplier to claim with, such as 'small' or 'large'
    * @params {Array} choose which denom(s) of your rewards that you would like to claim
+   * and at which multiplier you claim them
+   * [{ denom: 'hard', multiplierName: 'large'}, { denom: 'ukava', multiplierName: 'small' }]
    * @param {Object} fee optional fee consisting of { amount: [Coins], gas: String(Number) }
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async claimSwapRewardVVesting(receiver, multiplierName, denomToClaim, fee = DEFAULT_FEE, sequence = null) {
+  async claimSwapRewardVVesting(receiver, denomToClaim, fee = DEFAULT_FEE, sequence = null) {
     const msgClaimSwapRewardVVesting = msg.kava.newMsgClaimSwapRewardVVesting(
       this.wallet.address,
       receiver,
-      multiplierName,
       denomToClaim
     );
     return await this.sendTx([msgClaimSwapRewardVVesting], fee, sequence);
