@@ -1,4 +1,10 @@
-function newMsgDeposit(depositor, tokenA, tokenB, slippage, deadline) {
+
+type Coin = {
+  amount: string;
+  denom: string;
+}
+
+function newMsgDeposit(depositor: string, tokenA: Coin, tokenB: Coin, slippage: string, deadline: string) {
   return {
     type: 'swap/MsgDeposit',
     value: {
@@ -11,7 +17,7 @@ function newMsgDeposit(depositor, tokenA, tokenB, slippage, deadline) {
   }
 }
 
-function newMsgWithdraw(from, shares, minTokenA, minTokenB, deadline) {
+function newMsgWithdraw(from: string, shares: any, minTokenA: Coin, minTokenB: Coin, deadline: string) {
   return {
     type: 'swap/MsgWithdraw',
     value: {
@@ -24,7 +30,7 @@ function newMsgWithdraw(from, shares, minTokenA, minTokenB, deadline) {
   }
 }
 
-function newMsgSwapExactForTokens(requester, exactTokenA, tokenB, slippage, deadline) {
+function newMsgSwapExactForTokens(requester: string, exactTokenA: Coin, tokenB: Coin, slippage: string, deadline: string) {
   return {
     type: 'swap/MsgSwapExactForTokens',
     value: {
@@ -37,7 +43,7 @@ function newMsgSwapExactForTokens(requester, exactTokenA, tokenB, slippage, dead
   }
 }
 
-function newMsgSwapForExactTokens(requester, tokenA, exactTokenB, slippage, deadline) {
+function newMsgSwapForExactTokens(requester: string, tokenA: Coin, exactTokenB: Coin, slippage: string, deadline: string) {
   return {
     type: 'swap/MsgSwapForExactTokens',
     value: {
@@ -50,7 +56,7 @@ function newMsgSwapForExactTokens(requester, tokenA, exactTokenB, slippage, dead
   }
 }
 
-module.exports.swap = {
+export const swap = {
   newMsgDeposit,
   newMsgWithdraw,
   newMsgSwapExactForTokens,

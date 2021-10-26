@@ -1,4 +1,4 @@
-function newMsgDeposit(depositor, amount) {
+function newMsgDeposit(depositor: string, amount: number) {
   return {
     type: 'hard/MsgDeposit',
     value: {
@@ -8,7 +8,7 @@ function newMsgDeposit(depositor, amount) {
   };
 };
 
-function newMsgWithdraw(depositor, amount) {
+function newMsgWithdraw(depositor: string, amount: number) {
   return {
     type: 'hard/MsgWithdraw',
     value: {
@@ -18,7 +18,7 @@ function newMsgWithdraw(depositor, amount) {
   };
 };
 
-function newMsgBorrow(borrower, amount) {
+function newMsgBorrow(borrower: string, amount: number) {
   return {
     type: 'hard/MsgBorrow',
     value: {
@@ -28,7 +28,7 @@ function newMsgBorrow(borrower, amount) {
   };
 };
 
-function newMsgRepay(sender, owner, amount) {
+function newMsgRepay(sender: string, owner: string, amount: number) {
   return {
     type: 'hard/MsgRepay',
     value: {
@@ -39,7 +39,7 @@ function newMsgRepay(sender, owner, amount) {
   };
 };
 
-function newMsgLiquidate(keeper, borrower) {
+function newMsgLiquidate(keeper: string, borrower: string) {
   return {
     type: 'hard/MsgLiquidate',
     value: {
@@ -49,7 +49,7 @@ function newMsgLiquidate(keeper, borrower) {
   }
 }
 
-module.exports.hard = {
+export const hard = {
   newMsgDeposit,
   newMsgWithdraw,
   newMsgBorrow,

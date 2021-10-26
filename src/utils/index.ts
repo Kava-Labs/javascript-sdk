@@ -1,13 +1,13 @@
-const SHA256 = require('crypto-js/sha256');
-const hexEncoding = require('crypto-js/enc-hex');
-const Big = require('big.js');
-const cryptoRand = require('crypto');
-const crypto = require('../crypto').crypto;
+import SHA256 from "crypto-js/sha256";
+import hexEncoding from "crypto-js/enc-hex";
+import Big from "big.js";
+import cryptoRand from "crypto";
+import { crypto } from "../crypto";
 
 const RandomNumberLength = 64;
 
 // Precision is relative to KAVA or 10**6
-const precision = {
+const precision: Record<string, number> = {
   kava: 1,
   ukava: Math.pow(10, 6),
 };
@@ -17,7 +17,7 @@ const precision = {
  * @param {string} hex message to hash
  * @returns {string} hash output
  */
-const sha256 = (hex) => {
+const sha256 = (hex: string) => {
   if (typeof hex !== 'string') throw new Error('sha256 expects a hex string');
   if (hex.length % 2 !== 0)
     throw new Error(`invalid hex string length: ${hex}`);
@@ -42,7 +42,7 @@ const generateRandomNumber = () => {
  * @param {Number} timestamp
  * @returns {string} sha256 result
  */
-const calculateRandomNumberHash = (randomNumber, timestamp) => {
+const calculateRandomNumberHash = (randomNumber: string, timestamp: number) => {
   const timestampHexStr = timestamp.toString(16);
   let timestampHexStrFormat = timestampHexStr;
   for (let i = 0; i < 16 - timestampHexStr.length; i++) {
@@ -63,7 +63,7 @@ const calculateRandomNumberHash = (randomNumber, timestamp) => {
  * @param {String} senderOtherChain
  * @returns {string} sha256 result
  */
-const calculateSwapID = (randomNumberHash, sender, senderOtherChain) => {
+const calculateSwapID = (randomNumberHash: string, sender: string, senderOtherChain: string) => {
   const randomNumberHashBytes = Buffer.from(randomNumberHash, 'hex');
   const senderBytes = crypto.decodeAddress(sender);
   const sendOtherChainBytes = Buffer.from(
@@ -85,24 +85,26 @@ const calculateSwapID = (randomNumberHash, sender, senderOtherChain) => {
  * @param {String} outputDenom denom of the output asset
  * @return {object} coins result
  */
-const convertCoinDecimals = (inputAmount, inputDenom, outputDenom) => {
-  let amount = new Big(inputAmount);
+const convertCoinDecimals = (inputAmount: string, inputDenom: string, outputDenom: string) => {
+  const amount = new Big(inputAmount);
 
   try {
     if (!precision[inputDenom] || !precision[outputDenom]) {
       throw new Error('Invalid asset pairing for decimal conversion.');
     }
   } catch (err) {
-    console.log('Error:', err.message);
+    if (err instanceof Error) {
+      console.log('Error:', err.message);
+    }
     return;
   }
 
-  amount = amount
+  const amountString = amount
     .mul(precision[outputDenom])
     .div(precision[inputDenom])
     .toString();
 
-  return formatCoins(amount, outputDenom);
+  return formatCoins(amountString, outputDenom);
 };
 
 /**
@@ -111,7 +113,7 @@ const convertCoinDecimals = (inputAmount, inputDenom, outputDenom) => {
  * @param {String} denom name of the asset
  * @return {object} resulting formatted coin
  */
-const formatCoin = (amount, denom) => {
+const formatCoin = (amount: string | number, denom: string) => {
   return {
     denom: String(denom),
     amount: String(amount),
@@ -124,7 +126,7 @@ const formatCoin = (amount, denom) => {
  * @param {String} denom name of the asset
  * @return {object} resulting formatted coins
  */
-const formatCoins = (amount, denom) => {
+const formatCoins = (amount: string | number, denom: string) => {
   return [
     {
       denom: String(denom),
@@ -139,13 +141,15 @@ const formatCoins = (amount, denom) => {
  * @param {String} denoms an array of asset denoms
  * @return {object} resulting formatted coins
  */
-const formatMultiCoins = (amounts, denoms) => {
+const formatMultiCoins = (amounts: string[], denoms: string[]) => {
   try {
-    if (amounts.length != denoms.lenth) {
+    if (amounts.length != denoms.length) {
       throw new Error('Every amount must have exactly 1 corresponding denom.');
     }
   } catch (err) {
-    console.log('Error:', err.message);
+    if (err instanceof Error) {
+      console.log('Error:', err.message);
+    }
     return;
   }
 
@@ -169,7 +173,7 @@ const calculateUnixTime = (seconds = 86400) => {
   return String(Math.floor(new Date(myDate).getTime() / 1000))
 }
 
-module.exports.utils = {
+export const utils = {
   generateRandomNumber,
   calculateRandomNumberHash,
   calculateSwapID,

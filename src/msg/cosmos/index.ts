@@ -1,4 +1,4 @@
-const _ = require('lodash');
+import _ from "lodash";
 
 const FEE_DEFAULT = { amount: [], gas: '300000' };
 
@@ -10,7 +10,7 @@ const FEE_DEFAULT = { amount: [], gas: '300000' };
  * @param {Object} signatures generated when an address signs a data package, required for tx confirmation
  * @return {Promise}
  */
-function newStdTx(msgs, fee = FEE_DEFAULT, memo = '', signatures = null) {
+function newStdTx(msgs: any[], fee = FEE_DEFAULT, memo = '', signatures = null) {
   return {
     type: 'cosmos-sdk/StdTx',
     value: {
@@ -23,7 +23,7 @@ function newStdTx(msgs, fee = FEE_DEFAULT, memo = '', signatures = null) {
 }
 
 // newMsgSend creates a new MsgSend
-function newMsgSend(address, to, coins) {
+function newMsgSend(address: string, to: string, coins: any[]) {
   const sendTx = {
     type: 'cosmos-sdk/MsgSend',
     value: {
@@ -35,7 +35,7 @@ function newMsgSend(address, to, coins) {
   return sendTx;
 }
 
-module.exports.cosmos = {
+export const cosmos = {
   newStdTx,
   newMsgSend
 }
