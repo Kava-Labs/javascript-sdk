@@ -119,7 +119,7 @@ function newMsgDrawDebt(sender: string, collateralType: string, principal: Coin)
   };
 }
 
-function newMsgRepayDebt(sender: string, collateralType: string, payment: string) {
+function newMsgRepayDebt(sender: string, collateralType: string, payment: Coin) {
   return {
     type: 'cdp/MsgRepayDebt',
     value: {
