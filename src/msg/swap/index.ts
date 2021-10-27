@@ -1,8 +1,4 @@
-
-type Coin = {
-  amount: string;
-  denom: string;
-}
+import { Coin } from "../../types/Coin";
 
 function newMsgDeposit(depositor: string, tokenA: Coin, tokenB: Coin, slippage: string, deadline: string) {
   return {

@@ -1,4 +1,6 @@
-function newMsgDeposit(depositor: string, amount: number) {
+import { Coin } from "../../types/Coin";
+
+function newMsgDeposit(depositor: string, amount: Coin) {
   return {
     type: 'hard/MsgDeposit',
     value: {
@@ -8,7 +10,7 @@ function newMsgDeposit(depositor: string, amount: number) {
   };
 };
 
-function newMsgWithdraw(depositor: string, amount: number) {
+function newMsgWithdraw(depositor: string, amount: Coin) {
   return {
     type: 'hard/MsgWithdraw',
     value: {
@@ -18,7 +20,7 @@ function newMsgWithdraw(depositor: string, amount: number) {
   };
 };
 
-function newMsgBorrow(borrower: string, amount: number) {
+function newMsgBorrow(borrower: string, amount: Coin) {
   return {
     type: 'hard/MsgBorrow',
     value: {
@@ -28,7 +30,7 @@ function newMsgBorrow(borrower: string, amount: number) {
   };
 };
 
-function newMsgRepay(sender: string, owner: string, amount: number) {
+function newMsgRepay(sender: string, owner: string, amount: Coin) {
   return {
     type: 'hard/MsgRepay',
     value: {

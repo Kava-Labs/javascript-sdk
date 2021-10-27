@@ -1,8 +1,10 @@
+import { Coin } from "../../types/Coin";
+
 /***************************************************
  *                   Auction
  ***************************************************/
 
-function newMsgPlaceBid(auctionID: string, bidder: string, amount: number) {
+function newMsgPlaceBid(auctionID: string, bidder: string, amount: Coin) {
   return {
     type: 'auction/MsgPlaceBid',
     value: {
@@ -25,7 +27,7 @@ function newMsgCreateAtomicSwap(
   senderOtherChain: string,
   randomNumberHash: string,
   timestamp: number,
-  amount: number,
+  amount: Coin,
   heightSpan: number
 ) {
   return {
@@ -70,7 +72,7 @@ function newMsgRefundAtomicSwap(sender: string, swapID: string) {
  *                       CDP
  ***************************************************/
 
-function newMsgCreateCDP(sender: string, principal: string, collateral: string, collateralType: string) {
+function newMsgCreateCDP(sender: string, principal: Coin, collateral: Coin, collateralType: string) {
   return {
     type: 'cdp/MsgCreateCDP',
     value: {
@@ -82,7 +84,7 @@ function newMsgCreateCDP(sender: string, principal: string, collateral: string, 
   };
 }
 
-function newMsgDeposit(owner: string, depositor: string, collateral: string, collateralType: string) {
+function newMsgDeposit(owner: string, depositor: string, collateral: Coin, collateralType: string) {
   return {
     type: 'cdp/MsgDeposit',
     value: {
@@ -94,7 +96,7 @@ function newMsgDeposit(owner: string, depositor: string, collateral: string, col
   };
 }
 
-function newMsgWithdraw(owner: string, depositor: string, collateral: string, collateralType: string) {
+function newMsgWithdraw(owner: string, depositor: string, collateral: Coin, collateralType: string) {
   return {
     type: 'cdp/MsgWithdraw',
     value: {
@@ -106,7 +108,7 @@ function newMsgWithdraw(owner: string, depositor: string, collateral: string, co
   };
 }
 
-function newMsgDrawDebt(sender: string, collateralType: string, principal: string) {
+function newMsgDrawDebt(sender: string, collateralType: string, principal: Coin) {
   return {
     type: 'cdp/MsgDrawDebt',
     value: {
