@@ -1,4 +1,5 @@
 import { Coin } from '../../types/Coin';
+import { DenomToClaim } from '../../types/DenomToClaim';
 
 /***************************************************
  *                   Auction
@@ -244,7 +245,7 @@ function newMsgClaimHardReward(sender: string, denomsToClaim: any[]) {
 function newMsgClaimHardRewardVVesting(
   sender: string,
   receiver: string,
-  denomsToClaim: any[]
+  denomsToClaim: DenomToClaim[]
 ) {
   return {
     type: 'incentive/MsgClaimHardRewardVVesting',
@@ -256,7 +257,7 @@ function newMsgClaimHardRewardVVesting(
   };
 }
 
-function newMsgClaimDelegatorReward(sender: string, denomsToClaim: any[]) {
+function newMsgClaimDelegatorReward(sender: string, denomsToClaim: DenomToClaim[]) {
   return {
     type: 'incentive/MsgClaimDelegatorReward',
     value: {
@@ -281,7 +282,7 @@ function newMsgClaimDelegatorRewardVVesting(
   };
 }
 
-function newMsgClaimSwapReward(sender: string, denomsToClaim: any[]) {
+function newMsgClaimSwapReward(sender: string, denomsToClaim: DenomToClaim[]) {
   return {
     type: 'incentive/MsgClaimSwapReward',
     value: {
@@ -294,7 +295,7 @@ function newMsgClaimSwapReward(sender: string, denomsToClaim: any[]) {
 function newMsgClaimSwapRewardVVesting(
   sender: string,
   receiver: string,
-  denomsToClaim: any[]
+  denomsToClaim: DenomToClaim[]
 ) {
   return {
     type: 'incentive/MsgClaimSwapRewardVVesting',
