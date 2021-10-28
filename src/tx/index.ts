@@ -1,7 +1,7 @@
 const sig = require('@kava-labs/sig');
-import _ from "lodash";
-import axios from "axios";
-import { URL as URL } from "url";
+import _ from 'lodash';
+import axios from 'axios';
+import { URL } from 'url';
 
 const api = {
   getAccount: '/auth/accounts',
@@ -38,11 +38,11 @@ async function getTx(path: string, base: string, timeout = 5000, args = {}) {
  * @return {String}
  */
 function applyRequestArgs(url: string, args: Record<string, string> = {}) {
-  const search = []
+  const search = [];
   for (let k in args) {
-    search.push(`${k}=${args[k]}`)
+    search.push(`${k}=${args[k]}`);
   }
-  return `${url}?${search.join("&")}`
+  return `${url}?${search.join('&')}`;
 }
 
 type RetryFunction = (
@@ -51,7 +51,8 @@ type RetryFunction = (
   args: string[],
   retriesLeft: number,
   interval: number,
-  exponential: boolean) => Promise<any>
+  exponential: boolean
+) => Promise<any>;
 
 /**
  * Retries the given function until it succeeds given a number of retries and an interval between them. They are set
@@ -91,7 +92,7 @@ const retry: RetryFunction = async (
       throw new Error(`Max retries reached:
     error: ${error}`);
   }
-}
+};
 
 /**
  * Loads an account's account number and sequence from Kava

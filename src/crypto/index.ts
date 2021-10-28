@@ -1,6 +1,6 @@
 const sig = require('@kava-labs/sig');
-import bech32 from "bech32";
-import bip39 from "bip39";
+import bech32 from 'bech32';
+import bip39 from 'bip39';
 
 const KAVA_PREFIX = 'kava';
 const MNEMONIC_LEN = 256;
@@ -19,7 +19,7 @@ const generateMnemonic = () => bip39.generateMnemonic(MNEMONIC_LEN);
  * @param {boolean} legacy optional boolean to use the legacy coin type
  */
 const getAddressFromMnemonic = (mnemonic: string, legacy = false) => {
-  const derivationPath = legacy ? DERIVATION_PATH_LEGACY : DERIVATION_PATH
+  const derivationPath = legacy ? DERIVATION_PATH_LEGACY : DERIVATION_PATH;
   const masterKey = sig.createMasterKeyFromMnemonic(mnemonic);
   const keyPair = sig.createKeyPairFromMasterKey(masterKey, derivationPath);
   return sig.createAddress(keyPair.publicKey, KAVA_PREFIX);

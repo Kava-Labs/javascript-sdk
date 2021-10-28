@@ -1,8 +1,8 @@
-import SHA256 from "crypto-js/sha256";
-import hexEncoding from "crypto-js/enc-hex";
-import Big from "big.js";
-import cryptoRand from "crypto";
-import { crypto } from "../crypto";
+import SHA256 from 'crypto-js/sha256';
+import hexEncoding from 'crypto-js/enc-hex';
+import Big from 'big.js';
+import cryptoRand from 'crypto';
+import { crypto } from '../crypto';
 
 const RandomNumberLength = 64;
 
@@ -63,7 +63,11 @@ const calculateRandomNumberHash = (randomNumber: string, timestamp: number) => {
  * @param {String} senderOtherChain
  * @returns {string} sha256 result
  */
-const calculateSwapID = (randomNumberHash: string, sender: string, senderOtherChain: string) => {
+const calculateSwapID = (
+  randomNumberHash: string,
+  sender: string,
+  senderOtherChain: string
+) => {
   const randomNumberHashBytes = Buffer.from(randomNumberHash, 'hex');
   const senderBytes = crypto.decodeAddress(sender);
   const sendOtherChainBytes = Buffer.from(
@@ -85,7 +89,11 @@ const calculateSwapID = (randomNumberHash: string, sender: string, senderOtherCh
  * @param {String} outputDenom denom of the output asset
  * @return {object} coins result
  */
-const convertCoinDecimals = (inputAmount: string, inputDenom: string, outputDenom: string) => {
+const convertCoinDecimals = (
+  inputAmount: string,
+  inputDenom: string,
+  outputDenom: string
+) => {
   const amount = new Big(inputAmount);
 
   try {
@@ -170,8 +178,8 @@ const formatMultiCoins = (amounts: string[], denoms: string[]) => {
 const calculateUnixTime = (seconds = 86400) => {
   var myDate = new Date(2021, 6, 20, 14, 30, 15);
   myDate.setSeconds(myDate.getSeconds() + seconds);
-  return String(Math.floor(new Date(myDate).getTime() / 1000))
-}
+  return String(Math.floor(new Date(myDate).getTime() / 1000));
+};
 
 export const utils = {
   generateRandomNumber,

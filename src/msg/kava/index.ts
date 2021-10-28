@@ -1,4 +1,4 @@
-import { Coin } from "../../types/Coin";
+import { Coin } from '../../types/Coin';
 
 /***************************************************
  *                   Auction
@@ -46,7 +46,11 @@ function newMsgCreateAtomicSwap(
 }
 
 // newMsgClaimAtomicSwap creates a new MsgClaimAtomicSwap
-function newMsgClaimAtomicSwap(sender: string, swapID: string, randomNumber: number) {
+function newMsgClaimAtomicSwap(
+  sender: string,
+  swapID: string,
+  randomNumber: number
+) {
   return {
     type: 'bep3/MsgClaimAtomicSwap',
     value: {
@@ -72,7 +76,12 @@ function newMsgRefundAtomicSwap(sender: string, swapID: string) {
  *                       CDP
  ***************************************************/
 
-function newMsgCreateCDP(sender: string, principal: Coin, collateral: Coin, collateralType: string) {
+function newMsgCreateCDP(
+  sender: string,
+  principal: Coin,
+  collateral: Coin,
+  collateralType: string
+) {
   return {
     type: 'cdp/MsgCreateCDP',
     value: {
@@ -84,7 +93,12 @@ function newMsgCreateCDP(sender: string, principal: Coin, collateral: Coin, coll
   };
 }
 
-function newMsgDeposit(owner: string, depositor: string, collateral: Coin, collateralType: string) {
+function newMsgDeposit(
+  owner: string,
+  depositor: string,
+  collateral: Coin,
+  collateralType: string
+) {
   return {
     type: 'cdp/MsgDeposit',
     value: {
@@ -96,7 +110,12 @@ function newMsgDeposit(owner: string, depositor: string, collateral: Coin, colla
   };
 }
 
-function newMsgWithdraw(owner: string, depositor: string, collateral: Coin, collateralType: string) {
+function newMsgWithdraw(
+  owner: string,
+  depositor: string,
+  collateral: Coin,
+  collateralType: string
+) {
   return {
     type: 'cdp/MsgWithdraw',
     value: {
@@ -108,7 +127,11 @@ function newMsgWithdraw(owner: string, depositor: string, collateral: Coin, coll
   };
 }
 
-function newMsgDrawDebt(sender: string, collateralType: string, principal: Coin) {
+function newMsgDrawDebt(
+  sender: string,
+  collateralType: string,
+  principal: Coin
+) {
   return {
     type: 'cdp/MsgDrawDebt',
     value: {
@@ -119,7 +142,11 @@ function newMsgDrawDebt(sender: string, collateralType: string, principal: Coin)
   };
 }
 
-function newMsgRepayDebt(sender: string, collateralType: string, payment: Coin) {
+function newMsgRepayDebt(
+  sender: string,
+  collateralType: string,
+  payment: Coin
+) {
   return {
     type: 'cdp/MsgRepayDebt',
     value: {
@@ -130,7 +157,11 @@ function newMsgRepayDebt(sender: string, collateralType: string, payment: Coin) 
   };
 }
 
-function newMsgLiquidate(keeper: string, borrower: string, collateralType: string) {
+function newMsgLiquidate(
+  keeper: string,
+  borrower: string,
+  collateralType: string
+) {
   return {
     type: 'cdp/MsgLiquidate',
     value: {
@@ -145,7 +176,11 @@ function newMsgLiquidate(keeper: string, borrower: string, collateralType: strin
  *                   Committee
  ***************************************************/
 
-function newMsgSubmitProposal(proposal: string, proposer: string, committeeID: string) {
+function newMsgSubmitProposal(
+  proposal: string,
+  proposer: string,
+  committeeID: string
+) {
   return {
     type: 'kava/MsgSubmitProposal',
     value: {
@@ -162,11 +197,10 @@ function newMsgVote(proposalID: string, voter: string, voteType: string) {
     value: {
       proposal_id: String(proposalID),
       voter: voter,
-      vote_type: voteType
+      vote_type: voteType,
     },
   };
 }
-
 
 /***************************************************
  *                   Incentive
@@ -177,20 +211,24 @@ function newMsgClaimUSDXMintingReward(sender: string, multiplierName: string) {
     type: 'incentive/MsgClaimUSDXMintingReward',
     value: {
       sender: sender,
-      multiplier_name: multiplierName
-    }
-  }
+      multiplier_name: multiplierName,
+    },
+  };
 }
 
-function newMsgClaimUSDXMintingRewardVVesting(sender: string, receiver: string, multiplierName: string) {
+function newMsgClaimUSDXMintingRewardVVesting(
+  sender: string,
+  receiver: string,
+  multiplierName: string
+) {
   return {
     type: 'incentive/MsgClaimUSDXMintingRewardVVesting',
     value: {
       sender: sender,
       receiver: receiver,
-      multiplierName: multiplierName
-    }
-  }
+      multiplierName: multiplierName,
+    },
+  };
 }
 
 function newMsgClaimHardReward(sender: string, denomsToClaim: any[]) {
@@ -198,20 +236,24 @@ function newMsgClaimHardReward(sender: string, denomsToClaim: any[]) {
     type: 'incentive/MsgClaimHardReward',
     value: {
       sender: sender,
-      denoms_to_claim: denomsToClaim
-    }
-  }
+      denoms_to_claim: denomsToClaim,
+    },
+  };
 }
 
-function newMsgClaimHardRewardVVesting(sender: string, receiver: string, denomsToClaim: any[]) {
+function newMsgClaimHardRewardVVesting(
+  sender: string,
+  receiver: string,
+  denomsToClaim: any[]
+) {
   return {
     type: 'incentive/MsgClaimHardRewardVVesting',
     value: {
       sender: sender,
       receiver: receiver,
-      denoms_to_claim: denomsToClaim
-    }
-  }
+      denoms_to_claim: denomsToClaim,
+    },
+  };
 }
 
 function newMsgClaimDelegatorReward(sender: string, denomsToClaim: any[]) {
@@ -219,20 +261,24 @@ function newMsgClaimDelegatorReward(sender: string, denomsToClaim: any[]) {
     type: 'incentive/MsgClaimDelegatorReward',
     value: {
       sender: sender,
-      denoms_to_claim: denomsToClaim
-    }
-  }
+      denoms_to_claim: denomsToClaim,
+    },
+  };
 }
 
-function newMsgClaimDelegatorRewardVVesting(sender: string, receiver: string, denomsToClaim: any[]) {
+function newMsgClaimDelegatorRewardVVesting(
+  sender: string,
+  receiver: string,
+  denomsToClaim: any[]
+) {
   return {
     type: 'incentive/MsgClaimDelegatorRewardVVesting',
     value: {
       sender: sender,
       receiver: receiver,
-      denoms_to_claim: denomsToClaim
-    }
-  }
+      denoms_to_claim: denomsToClaim,
+    },
+  };
 }
 
 function newMsgClaimSwapReward(sender: string, denomsToClaim: any[]) {
@@ -240,20 +286,24 @@ function newMsgClaimSwapReward(sender: string, denomsToClaim: any[]) {
     type: 'incentive/MsgClaimSwapReward',
     value: {
       sender: sender,
-      denoms_to_claim: denomsToClaim
-    }
-  }
+      denoms_to_claim: denomsToClaim,
+    },
+  };
 }
 
-function newMsgClaimSwapRewardVVesting(sender: string, receiver: string, denomsToClaim: any[]) {
+function newMsgClaimSwapRewardVVesting(
+  sender: string,
+  receiver: string,
+  denomsToClaim: any[]
+) {
   return {
     type: 'incentive/MsgClaimSwapRewardVVesting',
     value: {
       sender: sender,
       receiver: receiver,
-      denoms_to_claim: denomsToClaim
-    }
-  }
+      denoms_to_claim: denomsToClaim,
+    },
+  };
 }
 
 /***************************************************
@@ -281,7 +331,11 @@ function newMsgRedeemTokens(sender: string, tokens: any[]) {
   };
 }
 
-function newMsgBlockAddress(sender: string, denom: string, blockedAddress: string) {
+function newMsgBlockAddress(
+  sender: string,
+  denom: string,
+  blockedAddress: string
+) {
   return {
     type: 'issuance/MsgBlockAddress',
     value: {
@@ -314,12 +368,16 @@ function newMsgSetPauseStatus(sender: string, denom: string, status: string) {
   };
 }
 
-
 /***************************************************
  *                   Pricefeed
  ***************************************************/
 
-function newMsgPostPrice(from: string, marketID: string, price: string, expiry:string) {
+function newMsgPostPrice(
+  from: string,
+  marketID: string,
+  price: string,
+  expiry: string
+) {
   return {
     type: 'pricefeed/MsgPostPrice',
     value: {
@@ -357,5 +415,5 @@ export const kava = {
   newMsgBlockAddress,
   newMsgUnblockAddress,
   newMsgSetPauseStatus,
-  newMsgPostPrice
+  newMsgPostPrice,
 };

@@ -4,10 +4,10 @@ import { utils } from './utils';
 import { crypto } from './crypto';
 
 const Kava = {
-    tx,
-    msg,
-    utils,
-    crypto
-}
+  tx,
+  msg,
+  utils,
+  crypto,
+};
 
 export default Kava;
