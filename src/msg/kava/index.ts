@@ -1,5 +1,6 @@
 import { Coin } from '../../types/Coin';
 import { DenomToClaim } from '../../types/DenomToClaim';
+import { VoteType } from '../../types/VoteType';
 
 /***************************************************
  *                   Auction
@@ -192,13 +193,24 @@ function newMsgSubmitProposal(
   };
 }
 
-function newMsgVote(proposalID: string, voter: string, voteType: string) {
+function newMsgVote(proposalID: string, voter: string, voteType: VoteType) {
   return {
     type: 'kava/MsgVote',
     value: {
       proposal_id: String(proposalID),
       voter: voter,
       vote_type: voteType,
+    },
+  };
+}
+
+function newMsgVoteGovernance(proposalID: string, voter: string, voteType: VoteType) {
+  return {
+    type: 'cosmos-sdk/MsgVote',
+    value: {
+      voter: voter,
+      proposal_id: proposalID,
+      option: voteType,
     },
   };
 }
@@ -403,6 +415,7 @@ export const kava = {
   newMsgLiquidate,
   newMsgSubmitProposal,
   newMsgVote,
+  newMsgVoteGovernance,
   newMsgClaimUSDXMintingReward,
   newMsgClaimUSDXMintingRewardVVesting,
   newMsgClaimHardReward,
