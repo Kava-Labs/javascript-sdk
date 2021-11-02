@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import { VoteType } from '../../types/VoteType';
 
 const FEE_DEFAULT = { amount: [], gas: '300000' };
 
@@ -40,7 +41,19 @@ function newMsgSend(address: string, to: string, coins: any[]) {
   return sendTx;
 }
 
+function newMsgVoteGovernance(proposalID: string, voter: string, voteType: VoteType) {
+  return {
+    type: 'cosmos-sdk/MsgVote',
+    value: {
+      voter: voter,
+      proposal_id: proposalID,
+      option: voteType,
+    },
+  };
+}
+
 export const cosmos = {
   newStdTx,
   newMsgSend,
+  newMsgVoteGovernance
 };

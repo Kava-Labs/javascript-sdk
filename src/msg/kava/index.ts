@@ -204,17 +204,6 @@ function newMsgVote(proposalID: string, voter: string, voteType: VoteType) {
   };
 }
 
-function newMsgVoteGovernance(proposalID: string, voter: string, voteType: VoteType) {
-  return {
-    type: 'cosmos-sdk/MsgVote',
-    value: {
-      voter: voter,
-      proposal_id: proposalID,
-      option: voteType,
-    },
-  };
-}
-
 /***************************************************
  *                   Incentive
  ***************************************************/
@@ -415,7 +404,6 @@ export const kava = {
   newMsgLiquidate,
   newMsgSubmitProposal,
   newMsgVote,
-  newMsgVoteGovernance,
   newMsgClaimUSDXMintingReward,
   newMsgClaimUSDXMintingRewardVVesting,
   newMsgClaimHardReward,
