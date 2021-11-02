@@ -1,10 +1,10 @@
-const Env = require("./static/env").env;
-const KavaClient = require("../src/client").KavaClient;
-const kavaUtils = require('../src/utils').utils;
+import { env as Env } from "./static/env";
+import { KavaClient as KavaClient } from "../src/client";
+import { utils as kavaUtils } from "../src/utils";
 
 var main = async () => {
     // Start new Kava client
-    kavaClient = new KavaClient(Env.KavaEndpoints.Testnet);
+    const kavaClient = new KavaClient(Env.KavaEndpoints.Testnet);
     kavaClient.setWallet(Env.KavaAccount.Testnet.Mnemonic);
     await kavaClient.initChain();
 

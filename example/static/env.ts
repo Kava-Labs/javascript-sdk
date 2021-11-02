@@ -45,7 +45,7 @@ const BinanceDeputy = {
     Mainnet: "bnb1jh7uv2rm6339yue8k4mj9406k3509kr4wt5nxn"
 }
 
-module.exports.env = {
+export const env = {
     KavaAccount,
     KavaEndpoints,
     KavaDeputy,

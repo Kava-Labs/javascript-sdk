@@ -1,4 +1,5 @@
-const _ = require('lodash');
+import _ from 'lodash';
+import { VoteType } from '../../types/VoteType';
 
 const FEE_DEFAULT = { amount: [], gas: '300000' };
 
@@ -10,20 +11,25 @@ const FEE_DEFAULT = { amount: [], gas: '300000' };
  * @param {Object} signatures generated when an address signs a data package, required for tx confirmation
  * @return {Promise}
  */
-function newStdTx(msgs, fee = FEE_DEFAULT, memo = '', signatures = null) {
+function newStdTx(
+  msgs: any[],
+  fee = FEE_DEFAULT,
+  memo = '',
+  signatures = null
+) {
   return {
     type: 'cosmos-sdk/StdTx',
     value: {
-    msg: msgs,
-    fee: fee,
-    signatures: signatures,
-    memo: memo,
+      msg: msgs,
+      fee: fee,
+      signatures: signatures,
+      memo: memo,
     },
   };
 }
 
 // newMsgSend creates a new MsgSend
-function newMsgSend(address, to, coins) {
+function newMsgSend(address: string, to: string, coins: any[]) {
   const sendTx = {
     type: 'cosmos-sdk/MsgSend',
     value: {
@@ -35,7 +41,19 @@ function newMsgSend(address, to, coins) {
   return sendTx;
 }
 
-module.exports.cosmos = {
-  newStdTx,
-  newMsgSend
+function newMsgVoteGovernance(proposalID: string, voter: string, voteType: VoteType) {
+  return {
+    type: 'cosmos-sdk/MsgVote',
+    value: {
+      voter: voter,
+      proposal_id: proposalID,
+      option: voteType,
+    },
+  };
 }
+
+export const cosmos = {
+  newStdTx,
+  newMsgSend,
+  newMsgVoteGovernance
+};
