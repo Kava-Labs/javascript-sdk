@@ -10,4 +10,6 @@ const Kava = {
   crypto,
 };
 
+export { tx, msg, utils, crypto };
+
 export default Kava;
