@@ -1,8 +1,8 @@
-const sig = require('@kava-labs/sig');
-const _ = require('lodash');
-const tx = require('../tx').tx;
-const msg = require('../msg').msg;
-const Hard = require('./hard').Hard;
+import * as sig from "@kava-labs/sig";
+import _ from "lodash";
+import { tx } from "../tx";
+import { msg } from "../msg";
+import { Hard } from "./hard";
 
 const KAVA_PREFIX = 'kava';
 const DERIVATION_PATH = "m/44'/459'/0'/0/0";
@@ -49,10 +49,21 @@ const api = {
   getProposal: '/committee/proposals', // endpoint also used by getProposer, getProposalTally, getProposalVotes
 };
 
+type Wallet = {
+  address: string;
+}
+
 /**
  * The Kava client.
  */
-class KavaClient {
+export class KavaClient {
+  public baseURI: string;
+  public broadcastMode: string;
+  public hard: Hard;
+  public wallet: Wallet;
+  public chainID: string;
+  public accNum: string;
+
   /**
    * @param {String} server Kava public url
    */
@@ -105,16 +116,16 @@ class KavaClient {
    * Set broadcast mode
    * @param {String} mode transaction broadcast mode
    */
-  setBroadcastMode(mode) {
+  setBroadcastMode(mode: string) {
     if (!mode) {
       throw new Error('broadcast mode cannot be undefined');
     }
     if (mode != 'async' && mode != 'sync' && mode != 'block') {
-      throw new Error(
+      throw new Error([
         'invalid broadcast mode ',
         mode,
         ' - must be async, sync, or block'
-      );
+      ].join(' '));
     }
     this.broadcastMode = String(mode);
     return this;
@@ -1236,5 +1247,3 @@ class KavaClient {
     return await this.sendTx([msgSetPauseStatus], fee, sequence);
   }
 }
-
-module.exports.KavaClient = KavaClient;

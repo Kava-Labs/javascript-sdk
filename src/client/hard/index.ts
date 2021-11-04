@@ -1,5 +1,6 @@
-const tx = require('../../tx').tx;
-const msg = require('../../msg').msg;
+import { tx } from "../../tx";
+import { msg } from "../../msg";
+import { KavaClient } from "..";
 
 const DEFAULT_GAS = 300000;
 
@@ -12,12 +13,11 @@ const api = {
     getTotalBorrowed: '/hard/total-borrowed',
   };
 
-class Hard {
+export class Hard {
+  public kavaClient: KavaClient;
+  public static instance: Hard;
 
-  /**
-   * @param {Object} kavaClient
-   */
-  constructor(kavaClient) {
+  constructor(kavaClient: KavaClient) {
     if (!Hard.instance) {
       this.kavaClient = kavaClient;
       Hard.instance = this;
@@ -159,6 +159,7 @@ class Hard {
    */
   async repay(amount, gas = DEFAULT_GAS, sequence = null) {
     const msgRepay = msg.hard.newMsgRepay(
+      this.kavaClient.wallet.address,
       this.kavaClient.wallet.address,
       amount,
     );

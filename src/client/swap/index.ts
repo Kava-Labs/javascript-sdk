@@ -1,5 +1,6 @@
-const tx = require('../../tx').tx;
-const msg = require('../../msg').msg;
+import { tx } from "../../tx";
+import { msg } from "../../msg";
+import { KavaClient } from "..";
 
 const DEFAULT_GAS = 300000;
 
@@ -11,11 +12,10 @@ const api = {
   };
 
 class Swap {
+  public kavaClient: KavaClient;
+  public static instance: Swap;
 
-  /**
-   * @param {Object} kavaClient
-   */
-  constructor(kavaClient) {
+  constructor(kavaClient: KavaClient) {
     if (!Swap.instance) {
       this.kavaClient = kavaClient;
       Swap.instance = this;
@@ -138,7 +138,7 @@ class Swap {
     );
     const fee = { amount: [], gas: String(gas) };
     // I think this is a bug, should be: msgSwapExactForTokens
-    return await this.kavaClient.sendTx([swapExactForTokens], fee, sequence);
+    return await this.kavaClient.sendTx([msgSwapExactForTokens], fee, sequence);
   }
 
   /**
@@ -161,7 +161,7 @@ class Swap {
     );
     const fee = { amount: [], gas: String(gas) };
     // I think this is a bug, should be: msgSwapForExactTokens
-    return await this.kavaClient.sendTx([swapForExactTokens], fee, sequence);
+    return await this.kavaClient.sendTx([msgSwapForExactTokens], fee, sequence);
   }
 }
 
