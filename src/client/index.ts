@@ -3,6 +3,7 @@ import _ from "lodash";
 import { tx } from "../tx";
 import { msg } from "../msg";
 import { Hard } from "./hard";
+import { Wallet } from "@kava-labs/sig";
 
 const KAVA_PREFIX = 'kava';
 const DERIVATION_PATH = "m/44'/459'/0'/0/0";
@@ -48,10 +49,6 @@ const api = {
   getCommittees: '/committee/committees',
   getProposal: '/committee/proposals', // endpoint also used by getProposer, getProposalTally, getProposalVotes
 };
-
-type Wallet = {
-  address: string;
-}
 
 /**
  * The Kava client.
