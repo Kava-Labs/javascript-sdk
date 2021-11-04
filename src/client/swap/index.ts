@@ -137,7 +137,6 @@ class Swap {
       deadline
     );
     const fee = { amount: [], gas: String(gas) };
-    // I think this is a bug, should be: msgSwapExactForTokens
     return await this.kavaClient.sendTx([msgSwapExactForTokens], fee, sequence);
   }
 
@@ -160,7 +159,6 @@ class Swap {
       deadline
     );
     const fee = { amount: [], gas: String(gas) };
-    // I think this is a bug, should be: msgSwapForExactTokens
     return await this.kavaClient.sendTx([msgSwapForExactTokens], fee, sequence);
   }
 }
