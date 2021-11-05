@@ -1,3 +1,4 @@
+import { Coin } from '@kava-labs/sig';
 import _ from 'lodash';
 import { VoteType } from '../../types/VoteType';
 
@@ -29,7 +30,7 @@ function newStdTx(
 }
 
 // newMsgSend creates a new MsgSend
-function newMsgSend(address: string, to: string, coins: any[]) {
+function newMsgSend(address: string, to: string, coins: Coin[]) {
   const sendTx = {
     type: 'cosmos-sdk/MsgSend',
     value: {

@@ -51,7 +51,7 @@ function newMsgCreateAtomicSwap(
 function newMsgClaimAtomicSwap(
   sender: string,
   swapID: string,
-  randomNumber: number
+  randomNumber: string
 ) {
   return {
     type: 'bep3/MsgClaimAtomicSwap',
