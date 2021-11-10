@@ -1,11 +1,12 @@
-import * as sig from "@kava-labs/sig";
+const sig = require('@kava-labs/sig');
 import _ from "lodash";
 import { tx } from "../tx";
 import { msg } from "../msg";
 import { Hard } from "./hard";
-import { Coin, Wallet } from "@kava-labs/sig";
 import { DenomToClaim } from "../types/DenomToClaim";
 import { VoteType } from "../types/VoteType";
+import { Wallet } from "../types/Wallet";
+import { Coin } from "../types/Coin";
 
 const KAVA_PREFIX = 'kava';
 const DERIVATION_PATH = "m/44'/459'/0'/0/0";

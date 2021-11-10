@@ -1,5 +1,5 @@
-import { Coin } from '@kava-labs/sig';
 import _ from 'lodash';
+import { Coin } from '../../types/Coin';
 import { VoteType } from '../../types/VoteType';
 
 const FEE_DEFAULT = { amount: [], gas: '300000' };
