@@ -1,5 +1,7 @@
-const tx = require('../../tx').tx;
-const msg = require('../../msg').msg;
+import { tx } from "../../tx";
+import { msg } from "../../msg";
+import { KavaClient } from "..";
+import { Coin } from "../../types/Coin";
 
 const DEFAULT_GAS = 300000;
 
@@ -12,12 +14,12 @@ const api = {
     getTotalBorrowed: '/hard/total-borrowed',
   };
 
-class Hard {
+export class Hard {
+  // @ts-ignore
+  public kavaClient: KavaClient;
+  public static instance: Hard;
 
-  /**
-   * @param {Object} kavaClient
-   */
-  constructor(kavaClient) {
+  constructor(kavaClient: KavaClient) {
     if (!Hard.instance) {
       this.kavaClient = kavaClient;
       Hard.instance = this;
@@ -109,7 +111,10 @@ class Hard {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async deposit(amount, gas = DEFAULT_GAS, sequence = null) {
+  async deposit(amount: Coin[], gas = DEFAULT_GAS, sequence = null) {
+    if (!this.kavaClient.wallet) {
+      throw Error('Wallet has not yet been initialized')
+    }
     const msgDeposit = msg.hard.newMsgDeposit(
       this.kavaClient.wallet.address,
       amount,
@@ -125,7 +130,10 @@ class Hard {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async withdraw(amount, gas = DEFAULT_GAS, sequence = null) {
+  async withdraw(amount: Coin[], gas = DEFAULT_GAS, sequence = null) {
+    if (!this.kavaClient.wallet) {
+      throw Error('Wallet has not yet been initialized')
+    }
     const msgWithdraw = msg.hard.newMsgWithdraw(
       this.kavaClient.wallet.address,
       amount,
@@ -141,7 +149,10 @@ class Hard {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async borrow(amount, gas = DEFAULT_GAS, sequence = null) {
+  async borrow(amount: Coin[], gas = DEFAULT_GAS, sequence = null) {
+    if (!this.kavaClient.wallet) {
+      throw Error('Wallet has not yet been initialized')
+    }
     const msgBorrow = msg.hard.newMsgBorrow(
       this.kavaClient.wallet.address,
       amount,
@@ -157,8 +168,12 @@ class Hard {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async repay(amount, gas = DEFAULT_GAS, sequence = null) {
+  async repay(amount: Coin[], gas = DEFAULT_GAS, sequence = null) {
+    if (!this.kavaClient.wallet) {
+      throw Error('Wallet has not yet been initialized')
+    }
     const msgRepay = msg.hard.newMsgRepay(
+      this.kavaClient.wallet.address,
       this.kavaClient.wallet.address,
       amount,
     );
@@ -173,7 +188,10 @@ class Hard {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async liquidate(borrower, gas = DEFAULT_GAS, sequence = null) {
+  async liquidate(borrower: string, gas = DEFAULT_GAS, sequence = null) {
+    if (!this.kavaClient.wallet) {
+      throw Error('Wallet has not yet been initialized')
+    }
     const msgLiquidate = msg.hard.newMsgLiquidate(
       this.kavaClient.wallet.address,
       borrower,

@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import { Coin } from '../../types/Coin';
 import { VoteType } from '../../types/VoteType';
 
 const FEE_DEFAULT = { amount: [], gas: '300000' };
@@ -29,7 +30,7 @@ function newStdTx(
 }
 
 // newMsgSend creates a new MsgSend
-function newMsgSend(address: string, to: string, coins: any[]) {
+function newMsgSend(address: string, to: string, coins: Coin[]) {
   const sendTx = {
     type: 'cosmos-sdk/MsgSend',
     value: {
