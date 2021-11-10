@@ -1,7 +1,7 @@
 import { tx } from "../../tx";
 import { msg } from "../../msg";
 import { KavaClient } from "..";
-import { Coin } from "@kava-labs/sig";
+import { Coin } from "../../types/Coin";
 
 const DEFAULT_GAS = 300000;
 
