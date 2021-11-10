@@ -1,6 +1,7 @@
 import { tx } from "../../tx";
 import { msg } from "../../msg";
 import { KavaClient } from "..";
+import { Coin } from "@kava-labs/sig";
 
 const DEFAULT_GAS = 300000;
 
@@ -12,6 +13,7 @@ const api = {
   };
 
 class Swap {
+  // @ts-ignore
   public kavaClient: KavaClient;
   public static instance: Swap;
 
@@ -83,7 +85,10 @@ class Swap {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async deposit(tokenA, tokenB, slippage, deadline, gas = DEFAULT_GAS, sequence = null) {
+  async deposit(tokenA: Coin, tokenB: Coin, slippage: string, deadline: string, gas = DEFAULT_GAS, sequence = null) {
+    if (!this.kavaClient.wallet) {
+      throw Error('Wallet has not yet been initialized')
+    }
     const msgDeposit = msg.swap.newMsgDeposit(
       this.kavaClient.wallet.address,
       tokenA,
@@ -106,7 +111,10 @@ class Swap {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async withdraw(shares, minTokenA, minTokenB, deadline, gas = DEFAULT_GAS, sequence = null) {
+  async withdraw(shares: any, minTokenA: Coin, minTokenB: Coin, deadline: string, gas = DEFAULT_GAS, sequence = null) {
+    if (!this.kavaClient.wallet) {
+      throw Error('Wallet has not yet been initialized')
+    }
     const msgWithdraw = msg.swap.newMsgWithdraw(
       this.kavaClient.wallet.address,
       shares,
@@ -128,10 +136,13 @@ class Swap {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async swapExactForTokens(extactTokenA, tokenB, slippage, deadline, gas = DEFAULT_GAS, sequence = null) {
+  async swapExactForTokens(exactTokenA: Coin, tokenB: Coin, slippage: string, deadline: string, gas = DEFAULT_GAS, sequence = null) {
+    if (!this.kavaClient.wallet) {
+      throw Error('Wallet has not yet been initialized')
+    }
     const msgSwapExactForTokens = msg.swap.newMsgSwapExactForTokens(
       this.kavaClient.wallet.address,
-      extactTokenA,
+      exactTokenA,
       tokenB,
       slippage,
       deadline
@@ -150,11 +161,14 @@ class Swap {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async swapForExactTokens(tokenA, extactTokenB, slippage, deadline, gas = DEFAULT_GAS, sequence = null) {
+  async swapForExactTokens(tokenA: Coin, exactTokenB: Coin, slippage: string, deadline: string, gas = DEFAULT_GAS, sequence = null) {
+    if (!this.kavaClient.wallet) {
+      throw Error('Wallet has not yet been initialized')
+    }
     const msgSwapForExactTokens = msg.swap.newMsgSwapForExactTokens(
       this.kavaClient.wallet.address,
       tokenA,
-      extactTokenB,
+      exactTokenB,
       slippage,
       deadline
     );
