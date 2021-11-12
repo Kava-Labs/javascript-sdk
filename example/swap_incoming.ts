@@ -14,7 +14,7 @@ var incomingSwap = async () => {
   // Start new Kava client
   kavaClient = new KavaClient(Env.KavaEndpoints.Testnet);
   kavaClient.setWallet(Env.KavaAccount.Testnet.Mnemonic);
-  kavaClient.setBroadcastMode("async");
+  kavaClient.setBroadcastMode('async');
   await kavaClient.initChain();
 
   // Start Binance Chain client
@@ -34,9 +34,9 @@ var incomingSwap = async () => {
   const amount = 1 * BNB_CONVERSION_FACTOR;
 
   // Addresses involved in the swap
-  const sender = Env.BinanceAccount.Testnet.Address // user's address on Binance Chain
-  const recipient = Env.BinanceDeputy.Testnet // deputy's address on Binance Chain
-  const senderOtherChain = Env.KavaDeputy.Testnet // deputy's address on Kava
+  const sender = Env.BinanceAccount.Testnet.Address; // user's address on Binance Chain
+  const recipient = Env.BinanceDeputy.Testnet; // deputy's address on Binance Chain
+  const senderOtherChain = Env.KavaDeputy.Testnet; // deputy's address on Kava
   const recipientOtherChain = Env.KavaAccount.Testnet.Address; // user's address on Kava
 
   // Format asset/amount parameters as tokens, expectedIncome
@@ -133,7 +133,7 @@ var printSwapIDs = (randomNumberHash, sender, senderOtherChain) => {
 
 // Sleep is a wait function
 function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 main();
