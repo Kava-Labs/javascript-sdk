@@ -36,7 +36,7 @@ function newMsgSend(address: string, to: string, coins: Coin[]) {
     value: {
       from_address: address,
       to_address: to,
-      amount: _.sortBy(coins, 'denom'),
+      amount: coins.sort((coinA, coinB) => coinA.denom > coinB.denom ? 1 : -1)
     },
   };
   return sendTx;

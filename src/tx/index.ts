@@ -1,6 +1,5 @@
 const sig = require('@kava-labs/sig');
-import _ from 'lodash';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { URL } from 'url';
 
 const api = {
@@ -104,8 +103,8 @@ const retry: RetryFunction = async (
 async function loadMetaData(address: string, base: string, timeout = 2000) {
   const path = api.getAccount + '/' + address;
   const res = await getTx(path, base, timeout);
-  const accNum = _.get(res, 'data.result.value.account_number');
-  const seqNum = _.get(res, 'data.result.value.sequence');
+  const accNum = res?.data?.result?.value?.account_number;
+  const seqNum = res?.data?.result?.value?.sequence;
   if (!(accNum || seqNum)) {
     throw new Error(
       'account number or sequence number from rest server are undefined'
@@ -148,34 +147,34 @@ async function broadcastTx(tx: any, base: string, mode: string) {
     const url = new URL(api.postTx, base).toString();
     txRes = await axios.post(url, sig.createBroadcastTx(tx.value, mode));
   } catch (err) {
-    if (err instanceof Error) {
+    if (axios.isAxiosError(err)) {
       logErr(err);
     }
   }
 
   // Check for and handle any tendermint errors
   try {
-    if (_.get(txRes, 'data.code')) {
+    if (txRes?.data?.code) {
       throw new Error(
-        `tx not accepted by chain: ${_.get(txRes, 'data.raw_log')}`
+        `tx not accepted by chain: ${txRes.data.raw_log}`
       );
     }
   } catch (err) {
     return err;
   }
 
-  return _.get(txRes, 'data.txhash');
+  return txRes?.data?.txhash;
 }
 
 /**
  * Parses and logs tx-related errors
- * @param {object} err an error resulting from a tx-related action
+ * @param {AxiosError} err an error resulting from a tx-related action
  */
-const logErr = (err: Error) => {
+const logErr = (err: AxiosError) => {
   // Load status, status text, and error
-  const status = _.get(err, 'response.status');
-  const statusText = _.get(err, 'response.statusText');
-  const error = _.get(err, 'response.data.error');
+  const status = err.response?.status;
+  const statusText = err.response?.statusText;
+  const error = err.response?.data.error;
 
   // Log status, status text, and error, or if unidentified, log network error
   status ? console.log('Status:', status) : null;

@@ -1,5 +1,4 @@
 const sig = require('@kava-labs/sig');
-import _ from "lodash";
 import { tx } from "../tx";
 import { msg } from "../msg";
 import { Hard } from "./hard";
@@ -83,7 +82,7 @@ export class KavaClient {
   async initChain() {
     if (!this.chainID) {
       const res = await tx.getTx(api.nodeInfo, this.baseURI);
-      this.chainID = _.get(res, 'data.node_info.network');
+      this.chainID = res?.data?.node_info?.network;
     }
     return this;
   }
@@ -277,9 +276,9 @@ export class KavaClient {
 
     // If the transaction is found, check that it was accepted by the chain
     try {
-      if (_.get(res, 'data.code')) {
+      if (res?.data?.code) {
         throw new Error(
-          `tx not accepted by chain: "${_.get(res, 'data.raw_log')}"`
+          `tx not accepted by chain: "${res.data.raw_log}"`
         );
       }
      } catch (e) {

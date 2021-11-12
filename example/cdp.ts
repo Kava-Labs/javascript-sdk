@@ -1,4 +1,3 @@
-const _ = require("lodash");
 const Env = require("./static/env").env
 const kavaUtils = require("../src/utils").utils;
 const KavaClient = require("../src/client").KavaClient;
@@ -8,14 +7,14 @@ const USDX_CONVERSION_FACTOR = 10 ** 6;
 
 var main = async () => {
     // Start new Kava client
-    kavaClient = new KavaClient(Env.KavaEndpoints.Testnet);
+    const kavaClient = new KavaClient(Env.KavaEndpoints.Testnet);
     kavaClient.setWallet(Env.KavaAccount.Testnet.Mnemonic);
     kavaClient.setBroadcastMode("async");
     await kavaClient.initChain();
 
     // Get minimum principal amount required for CDP creation
     const paramsCDP = await kavaClient.getParamsCDP();
-    const debtParam = _.get(paramsCDP, "debt_param");
+    const debtParam = paramsCDP.debt_param;
     const principalAmount = Number(debtParam.debt_floor);
     console.log("Minimum principal:", principalAmount + "usdx");
 
@@ -33,10 +32,10 @@ var main = async () => {
 
     // Confirm that our account has sufficient funds
     try {
-    account = await kavaClient.getAccount(kavaClient.wallet.address);
-    const coins = _.get(account, "value.coins");
+    const account = await kavaClient.getAccount(kavaClient.wallet.address);
+    const coins = account.value.coins;
     const bnbBalance = coins.find(coin => coin.denom == "bnb").amount;
-    if ((bnbBalance)* BNB_CONVERSION_FACTOR < collateralAmount) {
+    if ((bnbBalance)* BNB_CONVERSION_FACTOR < Number(collateralAmount)) {
         throw { message: "Account only has " + bnbBalance + "bnb" };
     }
     } catch (err) {
