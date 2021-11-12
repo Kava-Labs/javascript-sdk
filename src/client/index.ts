@@ -1,15 +1,17 @@
 const sig = require('@kava-labs/sig');
-const _ = require('lodash');
-const tx = require('../tx').tx;
-const msg = require('../msg').msg;
-const Hard = require('./hard').Hard;
+import { tx } from '../tx';
+import { msg } from '../msg';
+import { Hard } from './hard';
+import { DenomToClaim } from '../types/DenomToClaim';
+import { VoteType } from '../types/VoteType';
+import { Wallet } from '../types/Wallet';
+import { Coin } from '../types/Coin';
 
 const KAVA_PREFIX = 'kava';
 const DERIVATION_PATH = "m/44'/459'/0'/0/0";
 const DERIVATION_PATH_LEGACY = "m/44'/118'/0'/0/0";
-const DEFAULT_FEE = { amount: [], gas: String(300000) }
-const DEFAULT_CDP_FEE = { amount: [], gas: String(650000) }
-
+const DEFAULT_FEE = { amount: [], gas: String(300000) };
+const DEFAULT_CDP_FEE = { amount: [], gas: String(650000) };
 
 const api = {
   txs: '/txs',
@@ -54,11 +56,18 @@ const api = {
 /**
  * The Kava client.
  */
-class KavaClient {
+export class KavaClient {
+  public baseURI: string;
+  public broadcastMode: string;
+  public hard: Hard;
+  public wallet?: Wallet;
+  public chainID?: string;
+  public accNum?: string;
+
   /**
    * @param {String} server Kava public url
    */
-  constructor(server) {
+  constructor(server: string) {
     if (!server) {
       throw new Error('Kava server should not be null');
     }
@@ -74,7 +83,7 @@ class KavaClient {
   async initChain() {
     if (!this.chainID) {
       const res = await tx.getTx(api.nodeInfo, this.baseURI);
-      this.chainID = _.get(res, 'data.node_info.network');
+      this.chainID = res?.data?.node_info?.network;
     }
     return this;
   }
@@ -83,7 +92,7 @@ class KavaClient {
    * Manually set the chain's ID
    * @param {String} chainID Kava chain ID
    */
-  setChainID(chainID) {
+  setChainID(chainID: string) {
     if (!chainID) {
       throw new Error('chainID cannot be undefined');
     }
@@ -95,7 +104,7 @@ class KavaClient {
    * Manually set the wallet's account number
    * @param {String} accNum Account number of the Kava address
    */
-  setAccountNumber(accNum) {
+  setAccountNumber(accNum: string) {
     if (!accNum) {
       throw new Error('account number cannot be undefined');
     }
@@ -107,15 +116,17 @@ class KavaClient {
    * Set broadcast mode
    * @param {String} mode transaction broadcast mode
    */
-  setBroadcastMode(mode) {
+  setBroadcastMode(mode: string) {
     if (!mode) {
       throw new Error('broadcast mode cannot be undefined');
     }
     if (mode != 'async' && mode != 'sync' && mode != 'block') {
       throw new Error(
-        'invalid broadcast mode ',
-        mode,
-        ' - must be async, sync, or block'
+        [
+          'invalid broadcast mode ',
+          mode,
+          ' - must be async, sync, or block',
+        ].join(' ')
       );
     }
     this.broadcastMode = String(mode);
@@ -129,15 +140,11 @@ class KavaClient {
    * @param {boolean} legacy optional param to use the legacy coin type
    * @return {Promise}
    */
-  setWallet(
-    mnemonic,
-    password = '',
-    legacy = false,
-  ) {
+  setWallet(mnemonic: string, password = '', legacy = false) {
     if (!mnemonic) {
       throw new Error('mnemonic cannot be undefined');
     }
-    const derivationPath = legacy ? DERIVATION_PATH_LEGACY : DERIVATION_PATH
+    const derivationPath = legacy ? DERIVATION_PATH_LEGACY : DERIVATION_PATH;
     this.wallet = sig.createWalletFromMnemonic(
       mnemonic,
       password,
@@ -152,7 +159,7 @@ class KavaClient {
    * @param {String} sequence Kava address sequence
    * @return {Promise}
    */
-  async prepareSignInfo(sequence) {
+  async prepareSignInfo(sequence: string | null) {
     let signInfo;
     if (sequence && this.accNum != null) {
       // Prepare signing info from manually set values
@@ -162,6 +169,9 @@ class KavaClient {
         sequence: String(sequence),
       };
     } else {
+      if (!this.wallet) {
+        throw Error('Wallet has not yet been initialized');
+      }
       // Load meta data from the account's chain state
       const meta = await tx.loadMetaData(this.wallet.address, this.baseURI);
       // Select manually set values over automatically pulled values
@@ -184,7 +194,7 @@ class KavaClient {
    * @param {String} sequence account sequence
    * @return {Promise}
    */
-  async sendTx(msgs, fee, sequence) {
+  async sendTx(msgs: any[], fee: any, sequence: string | null) {
     const rawTx = msg.cosmos.newStdTx(msgs, fee);
     const signInfo = await this.prepareSignInfo(sequence);
     const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
@@ -200,10 +210,10 @@ class KavaClient {
    * @return {Promise}
    */
   async getLatestBlock(timeout = 2000) {
-      const res = await tx.getTx(api.getLatestBlock, this.baseURI, timeout);
-      if (res && res.data) {
-        return res.data;
-      }
+    const res = await tx.getTx(api.getLatestBlock, this.baseURI, timeout);
+    if (res && res.data) {
+      return res.data;
+    }
   }
 
   /**
@@ -212,7 +222,7 @@ class KavaClient {
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getBlock(height, timeout = 2000) {
+  async getBlock(height: number, timeout = 2000) {
     const path = api.getBlock + '/' + String(height);
     const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
@@ -226,7 +236,11 @@ class KavaClient {
    * @return {Promise}
    */
   async getLatestValidatorSet(timeout = 2000) {
-    const res = await tx.getTx(api.getLatestValidatorSet, this.baseURI, timeout);
+    const res = await tx.getTx(
+      api.getLatestValidatorSet,
+      this.baseURI,
+      timeout
+    );
     if (res && res.data) {
       return res.data;
     }
@@ -238,7 +252,7 @@ class KavaClient {
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getValidatorSet(height, timeout = 2000) {
+  async getValidatorSet(height: number, timeout = 2000) {
     const path = api.getValidatorSet + '/' + String(height);
     const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
@@ -252,7 +266,7 @@ class KavaClient {
    * @param {Number} timeout milliseconds until the transaction will be considered not found
    * @return {Promise}
    */
-  async checkTxHash(txHash, timeout = 10000) {
+  async checkTxHash(txHash: string, timeout = 10000) {
     const path = api.txs + '/' + txHash;
     let res;
 
@@ -265,14 +279,12 @@ class KavaClient {
 
     // If the transaction is found, check that it was accepted by the chain
     try {
-      if (_.get(res, 'data.code')) {
-        throw new Error(
-          `tx not accepted by chain: "${_.get(res, 'data.raw_log')}"`
-        );
+      if (res?.data?.code) {
+        throw new Error(`tx not accepted by chain: "${res.data.raw_log}"`);
       }
-     } catch (e) {
-       console.log("\n" + e)
-     }
+    } catch (e) {
+      console.log('\n' + e);
+    }
 
     return res.data;
   }
@@ -286,7 +298,7 @@ class KavaClient {
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getAccount(address, timeout = 2000) {
+  async getAccount(address: string, timeout = 2000) {
     const path = api.getAccount + '/' + address;
     const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
@@ -300,7 +312,7 @@ class KavaClient {
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getBalances(address, timeout = 2000) {
+  async getBalances(address: string, timeout = 2000) {
     const path = api.getBalances + '/' + address;
     const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
@@ -354,7 +366,7 @@ class KavaClient {
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getSupplyOf(denom, timeout = 2000) {
+  async getSupplyOf(denom: string, timeout = 2000) {
     const path = api.getSupply + '/' + denom;
     const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
@@ -370,8 +382,20 @@ class KavaClient {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async transfer(recipient, coins, fee = DEFAULT_FEE, sequence = null) {
-    const msgSend = msg.cosmos.newMsgSend(this.wallet.address, recipient, coins);
+  async transfer(
+    recipient: string,
+    coins: Coin[],
+    fee = DEFAULT_FEE,
+    sequence = null
+  ) {
+    if (!this.wallet) {
+      throw Error('Wallet has not yet been initialized');
+    }
+    const msgSend = msg.cosmos.newMsgSend(
+      this.wallet.address,
+      recipient,
+      coins
+    );
     return await this.sendTx([msgSend], fee, sequence);
   }
 
@@ -396,7 +420,7 @@ class KavaClient {
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getPrice(market, timeout = 2000) {
+  async getPrice(market: string, timeout = 2000) {
     const path = api.getPrice + '/' + market;
     const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
@@ -410,7 +434,7 @@ class KavaClient {
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getRawPrices(market, timeout = 2000) {
+  async getRawPrices(market: string, timeout = 2000) {
     const path = api.getRawPrices + '/' + market;
     const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
@@ -436,7 +460,7 @@ class KavaClient {
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getOracles(denom, timeout = 2000) {
+  async getOracles(denom: string, timeout = 2000) {
     const path = api.getOracles + '/' + denom;
     const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
@@ -453,7 +477,16 @@ class KavaClient {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async postPrice(marketID, price, expiry, fee = DEFAULT_FEE, sequence = null) {
+  async postPrice(
+    marketID: string,
+    price: string,
+    expiry: string,
+    fee = DEFAULT_FEE,
+    sequence = null
+  ) {
+    if (!this.wallet) {
+      throw Error('Wallet has not yet been initialized');
+    }
     const msgPostPrice = msg.kava.newMsgPostPrice(
       this.wallet.address,
       marketID,
@@ -484,7 +517,7 @@ class KavaClient {
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getAuction(id, timeout = 2000) {
+  async getAuction(id: string, timeout = 2000) {
     const path = api.getAuction + '/' + id;
     const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
@@ -513,7 +546,15 @@ class KavaClient {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async placeBid(auctionID, amount, fee = DEFAULT_FEE, sequence = null) {
+  async placeBid(
+    auctionID: string,
+    amount: Coin,
+    fee = DEFAULT_FEE,
+    sequence = null
+  ) {
+    if (!this.wallet) {
+      throw Error('Wallet has not yet been initialized');
+    }
     const msgPlaceBid = msg.kava.newMsgPlaceBid(
       auctionID,
       this.wallet.address,
@@ -544,7 +585,7 @@ class KavaClient {
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getCDP(owner, collateralType, timeout = 2000) {
+  async getCDP(owner: string, collateralType: string, timeout = 2000) {
     const path = api.getCDP + '/' + owner + '/' + collateralType;
     const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
@@ -571,7 +612,7 @@ class KavaClient {
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getCDPsByCollateralType(collateralType, timeout = 2000) {
+  async getCDPsByCollateralType(collateralType: string, timeout = 2000) {
     const path = api.getCDPsByCollateralType + '/' + collateralType;
     const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
@@ -586,7 +627,7 @@ class KavaClient {
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getCDPsByRatio(collateralType, ratio, timeout = 2000) {
+  async getCDPsByRatio(collateralType: string, ratio: string, timeout = 2000) {
     const path = api.getCDPsRatio + '/' + collateralType + '/' + ratio;
     const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
@@ -601,7 +642,7 @@ class KavaClient {
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getDeposits(owner, collateralType, timeout = 2000) {
+  async getDeposits(owner: string, collateralType: string, timeout = 2000) {
     const path = api.getDeposits + '/' + owner + '/' + collateralType;
     const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
@@ -618,7 +659,16 @@ class KavaClient {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async createCDP(principal, collateral, collateralType, fee = DEFAULT_CDP_FEE, sequence = null) {
+  async createCDP(
+    principal: Coin,
+    collateral: Coin,
+    collateralType: string,
+    fee = DEFAULT_CDP_FEE,
+    sequence = null
+  ) {
+    if (!this.wallet) {
+      throw Error('Wallet has not yet been initialized');
+    }
     const msgCreateCDP = msg.kava.newMsgCreateCDP(
       this.wallet.address,
       principal,
@@ -637,7 +687,16 @@ class KavaClient {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async deposit(owner, collateral, collateralType, fee = DEFAULT_CDP_FEE, sequence = null) {
+  async deposit(
+    owner: string,
+    collateral: Coin,
+    collateralType: string,
+    fee = DEFAULT_CDP_FEE,
+    sequence = null
+  ) {
+    if (!this.wallet) {
+      throw Error('Wallet has not yet been initialized');
+    }
     const msgDeposit = msg.kava.newMsgDeposit(
       owner,
       this.wallet.address,
@@ -656,7 +715,16 @@ class KavaClient {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async withdraw(owner, collateral, collateralType, fee = DEFAULT_CDP_FEE, sequence = null) {
+  async withdraw(
+    owner: string,
+    collateral: Coin,
+    collateralType: string,
+    fee = DEFAULT_CDP_FEE,
+    sequence = null
+  ) {
+    if (!this.wallet) {
+      throw Error('Wallet has not yet been initialized');
+    }
     const msgWithdraw = msg.kava.newMsgWithdraw(
       owner,
       this.wallet.address,
@@ -674,7 +742,15 @@ class KavaClient {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async drawDebt(collateralType, principal, fee = DEFAULT_CDP_FEE, sequence = null) {
+  async drawDebt(
+    collateralType: string,
+    principal: Coin,
+    fee = DEFAULT_CDP_FEE,
+    sequence = null
+  ) {
+    if (!this.wallet) {
+      throw Error('Wallet has not yet been initialized');
+    }
     const msgDrawDebt = msg.kava.newMsgDrawDebt(
       this.wallet.address,
       collateralType,
@@ -691,7 +767,15 @@ class KavaClient {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async repayDebt(collateralType, payment, fee = DEFAULT_CDP_FEE, sequence = null) {
+  async repayDebt(
+    collateralType: string,
+    payment: Coin,
+    fee = DEFAULT_CDP_FEE,
+    sequence = null
+  ) {
+    if (!this.wallet) {
+      throw Error('Wallet has not yet been initialized');
+    }
     const msgRepayDebt = msg.kava.newMsgRepayDebt(
       this.wallet.address,
       collateralType,
@@ -708,11 +792,19 @@ class KavaClient {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async liquidate(borrower, collateralType, fee = DEFAULT_CDP_FEE, sequence = null) {
+  async liquidate(
+    borrower: string,
+    collateralType: string,
+    fee = DEFAULT_CDP_FEE,
+    sequence = null
+  ) {
+    if (!this.wallet) {
+      throw Error('Wallet has not yet been initialized');
+    }
     const msgLiquidate = msg.kava.newMsgLiquidate(
       this.wallet.address,
       borrower,
-      collateralType,
+      collateralType
     );
     return await this.sendTx([msgLiquidate], fee, sequence);
   }
@@ -738,7 +830,7 @@ class KavaClient {
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getSwap(swapID, timeout = 2000) {
+  async getSwap(swapID: string, timeout = 2000) {
     const path = api.getSwap + '/' + swapID;
     const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
@@ -765,7 +857,7 @@ class KavaClient {
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getAssetSupply(assetDenom, timeout = 2000) {
+  async getAssetSupply(assetDenom: string, timeout = 2000) {
     const path = api.getAssetSupply + '/' + assetDenom;
     const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
@@ -799,16 +891,19 @@ class KavaClient {
    * @return {Promise}
    */
   async createSwap(
-    recipient,
-    recipientOtherChain,
-    senderOtherChain,
-    randomNumberHash,
-    timestamp,
-    amount,
-    heightSpan,
+    recipient: string,
+    recipientOtherChain: string,
+    senderOtherChain: string,
+    randomNumberHash: string,
+    timestamp: number,
+    amount: Coin,
+    heightSpan: number,
     fee = DEFAULT_FEE,
     sequence = null
   ) {
+    if (!this.wallet) {
+      throw Error('Wallet has not yet been initialized');
+    }
     const msgCreateAtomicSwap = msg.kava.newMsgCreateAtomicSwap(
       this.wallet.address,
       recipient,
@@ -830,7 +925,15 @@ class KavaClient {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async claimSwap(swapID, randomNumber, fee = DEFAULT_FEE, sequence = null) {
+  async claimSwap(
+    swapID: string,
+    randomNumber: string,
+    fee = DEFAULT_FEE,
+    sequence = null
+  ) {
+    if (!this.wallet) {
+      throw Error('Wallet has not yet been initialized');
+    }
     const msgClaimAtomicSwap = msg.kava.newMsgClaimAtomicSwap(
       this.wallet.address,
       swapID.toUpperCase(),
@@ -846,8 +949,10 @@ class KavaClient {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async refundSwap(swapID, fee = DEFAULT_FEE, sequence = null) {
-    console.log(fee)
+  async refundSwap(swapID: string, fee = DEFAULT_FEE, sequence = null) {
+    if (!this.wallet) {
+      throw Error('Wallet has not yet been initialized');
+    }
     const msgRefundAtomicSwap = msg.kava.newMsgRefundAtomicSwap(
       this.wallet.address,
       swapID.toUpperCase()
@@ -891,7 +996,14 @@ class KavaClient {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async claimUSDXMintingReward(multiplierName, fee = DEFAULT_FEE, sequence = null) {
+  async claimUSDXMintingReward(
+    multiplierName: string,
+    fee = DEFAULT_FEE,
+    sequence = null
+  ) {
+    if (!this.wallet) {
+      throw Error('Wallet has not yet been initialized');
+    }
     const msgClaimUSDXMintingReward = msg.kava.newMsgClaimUSDXMintingReward(
       this.wallet.address,
       multiplierName
@@ -907,13 +1019,25 @@ class KavaClient {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async claimUSDXMintingRewardVVesting(receiver, multiplierName, fee = DEFAULT_FEE, sequence = null) {
+  async claimUSDXMintingRewardVVesting(
+    receiver: string,
+    multiplierName: string,
+    fee = DEFAULT_FEE,
+    sequence = null
+  ) {
+    if (!this.wallet) {
+      throw Error('Wallet has not yet been initialized');
+    }
     const msgClaimUSDXMintingRewardVVesting = msg.kava.newMsgClaimUSDXMintingRewardVVesting(
       this.wallet.address,
       receiver,
       multiplierName
     );
-    return await this.sendTx([msgClaimUSDXMintingRewardVVesting], fee, sequence);
+    return await this.sendTx(
+      [msgClaimUSDXMintingRewardVVesting],
+      fee,
+      sequence
+    );
   }
 
   /**
@@ -925,7 +1049,14 @@ class KavaClient {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async claimHardReward(denomsToClaim, fee = DEFAULT_FEE, sequence = null) {
+  async claimHardReward(
+    denomsToClaim: DenomToClaim[],
+    fee = DEFAULT_FEE,
+    sequence = null
+  ) {
+    if (!this.wallet) {
+      throw Error('Wallet has not yet been initialized');
+    }
     const msgClaimHardReward = msg.kava.newMsgClaimHardReward(
       this.wallet.address,
       denomsToClaim
@@ -943,11 +1074,19 @@ class KavaClient {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async claimHardRewardVVesting(receiver, denomToClaim, fee = DEFAULT_FEE, sequence = null) {
+  async claimHardRewardVVesting(
+    receiver: string,
+    denomsToClaim: DenomToClaim[],
+    fee = DEFAULT_FEE,
+    sequence = null
+  ) {
+    if (!this.wallet) {
+      throw Error('Wallet has not yet been initialized');
+    }
     const msgClaimHardRewardVVesting = msg.kava.newMsgClaimHardRewardVVesting(
       this.wallet.address,
       receiver,
-      denomToClaim
+      denomsToClaim
     );
     return await this.sendTx([msgClaimHardRewardVVesting], fee, sequence);
   }
@@ -961,7 +1100,14 @@ class KavaClient {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async claimDelegatorReward(denomsToClaim, fee = DEFAULT_FEE, sequence = null) {
+  async claimDelegatorReward(
+    denomsToClaim: DenomToClaim[],
+    fee = DEFAULT_FEE,
+    sequence = null
+  ) {
+    if (!this.wallet) {
+      throw Error('Wallet has not yet been initialized');
+    }
     const msgClaimDelegatorReward = msg.kava.newMsgClaimDelegatorReward(
       this.wallet.address,
       denomsToClaim
@@ -979,11 +1125,19 @@ class KavaClient {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async claimDelegatorRewardVVesting(receiver, denomToClaim, fee = DEFAULT_FEE, sequence = null) {
+  async claimDelegatorRewardVVesting(
+    receiver: string,
+    denomsToClaim: DenomToClaim[],
+    fee = DEFAULT_FEE,
+    sequence = null
+  ) {
+    if (!this.wallet) {
+      throw Error('Wallet has not yet been initialized');
+    }
     const msgClaimDelegatorRewardVVesting = msg.kava.newMsgClaimDelegatorRewardVVesting(
       this.wallet.address,
       receiver,
-      denomToClaim
+      denomsToClaim
     );
     return await this.sendTx([msgClaimDelegatorRewardVVesting], fee, sequence);
   }
@@ -997,7 +1151,14 @@ class KavaClient {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async claimSwapReward(denomsToClaim, fee = DEFAULT_FEE, sequence = null) {
+  async claimSwapReward(
+    denomsToClaim: DenomToClaim[],
+    fee = DEFAULT_FEE,
+    sequence = null
+  ) {
+    if (!this.wallet) {
+      throw Error('Wallet has not yet been initialized');
+    }
     const msgClaimSwapReward = msg.kava.newMsgClaimSwapReward(
       this.wallet.address,
       denomsToClaim
@@ -1015,16 +1176,24 @@ class KavaClient {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async claimSwapRewardVVesting(receiver, denomToClaim, fee = DEFAULT_FEE, sequence = null) {
+  async claimSwapRewardVVesting(
+    receiver: string,
+    denomsToClaim: DenomToClaim[],
+    fee = DEFAULT_FEE,
+    sequence = null
+  ) {
+    if (!this.wallet) {
+      throw Error('Wallet has not yet been initialized');
+    }
     const msgClaimSwapRewardVVesting = msg.kava.newMsgClaimSwapRewardVVesting(
       this.wallet.address,
       receiver,
-      denomToClaim
+      denomsToClaim
     );
     return await this.sendTx([msgClaimSwapRewardVVesting], fee, sequence);
   }
 
- /***************************************************
+  /***************************************************
    *                    Committee
    ***************************************************/
   /**
@@ -1045,8 +1214,8 @@ class KavaClient {
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getCommittee(committeeID, timeout = 2000) {
-    const path = api.getCommittee + '/' + committeeID
+  async getCommittee(committeeID: number, timeout = 2000) {
+    const path = api.getCommittee + '/' + committeeID;
     const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
       return res.data.result;
@@ -1071,8 +1240,8 @@ class KavaClient {
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getCommitteeProposals(committeeID, timeout = 2000) {
-    const path = api.getCommittee + '/' + committeeID + '/proposals'
+  async getCommitteeProposals(committeeID: number, timeout = 2000) {
+    const path = api.getCommittee + '/' + committeeID + '/proposals';
     const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
       return res.data.result;
@@ -1085,8 +1254,8 @@ class KavaClient {
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getProposal(proposalID, timeout = 2000) {
-    const path = api.getProposal + '/' + proposalID
+  async getProposal(proposalID: number, timeout = 2000) {
+    const path = api.getProposal + '/' + proposalID;
     const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
       return res.data.result;
@@ -1099,8 +1268,8 @@ class KavaClient {
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getProposer(proposalID, timeout = 2000) {
-    const path = api.getProposal + '/' + proposalID + "/proposer"
+  async getProposer(proposalID: number, timeout = 2000) {
+    const path = api.getProposal + '/' + proposalID + '/proposer';
     const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
       return res.data.result;
@@ -1113,8 +1282,8 @@ class KavaClient {
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getProposalTally(proposalID, timeout = 2000) {
-    const path = api.getProposal + '/' + proposalID + "/tally"
+  async getProposalTally(proposalID: number, timeout = 2000) {
+    const path = api.getProposal + '/' + proposalID + '/tally';
     const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
       return res.data.result;
@@ -1127,8 +1296,8 @@ class KavaClient {
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getProposalVotes(proposalID, timeout = 2000) {
-    const path = api.getProposal + '/' + proposalID + "/votes"
+  async getProposalVotes(proposalID: number, timeout = 2000) {
+    const path = api.getProposal + '/' + proposalID + '/votes';
     const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
       return res.data.result;
@@ -1143,7 +1312,15 @@ class KavaClient {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async submitCommitteeProposal(proposal, committeeID, fee = DEFAULT_FEE, sequence = null) {
+  async submitCommitteeProposal(
+    proposal: string,
+    committeeID: string,
+    fee = DEFAULT_FEE,
+    sequence = null
+  ) {
+    if (!this.wallet) {
+      throw Error('Wallet has not yet been initialized');
+    }
     const msgSubmitProposal = msg.kava.newMsgSubmitProposal(
       proposal,
       this.wallet.address,
@@ -1159,7 +1336,15 @@ class KavaClient {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async voteOnCommitteeProposal(proposalID, voteType, fee = DEFAULT_FEE, sequence = null) {
+  async voteOnCommitteeProposal(
+    proposalID: string,
+    voteType: VoteType,
+    fee = DEFAULT_FEE,
+    sequence = null
+  ) {
+    if (!this.wallet) {
+      throw Error('Wallet has not yet been initialized');
+    }
     const msgVote = msg.kava.newMsgVote(
       proposalID,
       this.wallet.address,
@@ -1191,7 +1376,15 @@ class KavaClient {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async issueTokens(tokens, receiver, fee = DEFAULT_FEE, sequence = null) {
+  async issueTokens(
+    tokens: Coin[],
+    receiver: string,
+    fee = DEFAULT_FEE,
+    sequence = null
+  ) {
+    if (!this.wallet) {
+      throw Error('Wallet has not yet been initialized');
+    }
     const msgIssueTokens = msg.kava.newMsgIssueTokens(
       this.wallet.address,
       tokens,
@@ -1207,7 +1400,10 @@ class KavaClient {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async redeemTokens(tokens, fee = DEFAULT_FEE, sequence = null) {
+  async redeemTokens(tokens: Coin[], fee = DEFAULT_FEE, sequence = null) {
+    if (!this.wallet) {
+      throw Error('Wallet has not yet been initialized');
+    }
     const msgRedeemTokens = msg.kava.newMsgRedeemTokens(
       this.wallet.address,
       tokens
@@ -1223,7 +1419,15 @@ class KavaClient {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async blockAddress(denom, blockedAddress, fee = DEFAULT_FEE, sequence = null) {
+  async blockAddress(
+    denom: string,
+    blockedAddress: string,
+    fee = DEFAULT_FEE,
+    sequence = null
+  ) {
+    if (!this.wallet) {
+      throw Error('Wallet has not yet been initialized');
+    }
     const msgBlockAddress = msg.kava.newMsgBlockAddress(
       this.wallet.address,
       denom,
@@ -1240,7 +1444,15 @@ class KavaClient {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async unblockAddress(denom, blockedAddress, fee = DEFAULT_FEE, sequence = null) {
+  async unblockAddress(
+    denom: string,
+    blockedAddress: string,
+    fee = DEFAULT_FEE,
+    sequence = null
+  ) {
+    if (!this.wallet) {
+      throw Error('Wallet has not yet been initialized');
+    }
     const msgUnblockAddress = msg.kava.newMsgUnblockAddress(
       this.wallet.address,
       denom,
@@ -1257,7 +1469,15 @@ class KavaClient {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async setPauseStatus(denom, status, fee = DEFAULT_FEE, sequence = null) {
+  async setPauseStatus(
+    denom: string,
+    status: string,
+    fee = DEFAULT_FEE,
+    sequence = null
+  ) {
+    if (!this.wallet) {
+      throw Error('Wallet has not yet been initialized');
+    }
     const msgSetPauseStatus = msg.kava.newMsgSetPauseStatus(
       this.wallet.address,
       denom,
@@ -1266,5 +1486,3 @@ class KavaClient {
     return await this.sendTx([msgSetPauseStatus], fee, sequence);
   }
 }
-
-module.exports.KavaClient = KavaClient;

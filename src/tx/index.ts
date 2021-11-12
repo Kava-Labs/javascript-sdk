@@ -1,7 +1,6 @@
 const sig = require('@kava-labs/sig');
-const _ = require('lodash');
-const axios = require('axios');
-const URL = require('url').URL;
+import axios, { AxiosError } from 'axios';
+import { URL } from 'url';
 
 const api = {
   getAccount: '/auth/accounts',
@@ -14,7 +13,7 @@ const api = {
  * @param {String} base the request's base url
  * @return {Promise}
  */
-async function getTx(path, base, timeout = 5000, args = {}) {
+async function getTx(path: string, base: string, timeout = 5000, args = {}) {
   const requestUrl = new URL(path, base).toString();
 
   try {
@@ -27,7 +26,7 @@ async function getTx(path, base, timeout = 5000, args = {}) {
       false
     );
   } catch (err) {
-    throw new Error(err);
+    throw err;
   }
 }
 
@@ -37,13 +36,22 @@ async function getTx(path, base, timeout = 5000, args = {}) {
  * @param {String} args the request's http arguments in JSON e.g. {status: 'Open'}
  * @return {String}
  */
-function applyRequestArgs(url, args = {}) {
-  const search = []
+function applyRequestArgs(url: string, args: Record<string, string> = {}) {
+  const search = [];
   for (let k in args) {
-    search.push(`${k}=${args[k]}`)
+    search.push(`${k}=${args[k]}`);
   }
-  return `${url}?${search.join("&")}`
+  return `${url}?${search.join('&')}`;
 }
+
+type RetryFunction = (
+  fn: Function,
+  thisArg: any,
+  args: string[],
+  retriesLeft: number,
+  interval: number,
+  exponential: boolean
+) => Promise<any>;
 
 /**
  * Retries the given function until it succeeds given a number of retries and an interval between them. They are set
@@ -57,14 +65,14 @@ function applyRequestArgs(url, args = {}) {
  * @param {Boolean} exponential - Flag for exponential back-off mode
  * @return {Promise<*>}
  */
-async function retry(
-  fn,
-  thisArg,
-  args,
+const retry: RetryFunction = async (
+  fn: Function,
+  thisArg: any,
+  args: string[],
   retriesLeft = 5,
   interval = 1000,
   exponential = false
-) {
+) => {
   try {
     const result = await fn.apply(thisArg, args);
     return result;
@@ -83,7 +91,7 @@ async function retry(
       throw new Error(`Max retries reached:
     error: ${error}`);
   }
-}
+};
 
 /**
  * Loads an account's account number and sequence from Kava
@@ -92,11 +100,11 @@ async function retry(
  * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
  * @return {Promise}
  */
-async function loadMetaData(address, base, timeout = 2000) {
+async function loadMetaData(address: string, base: string, timeout = 2000) {
   const path = api.getAccount + '/' + address;
   const res = await getTx(path, base, timeout);
-  accNum = _.get(res, 'data.result.value.account_number');
-  seqNum = _.get(res, 'data.result.value.sequence');
+  const accNum = res?.data?.result?.value?.account_number;
+  const seqNum = res?.data?.result?.value?.sequence;
   if (!(accNum || seqNum)) {
     throw new Error(
       'account number or sequence number from rest server are undefined'
@@ -118,7 +126,7 @@ async function loadMetaData(address, base, timeout = 2000) {
  * @param {Object} wallet the wallet that will be used to sign the tx
  * @return {Promise}
  */
-function signTx(tx, signMetaData, wallet) {
+function signTx(tx: any, signMetaData: any, wallet: any) {
   tx = sig.signTx(tx, signMetaData, wallet);
   if (!sig.verifyTx(tx, signMetaData)) {
     throw new Error('problem signing tx, generated signature is invalid');
@@ -133,38 +141,38 @@ function signTx(tx, signMetaData, wallet) {
  * @param {String} mode transaction broadcast mode
  * @return {Promise}
  */
-async function broadcastTx(tx, base, mode) {
+async function broadcastTx(tx: any, base: string, mode: string) {
   let txRes;
   try {
     const url = new URL(api.postTx, base).toString();
     txRes = await axios.post(url, sig.createBroadcastTx(tx.value, mode));
   } catch (err) {
-    logErr(err);
+    if (axios.isAxiosError(err)) {
+      logErr(err);
+    }
   }
 
   // Check for and handle any tendermint errors
   try {
-    if (_.get(txRes, 'data.code')) {
-      throw new Error(
-        `tx not accepted by chain: ${_.get(txRes, 'data.raw_log')}`
-      );
+    if (txRes?.data?.code) {
+      throw new Error(`tx not accepted by chain: ${txRes.data.raw_log}`);
     }
   } catch (err) {
     return err;
   }
 
-  return _.get(txRes, 'data.txhash');
+  return txRes?.data?.txhash;
 }
 
 /**
  * Parses and logs tx-related errors
- * @param {object} err an error resulting from a tx-related action
+ * @param {AxiosError} err an error resulting from a tx-related action
  */
-const logErr = (err) => {
+const logErr = (err: AxiosError) => {
   // Load status, status text, and error
-  const status = _.get(err, 'response.status');
-  const statusText = _.get(err, 'response.statusText');
-  const error = _.get(err, 'response.data.error');
+  const status = err.response?.status;
+  const statusText = err.response?.statusText;
+  const error = err.response?.data.error;
 
   // Log status, status text, and error, or if unidentified, log network error
   status ? console.log('Status:', status) : null;
@@ -175,7 +183,7 @@ const logErr = (err) => {
   }
 };
 
-module.exports.tx = {
+export const tx = {
   getTx,
   loadMetaData,
   signTx,

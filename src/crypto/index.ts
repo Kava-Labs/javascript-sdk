@@ -1,6 +1,6 @@
 const sig = require('@kava-labs/sig');
-const bech32 = require('bech32');
-const bip39 = require('bip39');
+import bech32 from 'bech32';
+import bip39 from 'bip39';
 
 const KAVA_PREFIX = 'kava';
 const MNEMONIC_LEN = 256;
@@ -18,8 +18,8 @@ const generateMnemonic = () => bip39.generateMnemonic(MNEMONIC_LEN);
  * @param {string} mnemonic the mnemonic from which to generate the key pair
  * @param {boolean} legacy optional boolean to use the legacy coin type
  */
-const getAddressFromMnemonic = (mnemonic, legacy = false) => {
-  const derivationPath = legacy ? DERIVATION_PATH_LEGACY : DERIVATION_PATH
+const getAddressFromMnemonic = (mnemonic: string, legacy = false) => {
+  const derivationPath = legacy ? DERIVATION_PATH_LEGACY : DERIVATION_PATH;
   const masterKey = sig.createMasterKeyFromMnemonic(mnemonic);
   const keyPair = sig.createKeyPairFromMasterKey(masterKey, derivationPath);
   return sig.createAddress(keyPair.publicKey, KAVA_PREFIX);
@@ -29,7 +29,7 @@ const getAddressFromMnemonic = (mnemonic, legacy = false) => {
  * Decodes an address in bech32 format.
  * @param {string} value the bech32 address to decode
  */
-const decodeAddress = (value) => {
+const decodeAddress = (value: string) => {
   const decodeAddress = bech32.decode(value);
   return Buffer.from(bech32.fromWords(decodeAddress.words));
 };
@@ -40,7 +40,7 @@ const decodeAddress = (value) => {
  * @param {string} hrp the prefix to check for the bech32 address
  * @return {boolean}
  */
-const checkAddress = (address, hrp) => {
+const checkAddress = (address: string, hrp: string) => {
   try {
     if (!address.startsWith(hrp)) {
       return false;
@@ -61,7 +61,7 @@ const checkAddress = (address, hrp) => {
   }
 };
 
-module.exports.crypto = {
+export const crypto = {
   generateMnemonic,
   getAddressFromMnemonic,
   decodeAddress,
