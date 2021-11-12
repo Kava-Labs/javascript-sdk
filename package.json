@@ -1,6 +1,6 @@
 {
   "name": "@kava-labs/javascript-sdk",
-  "version": "5.3.0-beta",
+  "version": "5.3.0",
   "description": "Supports interaction with the Kava blockchain via a REST api",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
