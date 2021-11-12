@@ -8,7 +8,7 @@
     "build": "tsc",
     "format": "prettier --write \"src/**/*.ts\"",
     "postversion": "git push && git push --tags",
-    "prepare": "npm run build",
+    "prepare": "npm run build && husky install",
     "version": "npm run format && git add -A src"
   },
   "dependencies": {
@@ -22,10 +22,21 @@
   },
   "devDependencies": {
     "@binance-chain/javascript-sdk": "^3.0.2",
+    "husky": "^7.0.1",
     "jest": "^27.3.1",
+    "lint-staged": "^11.1.1",
     "prettier": "2.0.5",
     "ts-jest": "^27.0.7",
     "typescript": "^4.4.4"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": "eslint --cache --fix",
+    "*.{js,ts,jsx,tsx,css,md,yml,json,html}": "prettier --write"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
   },
   "jest": {
     "preset": "ts-jest",
