@@ -1,18 +1,18 @@
-import { tx } from "../../tx";
-import { msg } from "../../msg";
-import { KavaClient } from "..";
-import { Coin } from "../../types/Coin";
+import { tx } from '../../tx';
+import { msg } from '../../msg';
+import { KavaClient } from '..';
+import { Coin } from '../../types/Coin';
 
 const DEFAULT_GAS = 300000;
 
 const api = {
-    getParams: '/hard/parameters',
-    getModAccounts: '/hard/accounts',
-    getDeposits: '/hard/deposits',
-    getTotalDeposited: '/hard/total-deposited',
-    getBorrows: '/hard/borrows',
-    getTotalBorrowed: '/hard/total-borrowed',
-  };
+  getParams: '/hard/parameters',
+  getModAccounts: '/hard/accounts',
+  getDeposits: '/hard/deposits',
+  getTotalDeposited: '/hard/total-deposited',
+  getBorrows: '/hard/borrows',
+  getTotalBorrowed: '/hard/total-borrowed',
+};
 
 export class Hard {
   // @ts-ignore
@@ -46,7 +46,12 @@ export class Hard {
    * @return {Promise}
    */
   async getModAccounts(args = {}, timeout = 2000) {
-    const res = await tx.getTx(api.getModAccounts, this.kavaClient.baseURI, timeout, args);
+    const res = await tx.getTx(
+      api.getModAccounts,
+      this.kavaClient.baseURI,
+      timeout,
+      args
+    );
     if (res && res.data) {
       return res.data.result;
     }
@@ -59,33 +64,48 @@ export class Hard {
    * @return {Promise}
    */
   async getDeposits(args = {}, timeout = 2000) {
-    const res = await tx.getTx(api.getDeposits, this.kavaClient.baseURI, timeout, args);
+    const res = await tx.getTx(
+      api.getDeposits,
+      this.kavaClient.baseURI,
+      timeout,
+      args
+    );
     if (res && res.data) {
       return res.data.result;
     }
   }
 
-    /**
+  /**
    * Get hard total-deposited
    * @param {Object} args optional arguments {denom: "btc"}
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
   async getTotalDeposited(args = {}, timeout = 2000) {
-    const res = await tx.getTx(api.getTotalDeposited, this.kavaClient.baseURI, timeout, args);
+    const res = await tx.getTx(
+      api.getTotalDeposited,
+      this.kavaClient.baseURI,
+      timeout,
+      args
+    );
     if (res && res.data) {
       return res.data.result;
     }
   }
 
-   /**
+  /**
    * Get hard borrows
    * @param {Object} args optional arguments {owner: "kava1l0xsq2z7gqd7yly0g40y5836g0appumark77ny" denom: "btc" }
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
   async getBorrows(args = {}, timeout = 2000) {
-    const res = await tx.getTx(api.getBorrows, this.kavaClient.baseURI, timeout, args);
+    const res = await tx.getTx(
+      api.getBorrows,
+      this.kavaClient.baseURI,
+      timeout,
+      args
+    );
     if (res && res.data) {
       return res.data.result;
     }
@@ -98,7 +118,12 @@ export class Hard {
    * @return {Promise}
    */
   async getTotalBorrowed(args = {}, timeout = 2000) {
-    const res = await tx.getTx(api.getTotalBorrowed, this.kavaClient.baseURI, timeout, args);
+    const res = await tx.getTx(
+      api.getTotalBorrowed,
+      this.kavaClient.baseURI,
+      timeout,
+      args
+    );
     if (res && res.data) {
       return res.data.result;
     }
@@ -113,11 +138,11 @@ export class Hard {
    */
   async deposit(amount: Coin[], gas = DEFAULT_GAS, sequence = null) {
     if (!this.kavaClient.wallet) {
-      throw Error('Wallet has not yet been initialized')
+      throw Error('Wallet has not yet been initialized');
     }
     const msgDeposit = msg.hard.newMsgDeposit(
       this.kavaClient.wallet.address,
-      amount,
+      amount
     );
     const fee = { amount: [], gas: String(gas) };
     return await this.kavaClient.sendTx([msgDeposit], fee, sequence);
@@ -132,11 +157,11 @@ export class Hard {
    */
   async withdraw(amount: Coin[], gas = DEFAULT_GAS, sequence = null) {
     if (!this.kavaClient.wallet) {
-      throw Error('Wallet has not yet been initialized')
+      throw Error('Wallet has not yet been initialized');
     }
     const msgWithdraw = msg.hard.newMsgWithdraw(
       this.kavaClient.wallet.address,
-      amount,
+      amount
     );
     const fee = { amount: [], gas: String(gas) };
     return await this.kavaClient.sendTx([msgWithdraw], fee, sequence);
@@ -151,11 +176,11 @@ export class Hard {
    */
   async borrow(amount: Coin[], gas = DEFAULT_GAS, sequence = null) {
     if (!this.kavaClient.wallet) {
-      throw Error('Wallet has not yet been initialized')
+      throw Error('Wallet has not yet been initialized');
     }
     const msgBorrow = msg.hard.newMsgBorrow(
       this.kavaClient.wallet.address,
-      amount,
+      amount
     );
     const fee = { amount: [], gas: String(gas) };
     return await this.kavaClient.sendTx([msgBorrow], fee, sequence);
@@ -170,12 +195,12 @@ export class Hard {
    */
   async repay(amount: Coin[], gas = DEFAULT_GAS, sequence = null) {
     if (!this.kavaClient.wallet) {
-      throw Error('Wallet has not yet been initialized')
+      throw Error('Wallet has not yet been initialized');
     }
     const msgRepay = msg.hard.newMsgRepay(
       this.kavaClient.wallet.address,
       this.kavaClient.wallet.address,
-      amount,
+      amount
     );
     const fee = { amount: [], gas: String(gas) };
     return await this.kavaClient.sendTx([msgRepay], fee, sequence);
@@ -190,11 +215,11 @@ export class Hard {
    */
   async liquidate(borrower: string, gas = DEFAULT_GAS, sequence = null) {
     if (!this.kavaClient.wallet) {
-      throw Error('Wallet has not yet been initialized')
+      throw Error('Wallet has not yet been initialized');
     }
     const msgLiquidate = msg.hard.newMsgLiquidate(
       this.kavaClient.wallet.address,
-      borrower,
+      borrower
     );
     const fee = { amount: [], gas: String(gas) };
     return await this.kavaClient.sendTx([msgLiquidate], fee, sequence);

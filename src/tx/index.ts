@@ -155,9 +155,7 @@ async function broadcastTx(tx: any, base: string, mode: string) {
   // Check for and handle any tendermint errors
   try {
     if (txRes?.data?.code) {
-      throw new Error(
-        `tx not accepted by chain: ${txRes.data.raw_log}`
-      );
+      throw new Error(`tx not accepted by chain: ${txRes.data.raw_log}`);
     }
   } catch (err) {
     return err;

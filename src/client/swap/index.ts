@@ -1,16 +1,16 @@
-import { tx } from "../../tx";
-import { msg } from "../../msg";
-import { KavaClient } from "..";
-import { Coin } from "../../types/Coin";
+import { tx } from '../../tx';
+import { msg } from '../../msg';
+import { KavaClient } from '..';
+import { Coin } from '../../types/Coin';
 
 const DEFAULT_GAS = 300000;
 
 const api = {
-    getParams: '/swap/parameters',
-    getDeposits: '/swap/deposits',
-    getPool: '/swap/pool',
-    getPools: '/swap/pools'
-  };
+  getParams: '/swap/parameters',
+  getDeposits: '/swap/deposits',
+  getPool: '/swap/pool',
+  getPools: '/swap/pools',
+};
 
 class Swap {
   // @ts-ignore
@@ -44,32 +44,47 @@ class Swap {
    * @return {Promise}
    */
   async getDeposits(args = {}, timeout = 2000) {
-    const res = await tx.getTx(api.getDeposits, this.kavaClient.baseURI, timeout, args);
+    const res = await tx.getTx(
+      api.getDeposits,
+      this.kavaClient.baseURI,
+      timeout,
+      args
+    );
     if (res && res.data) {
       return res.data.result;
     }
   }
 
-    /**
+  /**
    * Get swap pool
    * @param {Object} args required arguments {pool: "bnb:usdx"}
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
   async getPool(args = {}, timeout = 2000) {
-    const res = await tx.getTx(api.getPool, this.kavaClient.baseURI, timeout, args);
+    const res = await tx.getTx(
+      api.getPool,
+      this.kavaClient.baseURI,
+      timeout,
+      args
+    );
     if (res && res.data) {
       return res.data.result;
     }
   }
 
-   /**
+  /**
    * Get swap pools
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
   async getPools(args = {}, timeout = 2000) {
-    const res = await tx.getTx(api.getPools, this.kavaClient.baseURI, timeout, args);
+    const res = await tx.getTx(
+      api.getPools,
+      this.kavaClient.baseURI,
+      timeout,
+      args
+    );
     if (res && res.data) {
       return res.data.result;
     }
@@ -85,9 +100,16 @@ class Swap {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async deposit(tokenA: Coin, tokenB: Coin, slippage: string, deadline: string, gas = DEFAULT_GAS, sequence = null) {
+  async deposit(
+    tokenA: Coin,
+    tokenB: Coin,
+    slippage: string,
+    deadline: string,
+    gas = DEFAULT_GAS,
+    sequence = null
+  ) {
     if (!this.kavaClient.wallet) {
-      throw Error('Wallet has not yet been initialized')
+      throw Error('Wallet has not yet been initialized');
     }
     const msgDeposit = msg.swap.newMsgDeposit(
       this.kavaClient.wallet.address,
@@ -111,9 +133,16 @@ class Swap {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async withdraw(shares: any, minTokenA: Coin, minTokenB: Coin, deadline: string, gas = DEFAULT_GAS, sequence = null) {
+  async withdraw(
+    shares: any,
+    minTokenA: Coin,
+    minTokenB: Coin,
+    deadline: string,
+    gas = DEFAULT_GAS,
+    sequence = null
+  ) {
     if (!this.kavaClient.wallet) {
-      throw Error('Wallet has not yet been initialized')
+      throw Error('Wallet has not yet been initialized');
     }
     const msgWithdraw = msg.swap.newMsgWithdraw(
       this.kavaClient.wallet.address,
@@ -136,9 +165,16 @@ class Swap {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async swapExactForTokens(exactTokenA: Coin, tokenB: Coin, slippage: string, deadline: string, gas = DEFAULT_GAS, sequence = null) {
+  async swapExactForTokens(
+    exactTokenA: Coin,
+    tokenB: Coin,
+    slippage: string,
+    deadline: string,
+    gas = DEFAULT_GAS,
+    sequence = null
+  ) {
     if (!this.kavaClient.wallet) {
-      throw Error('Wallet has not yet been initialized')
+      throw Error('Wallet has not yet been initialized');
     }
     const msgSwapExactForTokens = msg.swap.newMsgSwapExactForTokens(
       this.kavaClient.wallet.address,
@@ -161,9 +197,16 @@ class Swap {
    * @param {String} sequence optional account sequence
    * @return {Promise}
    */
-  async swapForExactTokens(tokenA: Coin, exactTokenB: Coin, slippage: string, deadline: string, gas = DEFAULT_GAS, sequence = null) {
+  async swapForExactTokens(
+    tokenA: Coin,
+    exactTokenB: Coin,
+    slippage: string,
+    deadline: string,
+    gas = DEFAULT_GAS,
+    sequence = null
+  ) {
     if (!this.kavaClient.wallet) {
-      throw Error('Wallet has not yet been initialized')
+      throw Error('Wallet has not yet been initialized');
     }
     const msgSwapForExactTokens = msg.swap.newMsgSwapForExactTokens(
       this.kavaClient.wallet.address,

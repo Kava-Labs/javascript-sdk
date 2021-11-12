@@ -1,3 +1,3 @@
 export type Wallet = {
-    address: string;
+  address: string;
 };

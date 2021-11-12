@@ -36,13 +36,19 @@ function newMsgSend(address: string, to: string, coins: Coin[]) {
     value: {
       from_address: address,
       to_address: to,
-      amount: coins.sort((coinA, coinB) => coinA.denom > coinB.denom ? 1 : -1)
+      amount: coins.sort((coinA, coinB) =>
+        coinA.denom > coinB.denom ? 1 : -1
+      ),
     },
   };
   return sendTx;
 }
 
-function newMsgVoteGovernance(proposalID: string, voter: string, voteType: VoteType) {
+function newMsgVoteGovernance(
+  proposalID: string,
+  voter: string,
+  voteType: VoteType
+) {
   return {
     type: 'cosmos-sdk/MsgVote',
     value: {
@@ -56,5 +62,5 @@ function newMsgVoteGovernance(proposalID: string, voter: string, voteType: VoteT
 export const cosmos = {
   newStdTx,
   newMsgSend,
-  newMsgVoteGovernance
+  newMsgVoteGovernance,
 };

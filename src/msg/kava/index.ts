@@ -258,7 +258,10 @@ function newMsgClaimHardRewardVVesting(
   };
 }
 
-function newMsgClaimDelegatorReward(sender: string, denomsToClaim: DenomToClaim[]) {
+function newMsgClaimDelegatorReward(
+  sender: string,
+  denomsToClaim: DenomToClaim[]
+) {
   return {
     type: 'incentive/MsgClaimDelegatorReward',
     value: {
