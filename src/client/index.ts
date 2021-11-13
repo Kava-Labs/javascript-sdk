@@ -326,7 +326,7 @@ export class KavaClient {
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getDistributionRewards(address, timeout = 2000) {
+  async getDistributionRewards(address: string, timeout = 2000) {
     const path = api.getDistributionRewards + '/' + address + '/rewards';
     const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
@@ -340,7 +340,7 @@ export class KavaClient {
    * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
    * @return {Promise}
    */
-  async getDelegations(address, timeout = 2000) {
+  async getDelegations(address: string, timeout = 2000) {
     const path = api.getDelegations + '/' + address + '/delegations';
     const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
