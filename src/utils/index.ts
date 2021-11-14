@@ -176,9 +176,7 @@ const formatMultiCoins = (amounts: string[], denoms: string[]) => {
  */
 
 const calculateUnixTime = (seconds = 86400) => {
-  var myDate = new Date(2021, 6, 20, 14, 30, 15);
-  myDate.setSeconds(myDate.getSeconds() + seconds);
-  return String(Math.floor(new Date(myDate).getTime() / 1000));
+	return String(Math.floor(Date.now() / 1000) + seconds); 
 };
 
 export const utils = {
