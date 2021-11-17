@@ -5,8 +5,7 @@
   "compilerOptions": {
     "lib": ["es2020"],
     "module": "commonjs",
-    "target": "es2020",
-
+    "target": "es5",
     "declaration": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
