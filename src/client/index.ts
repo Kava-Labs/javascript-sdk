@@ -49,6 +49,8 @@ const api = {
   getCommittee: '/committee/committees', // endpoint also used by getCommitteeProposals
   getCommittees: '/committee/committees',
   getProposal: '/committee/proposals', // endpoint also used by getProposer, getProposalTally, getProposalVotes
+  getDistributionRewards: '/distribution/delegators',
+  getDelegations: '/staking/delegators',  
 };
 
 /**
@@ -317,6 +319,34 @@ export class KavaClient {
       return res.data.result;
     }
   }
+  
+  /**
+   * Get an account's delegators reward
+   * @param {String} address account to query
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getDistributionRewards(address: string, timeout = 2000) {
+    const path = api.getDistributionRewards + '/' + address + '/rewards';
+    const res = await tx.getTx(path, this.baseURI, timeout);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }
+
+  /**
+   * Get an account's delegations
+   * @param {String} address account to query
+   * @param {Number} timeout request is attempted every 1000 milliseconds until millisecond timeout is reached
+   * @return {Promise}
+   */
+  async getDelegations(address: string, timeout = 2000) {
+    const path = api.getDelegations + '/' + address + '/delegations';
+    const res = await tx.getTx(path, this.baseURI, timeout);
+    if (res && res.data) {
+      return res.data.result;
+    }
+  }  
 
   /**
    * Get the total supply of coins on the chain
