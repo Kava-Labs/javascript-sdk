@@ -3,6 +3,7 @@ import { msg } from './msg';
 import { utils } from './utils';
 import { crypto } from './crypto';
 import { KavaClient } from './client';
+export * from './types';
 
 const Kava = {
   tx,
