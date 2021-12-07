@@ -1485,4 +1485,19 @@ export class KavaClient {
     );
     return await this.sendTx([msgSetPauseStatus], fee, sequence);
   }
+
+  /**
+   * Updates the paused/unpaused status for a specific token denom
+   * @param {String} messages messages that will be bundled in the transaction. e.g [ msg.Swap.newMsgSwapExactForTokens(...),msg.hard.newMsgDeposit(...)]
+   * @param {Object} fee optional fee consisting of { amount: [Coins], gas: String(Number) }
+   * @param {String} sequence optional account sequence
+   * @return {Promise}
+   */
+  async multipleMessages(
+      messages: any[],
+      fee = DEFAULT_FEE,
+      sequence = null
+  ) {
+      return await this.sendTx(messages, fee, sequence);
+  }
 }
