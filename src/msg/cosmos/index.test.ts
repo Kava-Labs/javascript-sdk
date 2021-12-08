@@ -62,8 +62,7 @@ describe('Cosmos messages', () => {
         coin,
         'kava1w66puffhccjck70hw75wu3v92tshw5rmdxp8hb',
         'kava1a22puffhccjck70hw75wu3v92tshw5rmdxp6xz',
-        23583,
-        1638988347480
+        1638988347480000
       );
       const expected = {
         type: 'cosmos-sdk/MsgTransfer',
@@ -76,8 +75,8 @@ describe('Cosmos messages', () => {
           },
           sender: 'kava1w66puffhccjck70hw75wu3v92tshw5rmdxp8hb',
           receiver: 'kava1a22puffhccjck70hw75wu3v92tshw5rmdxp6xz',
-          timeoutHeight: 23583,
-          timeoutTimestamp: 1638988347480,
+          timeoutHeight: 0,
+          timeoutTimestamp: 1638988347480000,
         },
       };
       expect(message).toEqual(expected);

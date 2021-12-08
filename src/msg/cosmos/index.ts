@@ -59,29 +59,12 @@ function newMsgVoteGovernance(
   };
 }
 
-// func NewMsgTransfer(
-// 	sourcePort, sourceChannel string,
-// 	token sdk.Coin, sender, receiver string,
-// 	timeoutHeight clienttypes.Height, timeoutTimestamp uint64,
-// ) *MsgTransfer {
-// 	return &MsgTransfer{
-// 		SourcePort:       sourcePort,
-// 		SourceChannel:    sourceChannel,
-// 		Token:            token,
-// 		Sender:           sender,
-// 		Receiver:         receiver,
-// 		TimeoutHeight:    timeoutHeight,
-// 		TimeoutTimestamp: timeoutTimestamp,
-// 	}
-// }
-
 function newMsgTransfer(
   sourcePort: string,
   sourceChannel: string,
   token: Coin,
   sender: string,
   receiver: string,
-  timeoutHeight: number,
   timeoutTimestamp: number
 ) {
   return {
@@ -92,7 +75,7 @@ function newMsgTransfer(
       token: token,
       sender: sender,
       receiver: receiver,
-      timeoutHeight: timeoutHeight,
+      timeoutHeight: 0,
       timeoutTimestamp: timeoutTimestamp,
     },
   };
