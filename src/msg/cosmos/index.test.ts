@@ -49,4 +49,38 @@ describe('Cosmos messages', () => {
       });
     });
   });
+
+  describe('newMsgTransfer', () => {
+    it('should generate a well-formed transfer', () => {
+      const coin = {
+        denom: 'ukava',
+        amount: '10000000',
+      };
+      const message = cosmos.newMsgTransfer(
+        'port',
+        'channel',
+        coin,
+        'kava1w66puffhccjck70hw75wu3v92tshw5rmdxp8hb',
+        'kava1a22puffhccjck70hw75wu3v92tshw5rmdxp6xz',
+        23583,
+        1638988347480
+      );
+      const expected = {
+        type: 'cosmos-sdk/MsgTransfer',
+        value: {
+          source_port: 'port',
+          source_channel: 'channel',
+          token: {
+            denom: 'ukava',
+            amount: '10000000',
+          },
+          sender: 'kava1w66puffhccjck70hw75wu3v92tshw5rmdxp8hb',
+          receiver: 'kava1a22puffhccjck70hw75wu3v92tshw5rmdxp6xz',
+          timeoutHeight: 23583,
+          timeoutTimestamp: 1638988347480,
+        },
+      };
+      expect(message).toEqual(expected);
+    });
+  });
 });
