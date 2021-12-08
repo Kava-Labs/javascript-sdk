@@ -6,7 +6,7 @@ import { VoteType } from '../../types/VoteType';
  *                   Auction
  ***************************************************/
 
-function newMsgPlaceBid(auctionID: string, bidder: string, amount: Coin) {
+function PlaceBid(auctionID: string, bidder: string, amount: Coin) {
   return {
     type: 'auction/MsgPlaceBid',
     value: {
@@ -21,8 +21,8 @@ function newMsgPlaceBid(auctionID: string, bidder: string, amount: Coin) {
  *                     BEP3
  ***************************************************/
 
-// newMsgCreateAtomicSwap creates a new MsgCreateAtomicSwap
-function newMsgCreateAtomicSwap(
+// CreateAtomicSwap creates a new MsgCreateAtomicSwap
+function CreateAtomicSwap(
   sender: string,
   recipient: string,
   recipientOtherChain: string,
@@ -47,8 +47,8 @@ function newMsgCreateAtomicSwap(
   };
 }
 
-// newMsgClaimAtomicSwap creates a new MsgClaimAtomicSwap
-function newMsgClaimAtomicSwap(
+// ClaimAtomicSwap creates a new MsgClaimAtomicSwap
+function ClaimAtomicSwap(
   sender: string,
   swapID: string,
   randomNumber: string
@@ -63,8 +63,8 @@ function newMsgClaimAtomicSwap(
   };
 }
 
-// newMsgRefundAtomicSwap creates a new MsgRefundAtomicSwap
-function newMsgRefundAtomicSwap(sender: string, swapID: string) {
+// RefundAtomicSwap creates a new MsgRefundAtomicSwap
+function RefundAtomicSwap(sender: string, swapID: string) {
   return {
     type: 'bep3/MsgRefundAtomicSwap',
     value: {
@@ -78,7 +78,7 @@ function newMsgRefundAtomicSwap(sender: string, swapID: string) {
  *                       CDP
  ***************************************************/
 
-function newMsgCreateCDP(
+function CreateCDP(
   sender: string,
   principal: Coin,
   collateral: Coin,
@@ -95,7 +95,7 @@ function newMsgCreateCDP(
   };
 }
 
-function newMsgDeposit(
+function Deposit(
   owner: string,
   depositor: string,
   collateral: Coin,
@@ -112,7 +112,7 @@ function newMsgDeposit(
   };
 }
 
-function newMsgWithdraw(
+function Withdraw(
   owner: string,
   depositor: string,
   collateral: Coin,
@@ -129,7 +129,7 @@ function newMsgWithdraw(
   };
 }
 
-function newMsgDrawDebt(
+function DrawDebt(
   sender: string,
   collateralType: string,
   principal: Coin
@@ -144,7 +144,7 @@ function newMsgDrawDebt(
   };
 }
 
-function newMsgRepayDebt(
+function RepayDebt(
   sender: string,
   collateralType: string,
   payment: Coin
@@ -159,7 +159,7 @@ function newMsgRepayDebt(
   };
 }
 
-function newMsgLiquidate(
+function Liquidate(
   keeper: string,
   borrower: string,
   collateralType: string
@@ -178,7 +178,7 @@ function newMsgLiquidate(
  *                   Committee
  ***************************************************/
 
-function newMsgSubmitProposal(
+function SubmitProposal(
   proposal: string,
   proposer: string,
   committeeID: string
@@ -193,7 +193,7 @@ function newMsgSubmitProposal(
   };
 }
 
-function newMsgVote(proposalID: string, voter: string, voteType: VoteType) {
+function Vote(proposalID: string, voter: string, voteType: VoteType) {
   return {
     type: 'kava/MsgVote',
     value: {
@@ -208,7 +208,7 @@ function newMsgVote(proposalID: string, voter: string, voteType: VoteType) {
  *                   Incentive
  ***************************************************/
 
-function newMsgClaimUSDXMintingReward(sender: string, multiplierName: string) {
+function ClaimUSDXMintingReward(sender: string, multiplierName: string) {
   return {
     type: 'incentive/MsgClaimUSDXMintingReward',
     value: {
@@ -218,7 +218,7 @@ function newMsgClaimUSDXMintingReward(sender: string, multiplierName: string) {
   };
 }
 
-function newMsgClaimUSDXMintingRewardVVesting(
+function ClaimUSDXMintingRewardVVesting(
   sender: string,
   receiver: string,
   multiplierName: string
@@ -233,7 +233,7 @@ function newMsgClaimUSDXMintingRewardVVesting(
   };
 }
 
-function newMsgClaimHardReward(sender: string, denomsToClaim: any[]) {
+function ClaimHardReward(sender: string, denomsToClaim: any[]) {
   return {
     type: 'incentive/MsgClaimHardReward',
     value: {
@@ -243,7 +243,7 @@ function newMsgClaimHardReward(sender: string, denomsToClaim: any[]) {
   };
 }
 
-function newMsgClaimHardRewardVVesting(
+function ClaimHardRewardVVesting(
   sender: string,
   receiver: string,
   denomsToClaim: DenomToClaim[]
@@ -258,7 +258,7 @@ function newMsgClaimHardRewardVVesting(
   };
 }
 
-function newMsgClaimDelegatorReward(
+function ClaimDelegatorReward(
   sender: string,
   denomsToClaim: DenomToClaim[]
 ) {
@@ -271,7 +271,7 @@ function newMsgClaimDelegatorReward(
   };
 }
 
-function newMsgClaimDelegatorRewardVVesting(
+function ClaimDelegatorRewardVVesting(
   sender: string,
   receiver: string,
   denomsToClaim: any[]
@@ -286,7 +286,7 @@ function newMsgClaimDelegatorRewardVVesting(
   };
 }
 
-function newMsgClaimSwapReward(sender: string, denomsToClaim: DenomToClaim[]) {
+function ClaimSwapReward(sender: string, denomsToClaim: DenomToClaim[]) {
   return {
     type: 'incentive/MsgClaimSwapReward',
     value: {
@@ -296,7 +296,7 @@ function newMsgClaimSwapReward(sender: string, denomsToClaim: DenomToClaim[]) {
   };
 }
 
-function newMsgClaimSwapRewardVVesting(
+function ClaimSwapRewardVVesting(
   sender: string,
   receiver: string,
   denomsToClaim: DenomToClaim[]
@@ -315,7 +315,7 @@ function newMsgClaimSwapRewardVVesting(
  *                   Issuance
  ***************************************************/
 
-function newMsgIssueTokens(sender: string, tokens: any[], receiver: string) {
+function IssueTokens(sender: string, tokens: any[], receiver: string) {
   return {
     type: 'issuance/MsgIssueTokens',
     value: {
@@ -326,7 +326,7 @@ function newMsgIssueTokens(sender: string, tokens: any[], receiver: string) {
   };
 }
 
-function newMsgRedeemTokens(sender: string, tokens: any[]) {
+function RedeemTokens(sender: string, tokens: any[]) {
   return {
     type: 'issuance/MsgRedeemTokens',
     value: {
@@ -336,7 +336,7 @@ function newMsgRedeemTokens(sender: string, tokens: any[]) {
   };
 }
 
-function newMsgBlockAddress(
+function BlockAddress(
   sender: string,
   denom: string,
   blockedAddress: string
@@ -351,7 +351,7 @@ function newMsgBlockAddress(
   };
 }
 
-function newMsgUnblockAddress(sender: string, denom: string, address: string) {
+function UnblockAddress(sender: string, denom: string, address: string) {
   return {
     type: 'issuance/MsgUnblockAddress',
     value: {
@@ -362,7 +362,7 @@ function newMsgUnblockAddress(sender: string, denom: string, address: string) {
   };
 }
 
-function newMsgSetPauseStatus(sender: string, denom: string, status: string) {
+function SetPauseStatus(sender: string, denom: string, status: string) {
   return {
     type: 'issuance/MsgChangePauseStatus',
     value: {
@@ -377,7 +377,7 @@ function newMsgSetPauseStatus(sender: string, denom: string, status: string) {
  *                   Pricefeed
  ***************************************************/
 
-function newMsgPostPrice(
+function PostPrice(
   from: string,
   marketID: string,
   price: string,
@@ -395,30 +395,30 @@ function newMsgPostPrice(
 }
 
 export const kava = {
-  newMsgPlaceBid,
-  newMsgCreateAtomicSwap,
-  newMsgClaimAtomicSwap,
-  newMsgRefundAtomicSwap,
-  newMsgCreateCDP,
-  newMsgDeposit,
-  newMsgWithdraw,
-  newMsgDrawDebt,
-  newMsgRepayDebt,
-  newMsgLiquidate,
-  newMsgSubmitProposal,
-  newMsgVote,
-  newMsgClaimUSDXMintingReward,
-  newMsgClaimUSDXMintingRewardVVesting,
-  newMsgClaimHardReward,
-  newMsgClaimHardRewardVVesting,
-  newMsgClaimDelegatorReward,
-  newMsgClaimDelegatorRewardVVesting,
-  newMsgClaimSwapReward,
-  newMsgClaimSwapRewardVVesting,
-  newMsgIssueTokens,
-  newMsgRedeemTokens,
-  newMsgBlockAddress,
-  newMsgUnblockAddress,
-  newMsgSetPauseStatus,
-  newMsgPostPrice,
+  PlaceBid,
+  CreateAtomicSwap,
+  ClaimAtomicSwap,
+  RefundAtomicSwap,
+  CreateCDP,
+  Deposit,
+  Withdraw,
+  DrawDebt,
+  RepayDebt,
+  Liquidate,
+  SubmitProposal,
+  Vote,
+  ClaimUSDXMintingReward,
+  ClaimUSDXMintingRewardVVesting,
+  ClaimHardReward,
+  ClaimHardRewardVVesting,
+  ClaimDelegatorReward,
+  ClaimDelegatorRewardVVesting,
+  ClaimSwapReward,
+  ClaimSwapRewardVVesting,
+  IssueTokens,
+  RedeemTokens,
+  BlockAddress,
+  UnblockAddress,
+  SetPauseStatus,
+  PostPrice,
 };

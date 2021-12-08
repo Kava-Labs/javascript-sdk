@@ -140,7 +140,7 @@ export class Hard {
     if (!this.kavaClient.wallet) {
       throw Error('Wallet has not yet been initialized');
     }
-    const msgDeposit = msg.hard.newMsgDeposit(
+    const msgDeposit = msg.hard.Deposit(
       this.kavaClient.wallet.address,
       amount
     );
@@ -159,7 +159,7 @@ export class Hard {
     if (!this.kavaClient.wallet) {
       throw Error('Wallet has not yet been initialized');
     }
-    const msgWithdraw = msg.hard.newMsgWithdraw(
+    const msgWithdraw = msg.hard.Withdraw(
       this.kavaClient.wallet.address,
       amount
     );
@@ -178,7 +178,7 @@ export class Hard {
     if (!this.kavaClient.wallet) {
       throw Error('Wallet has not yet been initialized');
     }
-    const msgBorrow = msg.hard.newMsgBorrow(
+    const msgBorrow = msg.hard.Borrow(
       this.kavaClient.wallet.address,
       amount
     );
@@ -197,7 +197,7 @@ export class Hard {
     if (!this.kavaClient.wallet) {
       throw Error('Wallet has not yet been initialized');
     }
-    const msgRepay = msg.hard.newMsgRepay(
+    const msgRepay = msg.hard.Repay(
       this.kavaClient.wallet.address,
       this.kavaClient.wallet.address,
       amount
@@ -217,7 +217,7 @@ export class Hard {
     if (!this.kavaClient.wallet) {
       throw Error('Wallet has not yet been initialized');
     }
-    const msgLiquidate = msg.hard.newMsgLiquidate(
+    const msgLiquidate = msg.hard.Liquidate(
       this.kavaClient.wallet.address,
       borrower
     );

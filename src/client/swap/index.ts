@@ -111,7 +111,7 @@ class Swap {
     if (!this.kavaClient.wallet) {
       throw Error('Wallet has not yet been initialized');
     }
-    const msgDeposit = msg.swap.newMsgDeposit(
+    const msgDeposit = msg.swap.Deposit(
       this.kavaClient.wallet.address,
       tokenA,
       tokenB,
@@ -144,7 +144,7 @@ class Swap {
     if (!this.kavaClient.wallet) {
       throw Error('Wallet has not yet been initialized');
     }
-    const msgWithdraw = msg.swap.newMsgWithdraw(
+    const msgWithdraw = msg.swap.Withdraw(
       this.kavaClient.wallet.address,
       shares,
       minTokenA,
@@ -176,7 +176,7 @@ class Swap {
     if (!this.kavaClient.wallet) {
       throw Error('Wallet has not yet been initialized');
     }
-    const msgSwapExactForTokens = msg.swap.newMsgSwapExactForTokens(
+    const msgSwapExactForTokens = msg.swap.SwapExactForTokens(
       this.kavaClient.wallet.address,
       exactTokenA,
       tokenB,
@@ -208,7 +208,7 @@ class Swap {
     if (!this.kavaClient.wallet) {
       throw Error('Wallet has not yet been initialized');
     }
-    const msgSwapForExactTokens = msg.swap.newMsgSwapForExactTokens(
+    const msgSwapForExactTokens = msg.swap.SwapForExactTokens(
       this.kavaClient.wallet.address,
       tokenA,
       exactTokenB,

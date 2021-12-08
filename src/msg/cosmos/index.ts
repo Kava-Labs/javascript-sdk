@@ -12,7 +12,7 @@ const FEE_DEFAULT = { amount: [], gas: '300000' };
  * @param {Object} signatures generated when an address signs a data package, required for tx confirmation
  * @return {Promise}
  */
-function newStdTx<T = unknown>(
+function StdTx<T = unknown>(
   msgs: Message<T>[],
   fee = FEE_DEFAULT,
   memo = '',
@@ -29,7 +29,7 @@ function newStdTx<T = unknown>(
   };
 }
 
-function newMsgSend(address: string, to: string, coins: Coin[]) {
+function Send(address: string, to: string, coins: Coin[]) {
   const sendTx = {
     type: 'cosmos-sdk/MsgSend',
     value: {
@@ -43,7 +43,7 @@ function newMsgSend(address: string, to: string, coins: Coin[]) {
   return sendTx;
 }
 
-function newMsgVoteGovernance(
+function VoteGovernance(
   proposalID: string,
   voter: string,
   voteType: VoteType
@@ -68,7 +68,7 @@ function newMsgVoteGovernance(
  * @param {Integer} timeoutTimestamp nanoseconds to allow transfer to complete
 
  */
-function newMsgTransfer(
+function Transfer(
   sourcePort: string,
   sourceChannel: string,
   token: Coin,
@@ -91,8 +91,8 @@ function newMsgTransfer(
 }
 
 export const cosmos = {
-  newStdTx,
-  newMsgSend,
-  newMsgVoteGovernance,
-  newMsgTransfer,
+  StdTx,
+  Send,
+  VoteGovernance,
+  Transfer,
 };

@@ -43,7 +43,7 @@ var main = async () => {
   const slippage = '0.010000000000000000';
   const deadline = kavaUtils.calculateUnixTime(30);
 
-  const swapExactForRes = await kavaClient.swap.newMsgSwapExactForTokens(
+  const swapExactForRes = await kavaClient.swap.SwapExactForTokens(
     exactTokenA,
     tokenB,
     slippage,
@@ -61,7 +61,7 @@ var main = async () => {
   const slippage = '0.010000000000000000';
   const deadline = kavaUtils.calculateUnixTime(30);
 
-  const swapForExactRes = await kavaClient.swap.newMsgSwapForExactTokens(
+  const swapForExactRes = await kavaClient.swap.SwapForExactTokens(
     tokenA,
     exactTokenB,
     slippage,

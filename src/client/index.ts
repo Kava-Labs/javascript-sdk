@@ -195,7 +195,7 @@ export class KavaClient {
    * @return {Promise}
    */
   async sendTx(msgs: any[], fee: any, sequence: string | null) {
-    const rawTx = msg.cosmos.newStdTx(msgs, fee);
+    const rawTx = msg.cosmos. StdTx(msgs, fee);
     const signInfo = await this.prepareSignInfo(sequence);
     const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
     return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
@@ -391,7 +391,7 @@ export class KavaClient {
     if (!this.wallet) {
       throw Error('Wallet has not yet been initialized');
     }
-    const msgSend = msg.cosmos.newMsgSend(
+    const msgSend = msg.cosmos.Send(
       this.wallet.address,
       recipient,
       coins
@@ -487,7 +487,7 @@ export class KavaClient {
     if (!this.wallet) {
       throw Error('Wallet has not yet been initialized');
     }
-    const msgPostPrice = msg.kava.newMsgPostPrice(
+    const msgPostPrice = msg.kava.PostPrice(
       this.wallet.address,
       marketID,
       price,
@@ -555,7 +555,7 @@ export class KavaClient {
     if (!this.wallet) {
       throw Error('Wallet has not yet been initialized');
     }
-    const msgPlaceBid = msg.kava.newMsgPlaceBid(
+    const msgPlaceBid = msg.kava.PlaceBid(
       auctionID,
       this.wallet.address,
       amount
@@ -669,7 +669,7 @@ export class KavaClient {
     if (!this.wallet) {
       throw Error('Wallet has not yet been initialized');
     }
-    const msgCreateCDP = msg.kava.newMsgCreateCDP(
+    const msgCreateCDP = msg.kava.CreateCDP(
       this.wallet.address,
       principal,
       collateral,
@@ -697,7 +697,7 @@ export class KavaClient {
     if (!this.wallet) {
       throw Error('Wallet has not yet been initialized');
     }
-    const msgDeposit = msg.kava.newMsgDeposit(
+    const msgDeposit = msg.kava.Deposit(
       owner,
       this.wallet.address,
       collateral,
@@ -725,7 +725,7 @@ export class KavaClient {
     if (!this.wallet) {
       throw Error('Wallet has not yet been initialized');
     }
-    const msgWithdraw = msg.kava.newMsgWithdraw(
+    const msgWithdraw = msg.kava.Withdraw(
       owner,
       this.wallet.address,
       collateral,
@@ -751,7 +751,7 @@ export class KavaClient {
     if (!this.wallet) {
       throw Error('Wallet has not yet been initialized');
     }
-    const msgDrawDebt = msg.kava.newMsgDrawDebt(
+    const msgDrawDebt = msg.kava.DrawDebt(
       this.wallet.address,
       collateralType,
       principal
@@ -776,7 +776,7 @@ export class KavaClient {
     if (!this.wallet) {
       throw Error('Wallet has not yet been initialized');
     }
-    const msgRepayDebt = msg.kava.newMsgRepayDebt(
+    const msgRepayDebt = msg.kava.RepayDebt(
       this.wallet.address,
       collateralType,
       payment
@@ -801,7 +801,7 @@ export class KavaClient {
     if (!this.wallet) {
       throw Error('Wallet has not yet been initialized');
     }
-    const msgLiquidate = msg.kava.newMsgLiquidate(
+    const msgLiquidate = msg.kava.Liquidate(
       this.wallet.address,
       borrower,
       collateralType
@@ -904,7 +904,7 @@ export class KavaClient {
     if (!this.wallet) {
       throw Error('Wallet has not yet been initialized');
     }
-    const msgCreateAtomicSwap = msg.kava.newMsgCreateAtomicSwap(
+    const msgCreateAtomicSwap = msg.kava.CreateAtomicSwap(
       this.wallet.address,
       recipient,
       recipientOtherChain,
@@ -934,7 +934,7 @@ export class KavaClient {
     if (!this.wallet) {
       throw Error('Wallet has not yet been initialized');
     }
-    const msgClaimAtomicSwap = msg.kava.newMsgClaimAtomicSwap(
+    const msgClaimAtomicSwap = msg.kava.ClaimAtomicSwap(
       this.wallet.address,
       swapID.toUpperCase(),
       randomNumber.toUpperCase()
@@ -953,7 +953,7 @@ export class KavaClient {
     if (!this.wallet) {
       throw Error('Wallet has not yet been initialized');
     }
-    const msgRefundAtomicSwap = msg.kava.newMsgRefundAtomicSwap(
+    const msgRefundAtomicSwap = msg.kava.RefundAtomicSwap(
       this.wallet.address,
       swapID.toUpperCase()
     );
@@ -1004,7 +1004,7 @@ export class KavaClient {
     if (!this.wallet) {
       throw Error('Wallet has not yet been initialized');
     }
-    const msgClaimUSDXMintingReward = msg.kava.newMsgClaimUSDXMintingReward(
+    const msgClaimUSDXMintingReward = msg.kava.ClaimUSDXMintingReward(
       this.wallet.address,
       multiplierName
     );
@@ -1028,7 +1028,7 @@ export class KavaClient {
     if (!this.wallet) {
       throw Error('Wallet has not yet been initialized');
     }
-    const msgClaimUSDXMintingRewardVVesting = msg.kava.newMsgClaimUSDXMintingRewardVVesting(
+    const msgClaimUSDXMintingRewardVVesting = msg.kava.ClaimUSDXMintingRewardVVesting(
       this.wallet.address,
       receiver,
       multiplierName
@@ -1057,7 +1057,7 @@ export class KavaClient {
     if (!this.wallet) {
       throw Error('Wallet has not yet been initialized');
     }
-    const msgClaimHardReward = msg.kava.newMsgClaimHardReward(
+    const msgClaimHardReward = msg.kava.ClaimHardReward(
       this.wallet.address,
       denomsToClaim
     );
@@ -1083,7 +1083,7 @@ export class KavaClient {
     if (!this.wallet) {
       throw Error('Wallet has not yet been initialized');
     }
-    const msgClaimHardRewardVVesting = msg.kava.newMsgClaimHardRewardVVesting(
+    const msgClaimHardRewardVVesting = msg.kava.ClaimHardRewardVVesting(
       this.wallet.address,
       receiver,
       denomsToClaim
@@ -1108,7 +1108,7 @@ export class KavaClient {
     if (!this.wallet) {
       throw Error('Wallet has not yet been initialized');
     }
-    const msgClaimDelegatorReward = msg.kava.newMsgClaimDelegatorReward(
+    const msgClaimDelegatorReward = msg.kava.ClaimDelegatorReward(
       this.wallet.address,
       denomsToClaim
     );
@@ -1134,7 +1134,7 @@ export class KavaClient {
     if (!this.wallet) {
       throw Error('Wallet has not yet been initialized');
     }
-    const msgClaimDelegatorRewardVVesting = msg.kava.newMsgClaimDelegatorRewardVVesting(
+    const msgClaimDelegatorRewardVVesting = msg.kava.ClaimDelegatorRewardVVesting(
       this.wallet.address,
       receiver,
       denomsToClaim
@@ -1159,7 +1159,7 @@ export class KavaClient {
     if (!this.wallet) {
       throw Error('Wallet has not yet been initialized');
     }
-    const msgClaimSwapReward = msg.kava.newMsgClaimSwapReward(
+    const msgClaimSwapReward = msg.kava.ClaimSwapReward(
       this.wallet.address,
       denomsToClaim
     );
@@ -1185,7 +1185,7 @@ export class KavaClient {
     if (!this.wallet) {
       throw Error('Wallet has not yet been initialized');
     }
-    const msgClaimSwapRewardVVesting = msg.kava.newMsgClaimSwapRewardVVesting(
+    const msgClaimSwapRewardVVesting = msg.kava.ClaimSwapRewardVVesting(
       this.wallet.address,
       receiver,
       denomsToClaim
@@ -1321,7 +1321,7 @@ export class KavaClient {
     if (!this.wallet) {
       throw Error('Wallet has not yet been initialized');
     }
-    const msgSubmitProposal = msg.kava.newMsgSubmitProposal(
+    const msgSubmitProposal = msg.kava.SubmitProposal(
       proposal,
       this.wallet.address,
       committeeID
@@ -1345,7 +1345,7 @@ export class KavaClient {
     if (!this.wallet) {
       throw Error('Wallet has not yet been initialized');
     }
-    const msgVote = msg.kava.newMsgVote(
+    const msgVote = msg.kava.Vote(
       proposalID,
       this.wallet.address,
       voteType
@@ -1385,7 +1385,7 @@ export class KavaClient {
     if (!this.wallet) {
       throw Error('Wallet has not yet been initialized');
     }
-    const msgIssueTokens = msg.kava.newMsgIssueTokens(
+    const msgIssueTokens = msg.kava.IssueTokens(
       this.wallet.address,
       tokens,
       receiver
@@ -1404,7 +1404,7 @@ export class KavaClient {
     if (!this.wallet) {
       throw Error('Wallet has not yet been initialized');
     }
-    const msgRedeemTokens = msg.kava.newMsgRedeemTokens(
+    const msgRedeemTokens = msg.kava.RedeemTokens(
       this.wallet.address,
       tokens
     );
@@ -1428,7 +1428,7 @@ export class KavaClient {
     if (!this.wallet) {
       throw Error('Wallet has not yet been initialized');
     }
-    const msgBlockAddress = msg.kava.newMsgBlockAddress(
+    const msgBlockAddress = msg.kava.BlockAddress(
       this.wallet.address,
       denom,
       blockedAddress
@@ -1453,7 +1453,7 @@ export class KavaClient {
     if (!this.wallet) {
       throw Error('Wallet has not yet been initialized');
     }
-    const msgUnblockAddress = msg.kava.newMsgUnblockAddress(
+    const msgUnblockAddress = msg.kava.UnblockAddress(
       this.wallet.address,
       denom,
       blockedAddress
@@ -1478,7 +1478,7 @@ export class KavaClient {
     if (!this.wallet) {
       throw Error('Wallet has not yet been initialized');
     }
-    const msgSetPauseStatus = msg.kava.newMsgSetPauseStatus(
+    const msgSetPauseStatus = msg.kava.SetPauseStatus(
       this.wallet.address,
       denom,
       status

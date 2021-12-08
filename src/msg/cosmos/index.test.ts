@@ -1,7 +1,7 @@
 import { cosmos } from '.';
 
 describe('Cosmos messages', () => {
-  describe('newMsgSend', () => {
+  describe('Send', () => {
     it('should sort the coins passed in by denom', () => {
       const coins = [
         {
@@ -21,7 +21,7 @@ describe('Cosmos messages', () => {
           amount: '20000000',
         },
       ];
-      const message = cosmos.newMsgSend('kavafrom', 'kavato', coins);
+      const message = cosmos.Send('kavafrom', 'kavato', coins);
       expect(message).toStrictEqual({
         type: 'cosmos-sdk/MsgSend',
         value: {
@@ -50,13 +50,13 @@ describe('Cosmos messages', () => {
     });
   });
 
-  describe('newMsgTransfer', () => {
+  describe('Transfer', () => {
     it('should generate a well-formed transfer', () => {
       const coin = {
         denom: 'ukava',
         amount: '10000000',
       };
-      const message = cosmos.newMsgTransfer(
+      const message = cosmos.Transfer(
         'transfer',
         'channel-0',
         coin,

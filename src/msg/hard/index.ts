@@ -1,6 +1,6 @@
 import { Coin } from '../../types/Coin';
 
-function newMsgDeposit(depositor: string, amount: Coin[]) {
+function Deposit(depositor: string, amount: Coin[]) {
   return {
     type: 'hard/MsgDeposit',
     value: {
@@ -10,7 +10,7 @@ function newMsgDeposit(depositor: string, amount: Coin[]) {
   };
 }
 
-function newMsgWithdraw(depositor: string, amount: Coin[]) {
+function Withdraw(depositor: string, amount: Coin[]) {
   return {
     type: 'hard/MsgWithdraw',
     value: {
@@ -20,7 +20,7 @@ function newMsgWithdraw(depositor: string, amount: Coin[]) {
   };
 }
 
-function newMsgBorrow(borrower: string, amount: Coin[]) {
+function Borrow(borrower: string, amount: Coin[]) {
   return {
     type: 'hard/MsgBorrow',
     value: {
@@ -30,7 +30,7 @@ function newMsgBorrow(borrower: string, amount: Coin[]) {
   };
 }
 
-function newMsgRepay(sender: string, owner: string, amount: Coin[]) {
+function Repay(sender: string, owner: string, amount: Coin[]) {
   return {
     type: 'hard/MsgRepay',
     value: {
@@ -41,7 +41,7 @@ function newMsgRepay(sender: string, owner: string, amount: Coin[]) {
   };
 }
 
-function newMsgLiquidate(keeper: string, borrower: string) {
+function Liquidate(keeper: string, borrower: string) {
   return {
     type: 'hard/MsgLiquidate',
     value: {
@@ -52,9 +52,9 @@ function newMsgLiquidate(keeper: string, borrower: string) {
 }
 
 export const hard = {
-  newMsgDeposit,
-  newMsgWithdraw,
-  newMsgBorrow,
-  newMsgRepay,
-  newMsgLiquidate,
+  Deposit,
+  Withdraw,
+  Borrow,
+  Repay,
+  Liquidate,
 };

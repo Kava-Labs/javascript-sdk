@@ -1,6 +1,6 @@
 import { Coin } from '../../types/Coin';
 
-function newMsgDeposit(
+function Deposit(
   depositor: string,
   tokenA: Coin,
   tokenB: Coin,
@@ -19,7 +19,7 @@ function newMsgDeposit(
   };
 }
 
-function newMsgWithdraw(
+function Withdraw(
   from: string,
   shares: any,
   minTokenA: Coin,
@@ -38,7 +38,7 @@ function newMsgWithdraw(
   };
 }
 
-function newMsgSwapExactForTokens(
+function SwapExactForTokens(
   requester: string,
   exactTokenA: Coin,
   tokenB: Coin,
@@ -57,7 +57,7 @@ function newMsgSwapExactForTokens(
   };
 }
 
-function newMsgSwapForExactTokens(
+function SwapForExactTokens(
   requester: string,
   tokenA: Coin,
   exactTokenB: Coin,
@@ -77,8 +77,8 @@ function newMsgSwapForExactTokens(
 }
 
 export const swap = {
-  newMsgDeposit,
-  newMsgWithdraw,
-  newMsgSwapExactForTokens,
-  newMsgSwapForExactTokens,
+  Deposit,
+  Withdraw,
+  SwapExactForTokens,
+  SwapForExactTokens,
 };
