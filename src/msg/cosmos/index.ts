@@ -29,7 +29,6 @@ function newStdTx<T = unknown>(
   };
 }
 
-// newMsgSend creates a new MsgSend
 function newMsgSend(address: string, to: string, coins: Coin[]) {
   const sendTx = {
     type: 'cosmos-sdk/MsgSend',
@@ -59,6 +58,16 @@ function newMsgVoteGovernance(
   };
 }
 
+/**
+ * Creates an IBC transfer
+ * @param {String} sourcePort the port identifier, we would expect to always be "transfer" * @param {String} sourcePort the port identifier, we would expect to always be "transfer"
+ * @param {String} source_channel the channel identifier
+ * @param {Coin} token
+ * @param {String} sender address of sender on the origin chain
+ * @param {String} receiver address of recipient on the destination chain
+ * @param {Integer} timeoutTimestamp nanoseconds to allow transfer to complete
+
+ */
 function newMsgTransfer(
   sourcePort: string,
   sourceChannel: string,

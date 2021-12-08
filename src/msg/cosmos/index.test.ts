@@ -57,8 +57,8 @@ describe('Cosmos messages', () => {
         amount: '10000000',
       };
       const message = cosmos.newMsgTransfer(
-        'port',
-        'channel',
+        'transfer',
+        'channel-0',
         coin,
         'kava1w66puffhccjck70hw75wu3v92tshw5rmdxp8hb',
         'kava1a22puffhccjck70hw75wu3v92tshw5rmdxp6xz',
@@ -67,8 +67,8 @@ describe('Cosmos messages', () => {
       const expected = {
         type: 'cosmos-sdk/MsgTransfer',
         value: {
-          source_port: 'port',
-          source_channel: 'channel',
+          source_port: 'transfer',
+          source_channel: 'channel-0',
           token: {
             denom: 'ukava',
             amount: '10000000',
