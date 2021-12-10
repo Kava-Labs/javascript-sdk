@@ -23,8 +23,8 @@ function newMsgPlaceBid(auctionID: string, bidder: string, amount: Coin) {
 
 // newMsgCreateAtomicSwap creates a new MsgCreateAtomicSwap
 function newMsgCreateAtomicSwap(
-  sender: string,
-  recipient: string,
+  from: string,
+  to: string,
   recipientOtherChain: string,
   senderOtherChain: string,
   randomNumberHash: string,
@@ -35,8 +35,8 @@ function newMsgCreateAtomicSwap(
   return {
     type: 'bep3/MsgCreateAtomicSwap',
     value: {
-      from: sender,
-      to: recipient,
+      from,
+      to,
       recipient_other_chain: recipientOtherChain,
       sender_other_chain: senderOtherChain,
       random_number_hash: randomNumberHash,
@@ -49,14 +49,14 @@ function newMsgCreateAtomicSwap(
 
 // newMsgClaimAtomicSwap creates a new MsgClaimAtomicSwap
 function newMsgClaimAtomicSwap(
-  sender: string,
+  from: string,
   swapID: string,
   randomNumber: string
 ) {
   return {
     type: 'bep3/MsgClaimAtomicSwap',
     value: {
-      from: sender,
+      from,
       swap_id: swapID,
       random_number: randomNumber,
     },
@@ -64,11 +64,11 @@ function newMsgClaimAtomicSwap(
 }
 
 // newMsgRefundAtomicSwap creates a new MsgRefundAtomicSwap
-function newMsgRefundAtomicSwap(sender: string, swapID: string) {
+function newMsgRefundAtomicSwap(from: string, swapID: string) {
   return {
     type: 'bep3/MsgRefundAtomicSwap',
     value: {
-      from: sender,
+      from,
       swap_id: swapID,
     },
   };
@@ -179,14 +179,14 @@ function newMsgLiquidate(
  ***************************************************/
 
 function newMsgSubmitProposal(
-  proposal: string,
+  pubProposal: string,
   proposer: string,
   committeeID: string
 ) {
   return {
     type: 'kava/MsgSubmitProposal',
     value: {
-      pub_proposal: proposal,
+      pub_proposal: pubProposal,
       proposer: proposer,
       committee_id: String(committeeID),
     },
@@ -218,41 +218,11 @@ function newMsgClaimUSDXMintingReward(sender: string, multiplierName: string) {
   };
 }
 
-function newMsgClaimUSDXMintingRewardVVesting(
-  sender: string,
-  receiver: string,
-  multiplierName: string
-) {
-  return {
-    type: 'incentive/MsgClaimUSDXMintingRewardVVesting',
-    value: {
-      sender: sender,
-      receiver: receiver,
-      multiplierName: multiplierName,
-    },
-  };
-}
-
 function newMsgClaimHardReward(sender: string, denomsToClaim: any[]) {
   return {
     type: 'incentive/MsgClaimHardReward',
     value: {
       sender: sender,
-      denoms_to_claim: denomsToClaim,
-    },
-  };
-}
-
-function newMsgClaimHardRewardVVesting(
-  sender: string,
-  receiver: string,
-  denomsToClaim: DenomToClaim[]
-) {
-  return {
-    type: 'incentive/MsgClaimHardRewardVVesting',
-    value: {
-      sender: sender,
-      receiver: receiver,
       denoms_to_claim: denomsToClaim,
     },
   };
@@ -271,41 +241,11 @@ function newMsgClaimDelegatorReward(
   };
 }
 
-function newMsgClaimDelegatorRewardVVesting(
-  sender: string,
-  receiver: string,
-  denomsToClaim: any[]
-) {
-  return {
-    type: 'incentive/MsgClaimDelegatorRewardVVesting',
-    value: {
-      sender: sender,
-      receiver: receiver,
-      denoms_to_claim: denomsToClaim,
-    },
-  };
-}
-
 function newMsgClaimSwapReward(sender: string, denomsToClaim: DenomToClaim[]) {
   return {
     type: 'incentive/MsgClaimSwapReward',
     value: {
       sender: sender,
-      denoms_to_claim: denomsToClaim,
-    },
-  };
-}
-
-function newMsgClaimSwapRewardVVesting(
-  sender: string,
-  receiver: string,
-  denomsToClaim: DenomToClaim[]
-) {
-  return {
-    type: 'incentive/MsgClaimSwapRewardVVesting',
-    value: {
-      sender: sender,
-      receiver: receiver,
       denoms_to_claim: denomsToClaim,
     },
   };
@@ -408,13 +348,9 @@ export const kava = {
   newMsgSubmitProposal,
   newMsgVote,
   newMsgClaimUSDXMintingReward,
-  newMsgClaimUSDXMintingRewardVVesting,
   newMsgClaimHardReward,
-  newMsgClaimHardRewardVVesting,
   newMsgClaimDelegatorReward,
-  newMsgClaimDelegatorRewardVVesting,
   newMsgClaimSwapReward,
-  newMsgClaimSwapRewardVVesting,
   newMsgIssueTokens,
   newMsgRedeemTokens,
   newMsgBlockAddress,
