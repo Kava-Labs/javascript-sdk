@@ -84,8 +84,8 @@ function newMsgTransfer(
       token: token,
       sender: sender,
       receiver: receiver,
-      timeoutHeight: '0',
-      timeoutTimestamp: timeoutTimestamp.toString(),
+      timeout_height: {},
+      timeout_timestamp: timeoutTimestamp.toString(),
     },
   };
 }
