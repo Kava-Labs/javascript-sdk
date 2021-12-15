@@ -1012,35 +1012,6 @@ export class KavaClient {
   }
 
   /**
-   * Claim USDX minting validator vesting reward using a specific multiplier
-   * @param {String} address to receive the rewards
-   * @param {String} multiplierName the multiplier to claim with, such as 'small' or 'large'
-   * @param {Object} fee optional fee consisting of { amount: [Coins], gas: String(Number) }
-   * @param {String} sequence optional account sequence
-   * @return {Promise}
-   */
-  async claimUSDXMintingRewardVVesting(
-    receiver: string,
-    multiplierName: string,
-    fee = DEFAULT_FEE,
-    sequence = null
-  ) {
-    if (!this.wallet) {
-      throw Error('Wallet has not yet been initialized');
-    }
-    const msgClaimUSDXMintingRewardVVesting = msg.kava.newMsgClaimUSDXMintingRewardVVesting(
-      this.wallet.address,
-      receiver,
-      multiplierName
-    );
-    return await this.sendTx(
-      [msgClaimUSDXMintingRewardVVesting],
-      fee,
-      sequence
-    );
-  }
-
-  /**
    * Claim Hard protocol reward using a specific multiplier and denoms
    * @params {Array} choose which denom(s) of your rewards that you would like to claim
    * and at which multiplier you claim them
@@ -1062,33 +1033,6 @@ export class KavaClient {
       denomsToClaim
     );
     return await this.sendTx([msgClaimHardReward], fee, sequence);
-  }
-
-  /**
-   * Claim  Hard protocol validator vesting reward using a specific multiplier
-   * @param {String} address to receive the rewards
-   * @params {Array} choose which denom(s) of your rewards that you would like to claim
-   * and at which multiplier you claim them
-   * [{ denom: 'hard', multiplierName: 'large'}, { denom: 'ukava', multiplierName: 'small' }]
-   * @param {Object} fee optional fee consisting of { amount: [Coins], gas: String(Number) }
-   * @param {String} sequence optional account sequence
-   * @return {Promise}
-   */
-  async claimHardRewardVVesting(
-    receiver: string,
-    denomsToClaim: DenomToClaim[],
-    fee = DEFAULT_FEE,
-    sequence = null
-  ) {
-    if (!this.wallet) {
-      throw Error('Wallet has not yet been initialized');
-    }
-    const msgClaimHardRewardVVesting = msg.kava.newMsgClaimHardRewardVVesting(
-      this.wallet.address,
-      receiver,
-      denomsToClaim
-    );
-    return await this.sendTx([msgClaimHardRewardVVesting], fee, sequence);
   }
 
   /**
@@ -1116,33 +1060,6 @@ export class KavaClient {
   }
 
   /**
-   * Claim delegator validator vesting reward using a specific multiplier
-   * @param {String} address to receive the rewards
-   * @params {Array} choose which denom(s) of your rewards that you would like to claim
-   * and at which multiplier you claim them
-   * [{ denom: 'hard', multiplierName: 'large'}, { denom: 'ukava', multiplierName: 'small' }]
-   * @param {Object} fee optional fee consisting of { amount: [Coins], gas: String(Number) }
-   * @param {String} sequence optional account sequence
-   * @return {Promise}
-   */
-  async claimDelegatorRewardVVesting(
-    receiver: string,
-    denomsToClaim: DenomToClaim[],
-    fee = DEFAULT_FEE,
-    sequence = null
-  ) {
-    if (!this.wallet) {
-      throw Error('Wallet has not yet been initialized');
-    }
-    const msgClaimDelegatorRewardVVesting = msg.kava.newMsgClaimDelegatorRewardVVesting(
-      this.wallet.address,
-      receiver,
-      denomsToClaim
-    );
-    return await this.sendTx([msgClaimDelegatorRewardVVesting], fee, sequence);
-  }
-
-  /**
    * Claim swap reward using a specific multiplier and denoms
    * @params {Array} choose which denom(s) of your rewards that you would like to claim
    * and at which multiplier you claim them
@@ -1166,35 +1083,8 @@ export class KavaClient {
     return await this.sendTx([msgClaimSwapReward], fee, sequence);
   }
 
-  /**
-   * Claim swap validator vesting reward using a specific multiplier
-   * @param {String} address to receive the rewards
-   * @params {Array} choose which denom(s) of your rewards that you would like to claim
-   * and at which multiplier you claim them
-   * [{ denom: 'hard', multiplierName: 'large'}, { denom: 'ukava', multiplierName: 'small' }]
-   * @param {Object} fee optional fee consisting of { amount: [Coins], gas: String(Number) }
-   * @param {String} sequence optional account sequence
-   * @return {Promise}
-   */
-  async claimSwapRewardVVesting(
-    receiver: string,
-    denomsToClaim: DenomToClaim[],
-    fee = DEFAULT_FEE,
-    sequence = null
-  ) {
-    if (!this.wallet) {
-      throw Error('Wallet has not yet been initialized');
-    }
-    const msgClaimSwapRewardVVesting = msg.kava.newMsgClaimSwapRewardVVesting(
-      this.wallet.address,
-      receiver,
-      denomsToClaim
-    );
-    return await this.sendTx([msgClaimSwapRewardVVesting], fee, sequence);
-  }
-
   /***************************************************
-   *                    Committee
+   *                    Committee 
    ***************************************************/
   /**
    * Get the params of the committee module
