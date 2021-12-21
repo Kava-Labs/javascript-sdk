@@ -1,5 +1,5 @@
-import _ from 'lodash';
 import { Coin } from '../../types/Coin';
+import { Message } from '../../types/Message';
 import { VoteType } from '../../types/VoteType';
 
 const FEE_DEFAULT = { amount: [], gas: '300000' };
@@ -12,8 +12,8 @@ const FEE_DEFAULT = { amount: [], gas: '300000' };
  * @param {Object} signatures generated when an address signs a data package, required for tx confirmation
  * @return {Promise}
  */
-function newStdTx(
-  msgs: any[],
+function newStdTx<T = unknown>(
+  msgs: Message<T>[],
   fee = FEE_DEFAULT,
   memo = '',
   signatures = null
@@ -29,7 +29,6 @@ function newStdTx(
   };
 }
 
-// newMsgSend creates a new MsgSend
 function newMsgSend(address: string, to: string, coins: Coin[]) {
   const sendTx = {
     type: 'cosmos-sdk/MsgSend',
@@ -59,8 +58,41 @@ function newMsgVoteGovernance(
   };
 }
 
+/**
+ * Creates an IBC transfer
+ * @param {String} sourcePort the port identifier, we would expect to always be "transfer" * @param {String} sourcePort the port identifier, we would expect to always be "transfer"
+ * @param {String} source_channel the channel identifier
+ * @param {Coin} token
+ * @param {String} sender address of sender on the origin chain
+ * @param {String} receiver address of recipient on the destination chain
+ * @param {Integer} timeoutTimestamp nanoseconds to allow transfer to complete
+
+ */
+function newMsgTransfer(
+  sourcePort: string,
+  sourceChannel: string,
+  token: Coin,
+  sender: string,
+  receiver: string,
+  timeoutTimestamp: number
+) {
+  return {
+    type: 'cosmos-sdk/MsgTransfer',
+    value: {
+      source_port: sourcePort,
+      source_channel: sourceChannel,
+      token: token,
+      sender: sender,
+      receiver: receiver,
+      timeout_height: {},
+      timeout_timestamp: timeoutTimestamp.toString(),
+    },
+  };
+}
+
 export const cosmos = {
   newStdTx,
   newMsgSend,
   newMsgVoteGovernance,
+  newMsgTransfer,
 };
