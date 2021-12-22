@@ -104,7 +104,7 @@ async function loadMetaData(address: string, base: string, timeout = 2000) {
   const path = api.getAccount + '/' + address;
   const res = await getTx(path, base, timeout);
   const accNum = res?.data?.result?.value?.account_number;
-  const seqNum = res?.data?.result?.value?.sequence;
+  const seqNum = res?.data?.result?.value?.sequence || "0";
   if (!(accNum || seqNum)) {
     throw new Error(
       'account number or sequence number from rest server are undefined'
