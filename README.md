@@ -99,7 +99,7 @@ console.log('Tx result:', txRes.raw_log);
 
 ### Create CDP
 
-Collateralized debt positions have a minimum value of 10 USD and must be overcollateralized above a certain percentage threshold. Supported collateral coin types, their supply limits, and their minimum overcollateralization ratios can be checked at https://kava3.data.kava.io/cdp/parameters.
+Collateralized debt positions have a minimum value of 10 USD and must be overcollateralized above a certain percentage threshold. Supported collateral coin types, their supply limits, and their minimum overcollateralization ratios can be checked at https://api.data.kava.io/cdp/parameters.
 
 While USDX has 6 decimals, our example collateral coin BNB has 8. We'll need to apply each asset's conversion factor before sending the transaction.
 
@@ -201,7 +201,7 @@ const txRes = await client.checkTxHash(txHash, 15000);
 console.log('\nTx result:', txRes.raw_log);
 ```
 
-Note: swap height span must be within range 220-270, you can check the current mainet BEP3 module parameters at https://kava3.data.kava.io/bep3/parameters.
+Note: swap height span must be within range 220-270, you can check the current mainet BEP3 module parameters at https://api.data.kava.io/bep3/parameters.
 
 ### Claim swap
 
