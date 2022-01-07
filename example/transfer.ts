@@ -2,23 +2,27 @@ const Env = require('./static/env').env;
 const kavaUtils = require('../src/utils').utils;
 const KavaClient = require('../src/client').KavaClient;
 
+import { Coin } from '../src/types';
+
 const KAVA_CONVERSION_FACTOR = 10 ** 6;
 
 var main = async () => {
   const recipient = 'kava1g0qywkx6mt5jmvefv6hs7c7h333qas5ks63a6t';
 
   // Start new Kava client
-  kavaClient = new KavaClient(Env.KavaEndpoints.Testnet);
-  kavaClient.setWallet(Env.KavaAccount.Testnet.Mnemonic);
+  let kavaClient = new KavaClient(Env.KavaEndpoints.Local);
+  kavaClient.setWallet(Env.KavaDeputy.Local.Mnemonic);
   kavaClient.setBroadcastMode('async');
   await kavaClient.initChain();
 
+  let acc = await kavaClient.getAccount(Env.KavaDeputy.Local.Address);
+
   // First let's check our account balances
-  let balances = await kavaClient.getBalances(Env.KavaAccount.Testnet.Address);
+  let balances = await kavaClient.getBalances(Env.KavaAccount.Local.Address);
   console.log('Balances:', balances);
   // Print our KAVA balance (if we have one)
   let kavaBalance = balances.find(
-    (item) => item.denom.toUpperCase() === 'UKAVA'
+    (item: Coin) => item.denom.toUpperCase() === 'UKAVA'
   );
   if (kavaBalance) {
     console.log(
