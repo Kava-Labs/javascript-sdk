@@ -1,13 +1,14 @@
 /* eslint-disable */
 import Long from 'long';
 import _m0 from 'protobufjs/minimal';
+import { Coin } from '../../../cosmos/base/v1beta1/coin';
 
 export const protobufPackage = 'kava.issuance.v1beta1';
 
 /** MsgIssueTokens represents a message used by the issuer to issue new tokens */
 export interface MsgIssueTokens {
   sender: string;
-  tokens: Uint8Array;
+  tokens?: Coin;
   receiver: string;
 }
 
@@ -17,7 +18,7 @@ export interface MsgIssueTokensResponse {}
 /** MsgRedeemTokens represents a message used by the issuer to redeem (burn) tokens */
 export interface MsgRedeemTokens {
   sender: string;
-  tokens: Uint8Array;
+  tokens?: Coin;
 }
 
 /** MsgRedeemTokensResponse defines the Msg/RedeemTokens response type. */
@@ -54,7 +55,7 @@ export interface MsgSetPauseStatus {
 export interface MsgSetPauseStatusResponse {}
 
 function createBaseMsgIssueTokens(): MsgIssueTokens {
-  return { sender: '', tokens: new Uint8Array(), receiver: '' };
+  return { sender: '', tokens: undefined, receiver: '' };
 }
 
 export const MsgIssueTokens = {
@@ -65,8 +66,8 @@ export const MsgIssueTokens = {
     if (message.sender !== '') {
       writer.uint32(10).string(message.sender);
     }
-    if (message.tokens.length !== 0) {
-      writer.uint32(18).bytes(message.tokens);
+    if (message.tokens !== undefined) {
+      Coin.encode(message.tokens, writer.uint32(18).fork()).ldelim();
     }
     if (message.receiver !== '') {
       writer.uint32(26).string(message.receiver);
@@ -85,7 +86,7 @@ export const MsgIssueTokens = {
           message.sender = reader.string();
           break;
         case 2:
-          message.tokens = reader.bytes();
+          message.tokens = Coin.decode(reader, reader.uint32());
           break;
         case 3:
           message.receiver = reader.string();
@@ -101,9 +102,7 @@ export const MsgIssueTokens = {
   fromJSON(object: any): MsgIssueTokens {
     return {
       sender: isSet(object.sender) ? String(object.sender) : '',
-      tokens: isSet(object.tokens)
-        ? bytesFromBase64(object.tokens)
-        : new Uint8Array(),
+      tokens: isSet(object.tokens) ? Coin.fromJSON(object.tokens) : undefined,
       receiver: isSet(object.receiver) ? String(object.receiver) : '',
     };
   },
@@ -112,9 +111,7 @@ export const MsgIssueTokens = {
     const obj: any = {};
     message.sender !== undefined && (obj.sender = message.sender);
     message.tokens !== undefined &&
-      (obj.tokens = base64FromBytes(
-        message.tokens !== undefined ? message.tokens : new Uint8Array()
-      ));
+      (obj.tokens = message.tokens ? Coin.toJSON(message.tokens) : undefined);
     message.receiver !== undefined && (obj.receiver = message.receiver);
     return obj;
   },
@@ -124,7 +121,10 @@ export const MsgIssueTokens = {
   ): MsgIssueTokens {
     const message = createBaseMsgIssueTokens();
     message.sender = object.sender ?? '';
-    message.tokens = object.tokens ?? new Uint8Array();
+    message.tokens =
+      object.tokens !== undefined && object.tokens !== null
+        ? Coin.fromPartial(object.tokens)
+        : undefined;
     message.receiver = object.receiver ?? '';
     return message;
   },
@@ -178,7 +178,7 @@ export const MsgIssueTokensResponse = {
 };
 
 function createBaseMsgRedeemTokens(): MsgRedeemTokens {
-  return { sender: '', tokens: new Uint8Array() };
+  return { sender: '', tokens: undefined };
 }
 
 export const MsgRedeemTokens = {
@@ -189,8 +189,8 @@ export const MsgRedeemTokens = {
     if (message.sender !== '') {
       writer.uint32(10).string(message.sender);
     }
-    if (message.tokens.length !== 0) {
-      writer.uint32(18).bytes(message.tokens);
+    if (message.tokens !== undefined) {
+      Coin.encode(message.tokens, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -206,7 +206,7 @@ export const MsgRedeemTokens = {
           message.sender = reader.string();
           break;
         case 2:
-          message.tokens = reader.bytes();
+          message.tokens = Coin.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -219,9 +219,7 @@ export const MsgRedeemTokens = {
   fromJSON(object: any): MsgRedeemTokens {
     return {
       sender: isSet(object.sender) ? String(object.sender) : '',
-      tokens: isSet(object.tokens)
-        ? bytesFromBase64(object.tokens)
-        : new Uint8Array(),
+      tokens: isSet(object.tokens) ? Coin.fromJSON(object.tokens) : undefined,
     };
   },
 
@@ -229,9 +227,7 @@ export const MsgRedeemTokens = {
     const obj: any = {};
     message.sender !== undefined && (obj.sender = message.sender);
     message.tokens !== undefined &&
-      (obj.tokens = base64FromBytes(
-        message.tokens !== undefined ? message.tokens : new Uint8Array()
-      ));
+      (obj.tokens = message.tokens ? Coin.toJSON(message.tokens) : undefined);
     return obj;
   },
 
@@ -240,7 +236,10 @@ export const MsgRedeemTokens = {
   ): MsgRedeemTokens {
     const message = createBaseMsgRedeemTokens();
     message.sender = object.sender ?? '';
-    message.tokens = object.tokens ?? new Uint8Array();
+    message.tokens =
+      object.tokens !== undefined && object.tokens !== null
+        ? Coin.fromPartial(object.tokens)
+        : undefined;
     return message;
   },
 };
@@ -754,40 +753,6 @@ interface Rpc {
     method: string,
     data: Uint8Array
   ): Promise<Uint8Array>;
-}
-
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
-var globalThis: any = (() => {
-  if (typeof globalThis !== 'undefined') return globalThis;
-  if (typeof self !== 'undefined') return self;
-  if (typeof window !== 'undefined') return window;
-  if (typeof global !== 'undefined') return global;
-  throw 'Unable to locate global object';
-})();
-
-const atob: (b64: string) => string =
-  globalThis.atob ||
-  ((b64) => globalThis.Buffer.from(b64, 'base64').toString('binary'));
-function bytesFromBase64(b64: string): Uint8Array {
-  const bin = atob(b64);
-  const arr = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; ++i) {
-    arr[i] = bin.charCodeAt(i);
-  }
-  return arr;
-}
-
-const btoa: (bin: string) => string =
-  globalThis.btoa ||
-  ((bin) => globalThis.Buffer.from(bin, 'binary').toString('base64'));
-function base64FromBytes(arr: Uint8Array): string {
-  const bin: string[] = [];
-  for (const byte of arr) {
-    bin.push(String.fromCharCode(byte));
-  }
-  return btoa(bin.join(''));
 }
 
 type Builtin =

@@ -2,6 +2,7 @@
 import Long from 'long';
 import _m0 from 'protobufjs/minimal';
 import { Duration } from '../../../google/protobuf/duration';
+import { Coin } from '../../../cosmos/base/v1beta1/coin';
 
 export const protobufPackage = 'kava.issuance.v1beta1';
 
@@ -39,7 +40,7 @@ export interface RateLimit {
  * total supply of the asset is tracked in the top-level supply module)
  */
 export interface AssetSupply {
-  currentSupply: Uint8Array;
+  currentSupply?: Coin;
   timeElapsed?: Duration;
 }
 
@@ -378,7 +379,7 @@ export const RateLimit = {
 };
 
 function createBaseAssetSupply(): AssetSupply {
-  return { currentSupply: new Uint8Array(), timeElapsed: undefined };
+  return { currentSupply: undefined, timeElapsed: undefined };
 }
 
 export const AssetSupply = {
@@ -386,11 +387,11 @@ export const AssetSupply = {
     message: AssetSupply,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (message.currentSupply.length !== 0) {
-      writer.uint32(10).bytes(message.currentSupply);
+    if (message.currentSupply !== undefined) {
+      Coin.encode(message.currentSupply, writer.uint32(10).fork()).ldelim();
     }
     if (message.timeElapsed !== undefined) {
-      Duration.encode(message.timeElapsed, writer.uint32(26).fork()).ldelim();
+      Duration.encode(message.timeElapsed, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -403,9 +404,9 @@ export const AssetSupply = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.currentSupply = reader.bytes();
+          message.currentSupply = Coin.decode(reader, reader.uint32());
           break;
-        case 3:
+        case 2:
           message.timeElapsed = Duration.decode(reader, reader.uint32());
           break;
         default:
@@ -419,8 +420,8 @@ export const AssetSupply = {
   fromJSON(object: any): AssetSupply {
     return {
       currentSupply: isSet(object.currentSupply)
-        ? bytesFromBase64(object.currentSupply)
-        : new Uint8Array(),
+        ? Coin.fromJSON(object.currentSupply)
+        : undefined,
       timeElapsed: isSet(object.timeElapsed)
         ? Duration.fromJSON(object.timeElapsed)
         : undefined,
@@ -430,11 +431,9 @@ export const AssetSupply = {
   toJSON(message: AssetSupply): unknown {
     const obj: any = {};
     message.currentSupply !== undefined &&
-      (obj.currentSupply = base64FromBytes(
-        message.currentSupply !== undefined
-          ? message.currentSupply
-          : new Uint8Array()
-      ));
+      (obj.currentSupply = message.currentSupply
+        ? Coin.toJSON(message.currentSupply)
+        : undefined);
     message.timeElapsed !== undefined &&
       (obj.timeElapsed = message.timeElapsed
         ? Duration.toJSON(message.timeElapsed)
@@ -446,7 +445,10 @@ export const AssetSupply = {
     object: I
   ): AssetSupply {
     const message = createBaseAssetSupply();
-    message.currentSupply = object.currentSupply ?? new Uint8Array();
+    message.currentSupply =
+      object.currentSupply !== undefined && object.currentSupply !== null
+        ? Coin.fromPartial(object.currentSupply)
+        : undefined;
     message.timeElapsed =
       object.timeElapsed !== undefined && object.timeElapsed !== null
         ? Duration.fromPartial(object.timeElapsed)
