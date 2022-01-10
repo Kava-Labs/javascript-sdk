@@ -3,5 +3,7 @@ node_modules
 
 # build dir
 lib
+src/proto
+.build
 
 .eslintcache
