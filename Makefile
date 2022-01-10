@@ -25,6 +25,7 @@ proto-deps: clean
 
 .PHONY: proto-gen
 proto-gen:
+	mkdir -p $(OUT_DIR) && \
 	protoc \
 		--plugin="protoc-gen-ts_proto=$(TS_PROTO_PLUGIN_PATH)" \
 		--ts_proto_out="$(OUT_DIR)" \
