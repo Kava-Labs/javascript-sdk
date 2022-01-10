@@ -5,7 +5,7 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
-    "build": "tsc && make",
+    "build": "make && tsc",
     "format": "prettier --write \"src/**/*.ts\"",
     "postversion": "git push && git push --tags",
     "prepare": "npm run build && husky install",
