@@ -1,11 +1,11 @@
 {
   "name": "@kava-labs/javascript-sdk",
-  "version": "9.0.0-beta-10",
+  "version": "9.0.0-beta-11",
   "description": "Supports interaction with the Kava blockchain via a REST api",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
-    "build": "make && tsc",
+    "build": "KAVA_TAG=nd-add-ibc-protos make all && tsc",
     "format": "prettier --write \"src/**/*.ts\"",
     "postversion": "git push && git push --tags",
     "prepare": "npm run build && husky install",

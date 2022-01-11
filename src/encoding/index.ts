@@ -14,3 +14,4 @@ export * as incentive from '../proto/kava/incentive/v1beta1/tx';
 export * as issuance from '../proto/kava/issuance/v1beta1/tx';
 export * as pricefeed from '../proto/kava/pricefeed/v1beta1/tx';
 export * as swap from '../proto/kava/swap/v1beta1/tx';
+export * as ibc from '../proto/ibc/applications/transfer/v1/tx';
