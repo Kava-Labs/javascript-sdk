@@ -2,11 +2,18 @@
 
 The Kava JavaScript SDK allows browsers and node.js clients to interact with Kava. Core functionality and query examples are in the `examples` folder.
 
-- client - client that implements Kava transactions and messages.
-- tx - Kava transaction types.
-- msg - Kava message types.
-- crypto - core cryptographic functions.
-- utils - utility functions such as client-side secret generation.
+- 🟡 client - client that implements Kava transactions and messages.
+- 🟡 tx - Kava transaction types.
+- 🟢 msg - Kava message types.
+- 🟡 crypto - core cryptographic functions.
+- 🟢 utils - utility functions such as client-side secret generation.
+- 🔴 encoding - encoding utilities for Protobuf
+
+## Caveat
+
+Due to limited resources on our team, some parts of the SDK are better maintained than others. Modules marked with the 🟢 are best maintained and most reliable, while modules marked with the 🟡 are partially maintained and may be only partially functional. Modules marked with a 🔴 are experimental, and either may not be functional or may be removed or modified without warning in future releases.
+
+We welcome outside contributions to help keep the SDK as useful and up-to-date as possible.
 
 ## Installation
 
