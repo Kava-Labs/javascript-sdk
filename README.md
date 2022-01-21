@@ -9,9 +9,12 @@ The Kava JavaScript SDK allows browsers and node.js clients to interact with Kav
 - 🟢 utils - utility functions such as client-side secret generation.
 - 🔴 encoding - encoding utilities for Protobuf
 
-## Caveat
+## Proceed with Caution
 
-Due to limited resources on our team, some parts of the SDK are better maintained than others. Modules marked with the 🟢 are best maintained and most reliable, while modules marked with the 🟡 are partially maintained and may be only partially functional. Modules marked with a 🔴 are experimental, and either may not be functional or may be removed or modified without warning in future releases.
+Due to limited resources on our team, some parts of the SDK are better maintained than others. 
+🔴 Modules marked red are experimental, and either may not be functional or may be removed or modified without warning in future releases.
+🟡 Modules marked yellow are partially maintained and may be only partially functional.
+🟢 Modules marked green are best maintained and most reliable. Functionality should be up-to-date and functional in the latest stable or beta release.
 
 We welcome outside contributions to help keep the SDK as useful and up-to-date as possible.
 
