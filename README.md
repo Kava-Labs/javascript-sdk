@@ -7,13 +7,11 @@ The Kava JavaScript SDK allows browsers and node.js clients to interact with Kav
 - 🟢 msg - Kava message types.
 - 🟡 crypto - core cryptographic functions.
 - 🟢 utils - utility functions such as client-side secret generation.
-- 🔴 encoding - encoding utilities for Protobuf
 
 ## Proceed with Caution
 
 Due to limited resources on our team, some parts of the SDK are better maintained than others.
 
-- 🔴 Modules marked red are experimental, and either may not be functional or may be removed or modified without warning in future releases.
 - 🟡 Modules marked yellow are partially maintained and may be only partially functional.
 - 🟢 Modules marked green are best maintained and most reliable. Functionality should be up-to-date and functional in the latest stable or beta release.
 
@@ -27,6 +25,10 @@ Install the package via npm.
 npm install @kava-labs/javascript-sdk
 ```
 
+## Examples
+
+Examples are still being updated to TypeScript, but can be run with the proper env config and typechecking disabled.
+
 ## Network Information
 
 ### Mainnet
@@ -37,8 +39,8 @@ npm install @kava-labs/javascript-sdk
 
 ### Testnet
 
-- Chain ID: kava-testnet-13000
-- REST API endpoint: https://api.data-testnet.kava.io
+- Chain ID: kava-testnet-14000
+- REST API endpoint: https://api.testnet.kava.io
 - Binance Chain testnet REST API endpoint: https://testnet-dex.binance.org/
 
 ### Binance Chain
