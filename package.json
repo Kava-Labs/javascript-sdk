@@ -26,6 +26,7 @@
     "@binance-chain/javascript-sdk": "^3.0.2",
     "@typescript-eslint/eslint-plugin": "^5.6.0",
     "@typescript-eslint/parser": "^5.6.0",
+    "dotenv": "^14.3.0",
     "eslint": "^8.4.1",
     "husky": "^7.0.1",
     "jest": "^27.3.1",

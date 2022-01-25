@@ -7,3 +7,6 @@ src/proto
 .build
 
 .eslintcache
+
+# Environment configuration for running examples
+.env
