@@ -103,8 +103,19 @@ const retry: RetryFunction = async (
 async function loadMetaData(address: string, base: string, timeout = 2000) {
   const path = api.getAccount + '/' + address;
   const res = await getTx(path, base, timeout);
-  const accNum = res?.data?.result?.value?.base_vesting_account?.base_account?.account_number;
-  const seqNum = res?.data?.result?.value?.base_vesting_account?.base_account?.sequence || "0";
+  let accNum: string;
+  let seqNum: string;
+  if (res?.data?.result?.type === 'cosmos-sdk/BaseAccount') {
+    accNum = res?.data?.result?.value?.account_number;
+    seqNum = res?.data?.result?.value?.sequence || '0';
+  } else {
+    accNum =
+      res?.data?.result?.value?.base_vesting_account?.base_account
+        ?.account_number;
+    seqNum =
+      res?.data?.result?.value?.base_vesting_account?.base_account?.sequence ||
+      '0';
+  }
   if (!(accNum || seqNum)) {
     throw new Error(
       'account number or sequence number from rest server are undefined'

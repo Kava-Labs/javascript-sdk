@@ -50,7 +50,7 @@ const api = {
   getCommittees: '/committee/committees',
   getProposal: '/committee/proposals', // endpoint also used by getProposer, getProposalTally, getProposalVotes
   getDistributionRewards: '/distribution/delegators',
-  getDelegations: '/staking/delegators',  
+  getDelegations: '/staking/delegators',
 };
 
 /**
@@ -316,10 +316,10 @@ export class KavaClient {
     const path = api.getBalances + '/' + address;
     const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
-      return res.data.result;
+      return res.data.result as Coin[];
     }
   }
-  
+
   /**
    * Get an account's delegators reward
    * @param {String} address account to query
@@ -346,7 +346,7 @@ export class KavaClient {
     if (res && res.data) {
       return res.data.result;
     }
-  }  
+  }
 
   /**
    * Get the total supply of coins on the chain
@@ -1084,7 +1084,7 @@ export class KavaClient {
   }
 
   /***************************************************
-   *                    Committee 
+   *                    Committee
    ***************************************************/
   /**
    * Get the params of the committee module
