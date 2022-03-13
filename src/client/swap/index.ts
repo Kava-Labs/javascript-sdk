@@ -12,7 +12,7 @@ const api = {
   getPools: '/swap/pools',
 };
 
-class Swap {
+export class Swap {
   // @ts-ignore
   public kavaClient: KavaClient;
   public static instance: Swap;
