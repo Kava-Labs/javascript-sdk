@@ -2,6 +2,7 @@ const sig = require('@kava-labs/sig');
 import { tx } from '../tx';
 import { msg } from '../msg';
 import { Hard } from './hard';
+import { Swap } from './swap';
 import { DenomToClaim } from '../types/DenomToClaim';
 import { VoteType } from '../types/VoteType';
 import { Wallet } from '../types/Wallet';
@@ -60,6 +61,7 @@ export class KavaClient {
   public baseURI: string;
   public broadcastMode: string;
   public hard: Hard;
+  public swap: Swap;
   public wallet?: Wallet;
   public chainID?: string;
   public accNum?: string;
@@ -74,6 +76,7 @@ export class KavaClient {
     this.baseURI = server;
     this.broadcastMode = 'sync'; // default broadcast mode
     this.hard = new Hard(this);
+    this.swap = new Swap(this);
   }
 
   /**
