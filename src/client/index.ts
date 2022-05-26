@@ -15,7 +15,7 @@ const DEFAULT_FEE = { amount: [], gas: String(300000) };
 const DEFAULT_CDP_FEE = { amount: [], gas: String(650000) };
 
 const api = {
-  txs: '/txs',
+  txs: '/cosmos/tx/v1beta1/txs',
   nodeInfo: '/node_info',
   getBlock: '/blocks',
   getLatestBlock: '/blocks/latest',
