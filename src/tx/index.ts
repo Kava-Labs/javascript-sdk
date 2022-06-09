@@ -108,7 +108,14 @@ async function loadMetaData(address: string, base: string, timeout = 2000) {
   if (res?.data?.result?.type === 'cosmos-sdk/BaseAccount') {
     accNum = res?.data?.result?.value?.account_number;
     seqNum = res?.data?.result?.value?.sequence || '0';
-  } else {
+  } else if ((res?.data?.result?.type === 'ethermint/EthAccount') )  {
+    accNum =
+      res?.data?.result?.value?.base_account
+        ?.account_number;
+    seqNum =
+      res?.data?.result?.value?.base_account?.sequence ||
+      '0';
+  } else  {
     accNum =
       res?.data?.result?.value?.base_vesting_account?.base_account
         ?.account_number;
