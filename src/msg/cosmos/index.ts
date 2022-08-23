@@ -90,9 +90,41 @@ function newMsgTransfer(
   };
 }
 
+export function newMsgDelegate(
+  delegatorAddress: string,
+  validatorAddress: string,
+  amount: Coin
+) {
+  return {
+    type: 'cosmos-sdk/MsgDelegate',
+    value: {
+      delegator_address: delegatorAddress,
+      validator_address: validatorAddress,
+      amount,
+    },
+  };
+}
+
+export function newMsgUnDelegate(
+  delegatorAddress: string,
+  validatorAddress: string,
+  amount: Coin
+) {
+  return {
+    type: 'cosmos-sdk/MsgUndelegate',
+    value: {
+      delegator_address: delegatorAddress,
+      validator_address: validatorAddress,
+      amount,
+    },
+  };
+}
+
 export const cosmos = {
   newStdTx,
   newMsgSend,
   newMsgVoteGovernance,
   newMsgTransfer,
+  newMsgDelegate,
+  newMsgUnDelegate,
 };

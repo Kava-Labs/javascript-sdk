@@ -83,3 +83,49 @@ describe('Cosmos messages', () => {
     });
   });
 });
+describe('staking delegations messages', () => {
+  test('newMsgDelegate', () => {
+    const message = cosmos.newMsgDelegate(
+      'kava1w66puffhccjck70hw75wu3v92tshw5rmdxp8hb',
+      'kava1a22puffhccjck70hw75wu3v92tshw5rmdxp6xz',
+      {
+        denom: 'ukava',
+        amount: '10000000',
+      }
+    );
+    const expected = {
+      type: 'cosmos-sdk/MsgDelegate',
+      value: {
+        delegator_address: 'kava1w66puffhccjck70hw75wu3v92tshw5rmdxp8hb',
+        validator_address: 'kava1a22puffhccjck70hw75wu3v92tshw5rmdxp6xz',
+        amount: {
+          denom: 'ukava',
+          amount: '10000000',
+        },
+      },
+    };
+    expect(message).toEqual(expected);
+  });
+  test('newMsgUnDelegate', () => {
+    const message = cosmos.newMsgUnDelegate(
+      'kava1w66puffhccjck70hw75wu3v92tshw5rmdxp8hb',
+      'kava1a22puffhccjck70hw75wu3v92tshw5rmdxp6xz',
+      {
+        denom: 'ukava',
+        amount: '10000000',
+      }
+    );
+    const expected = {
+      type: 'cosmos-sdk/MsgUndelegate',
+      value: {
+        delegator_address: 'kava1w66puffhccjck70hw75wu3v92tshw5rmdxp8hb',
+        validator_address: 'kava1a22puffhccjck70hw75wu3v92tshw5rmdxp6xz',
+        amount: {
+          denom: 'ukava',
+          amount: '10000000',
+        },
+      },
+    };
+    expect(message).toEqual(expected);
+  });
+});
