@@ -3,6 +3,8 @@ import hexEncoding from 'crypto-js/enc-hex';
 import Big from 'big.js';
 import cryptoRand from 'crypto';
 import { crypto } from '../crypto';
+import { ethers } from 'ethers';
+import bech32 from 'bech32';
 
 const RandomNumberLength = 64;
 
@@ -161,9 +163,9 @@ const formatMultiCoins = (amounts: string[], denoms: string[]) => {
     return;
   }
 
-  var coins = [];
-  for (var i = 0; i < amounts.length; i++) {
-    let coin = formatCoin(amounts[i], denoms[i]);
+  const coins = [];
+  for (let i = 0; i < amounts.length; i++) {
+    const coin = formatCoin(amounts[i], denoms[i]);
     coins.push(coin);
   }
   return coins;
@@ -176,8 +178,33 @@ const formatMultiCoins = (amounts: string[], denoms: string[]) => {
  */
 
 const calculateUnixTime = (seconds = 86400) => {
-	return String(Math.floor(Date.now() / 1000) + seconds); 
+  return String(Math.floor(Date.now() / 1000) + seconds);
 };
+
+/**
+ *
+ * @param kavaAddress string
+ * @returns string representing eth address from given kava address
+ */
+export function kavaToEthAddress(kavaAddress: string) {
+  return ethers.utils.getAddress(
+    ethers.utils.hexlify(bech32.fromWords(bech32.decode(kavaAddress).words))
+  );
+}
+
+/**
+ *
+ * @param ethereumAddress string
+ * @returns string representing kava address from give eth address
+ */
+export function ethToKavaAddress(ethereumAddress: string) {
+  return bech32.encode(
+    'kava',
+    bech32.toWords(
+      ethers.utils.arrayify(ethers.utils.getAddress(ethereumAddress))
+    )
+  );
+}
 
 export const utils = {
   generateRandomNumber,
@@ -188,4 +215,6 @@ export const utils = {
   formatCoin,
   formatCoins,
   formatMultiCoins,
+  ethToKavaAddress,
+  kavaToEthAddress,
 };
