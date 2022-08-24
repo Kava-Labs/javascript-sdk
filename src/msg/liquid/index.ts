@@ -1,10 +1,6 @@
 import { Coin } from '../../types/Coin';
 
-function newMsgMintDerivative(
-  sender: string,
-  validator: string,
-  amount: Coin[]
-) {
+function newMsgMintDerivative(sender: string, validator: string, amount: Coin) {
   return {
     type: 'liquid/MsgMintDerivative',
     value: {
@@ -15,11 +11,7 @@ function newMsgMintDerivative(
   };
 }
 
-function newMsgBurnDerivative(
-  sender: string,
-  validator: string,
-  amount: Coin[]
-) {
+function newMsgBurnDerivative(sender: string, validator: string, amount: Coin) {
   return {
     type: 'liquid/MsgBurnDerivative',
     value: {
