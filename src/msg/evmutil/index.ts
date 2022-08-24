@@ -20,7 +20,7 @@ function newMsgConvertERC20ToCoin(
 function newMsgConvertCoinToERC20(
   initiator: InternalEVMAddress,
   receiver: string,
-  amount: Coin[]
+  amount: Coin
 ) {
   return {
     type: 'evmutil/MsgConvertCoinToERC20',
