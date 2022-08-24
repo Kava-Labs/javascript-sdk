@@ -1,0 +1,5 @@
+export enum Strategy {
+  STRATEGY_TYPE_UNSPECIFIED = 0,
+  STRATEGY_TYPE_HARD = 1,
+  STRATEGY_TYPE_SAVINGS = 2,
+}

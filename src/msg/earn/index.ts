@@ -1,16 +1,18 @@
-import { Coin } from '../../types/Coin';
+import { Strategy, Coin } from '../../types';
 
-function newMsgDeposit(depositor: string, amount: Coin[]) {
+function newMsgDeposit(depositor: string, amount: Coin[], strategy: Strategy) {
   return {
     depositor,
     amount,
+    strategy,
   };
 }
 
-function newMsgWithdraw(from: string, amount: Coin[]) {
+function newMsgWithdraw(from: string, amount: Coin[], strategy: Strategy) {
   return {
     from,
     amount,
+    strategy,
   };
 }
 
