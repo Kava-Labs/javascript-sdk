@@ -2,17 +2,23 @@ import { Strategy, Coin } from '../../types';
 
 function newMsgDeposit(depositor: string, amount: Coin[], strategy: Strategy) {
   return {
-    depositor,
-    amount,
-    strategy,
+    type: 'earn/MsgDeposit',
+    value: {
+      depositor,
+      amount,
+      strategy,
+    },
   };
 }
 
 function newMsgWithdraw(from: string, amount: Coin[], strategy: Strategy) {
   return {
-    from,
-    amount,
-    strategy,
+    type: 'earn/MsgWithdraw',
+    value: {
+      from,
+      amount,
+      strategy,
+    },
   };
 }
 
