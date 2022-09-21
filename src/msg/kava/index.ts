@@ -218,7 +218,7 @@ function newMsgClaimUSDXMintingReward(sender: string, multiplierName: string) {
   };
 }
 
-function newMsgClaimHardReward(sender: string, denomsToClaim: any[]) {
+function newMsgClaimHardReward(sender: string, denomsToClaim: DenomToClaim[]) {
   return {
     type: 'incentive/MsgClaimHardReward',
     value: {
@@ -251,11 +251,21 @@ function newMsgClaimSwapReward(sender: string, denomsToClaim: DenomToClaim[]) {
   };
 }
 
+function newMsgClaimEarnReward(sender: string, denomsToClaim: DenomToClaim[]) {
+  return {
+    type: 'incentive/MsgClaimEarnReward',
+    value: {
+      sender,
+      denoms_to_claim: denomsToClaim,
+    },
+  };
+}
+
 /***************************************************
  *                   Issuance
  ***************************************************/
 
-function newMsgIssueTokens(sender: string, tokens: any[], receiver: string) {
+function newMsgIssueTokens(sender: string, tokens: Coin, receiver: string) {
   return {
     type: 'issuance/MsgIssueTokens',
     value: {
@@ -266,7 +276,7 @@ function newMsgIssueTokens(sender: string, tokens: any[], receiver: string) {
   };
 }
 
-function newMsgRedeemTokens(sender: string, tokens: any[]) {
+function newMsgRedeemTokens(sender: string, tokens: Coin) {
   return {
     type: 'issuance/MsgRedeemTokens',
     value: {
@@ -351,6 +361,7 @@ export const kava = {
   newMsgClaimHardReward,
   newMsgClaimDelegatorReward,
   newMsgClaimSwapReward,
+  newMsgClaimEarnReward,
   newMsgIssueTokens,
   newMsgRedeemTokens,
   newMsgBlockAddress,
