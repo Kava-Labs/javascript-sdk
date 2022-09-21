@@ -265,7 +265,7 @@ function newMsgClaimEarnReward(sender: string, denomsToClaim: DenomToClaim[]) {
  *                   Issuance
  ***************************************************/
 
-function newMsgIssueTokens(sender: string, tokens: Coin, receiver: string) {
+function newMsgIssueTokens(sender: string, tokens: Coin[], receiver: string) {
   return {
     type: 'issuance/MsgIssueTokens',
     value: {
@@ -276,7 +276,7 @@ function newMsgIssueTokens(sender: string, tokens: Coin, receiver: string) {
   };
 }
 
-function newMsgRedeemTokens(sender: string, tokens: Coin) {
+function newMsgRedeemTokens(sender: string, tokens: Coin[]) {
   return {
     type: 'issuance/MsgRedeemTokens',
     value: {
