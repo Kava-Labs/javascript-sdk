@@ -1,4 +1,4 @@
-const sig = require('@kava-labs/sig');
+import * as sig from '@kava-labs/sig';
 import { tx } from '../tx';
 import { msg } from '../msg';
 import { Hard } from './hard';
@@ -197,7 +197,11 @@ export class KavaClient {
    * @param {String} sequence account sequence
    * @return {Promise}
    */
-  async sendTx(msgs: any[], fee: any, sequence: string | null) {
+  async sendTx(
+    msgs: any[],
+    fee: { amount: []; gas: string },
+    sequence: string | null
+  ) {
     const rawTx = msg.cosmos.newStdTx(msgs, fee);
     const signInfo = await this.prepareSignInfo(sequence);
     const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
@@ -899,7 +903,7 @@ export class KavaClient {
     senderOtherChain: string,
     randomNumberHash: string,
     timestamp: number,
-    amount: Coin,
+    amount: Coin[],
     heightSpan: number,
     fee = DEFAULT_FEE,
     sequence = null
