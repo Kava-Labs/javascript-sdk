@@ -9,7 +9,8 @@
     "format": "prettier --write \"src/**/*.ts\"",
     "postversion": "git push && git push --tags",
     "prepare": "npm run build && husky install",
-    "version": "npm run format && git add -A src"
+    "version": "npm run format && git add -A src",
+    "check": "tsc -p tsconfig.json"
   },
   "dependencies": {
     "@kava-labs/sig": "^0.1.0",
