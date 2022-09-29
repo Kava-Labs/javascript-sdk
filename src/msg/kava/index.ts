@@ -256,7 +256,7 @@ function newMsgClaimSavingsReward(
   denomsToClaim: DenomToClaim[]
 ) {
   return {
-    type: 'incentive/MsgClaimSwapReward',
+    type: 'incentive/MsgClaimSavingsReward',
     value: {
       sender: sender,
       denoms_to_claim: denomsToClaim,
