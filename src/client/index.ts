@@ -1,4 +1,5 @@
-import * as sig from '@kava-labs/sig';
+/* eslint-disable @typescript-eslint/no-var-requires, @typescript-eslint/no-explicit-any */
+const sig = require('@kava-labs/sig');
 import { tx } from '../tx';
 import { msg } from '../msg';
 import { Hard } from './hard';
