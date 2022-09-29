@@ -3,7 +3,7 @@ import { InternalEVMAddress, Coin } from '../../types';
 function newMsgConvertERC20ToCoin(
   initiator: InternalEVMAddress,
   receiver: string,
-  contractAddr: InternalEVMAddress,
+  kava_erc20_address: InternalEVMAddress,
   amount: string
 ) {
   return {
@@ -11,7 +11,7 @@ function newMsgConvertERC20ToCoin(
     value: {
       initiator,
       receiver,
-      contractAddr,
+      kava_erc20_address,
       amount,
     },
   };
