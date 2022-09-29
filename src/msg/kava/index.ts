@@ -29,7 +29,7 @@ function newMsgCreateAtomicSwap(
   senderOtherChain: string,
   randomNumberHash: string,
   timestamp: number,
-  amount: Coin,
+  amount: Coin[],
   heightSpan: number
 ) {
   return {
