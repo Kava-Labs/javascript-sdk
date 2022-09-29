@@ -22,7 +22,7 @@ function newMsgBurnDerivative(sender: string, validator: string, amount: Coin) {
   };
 }
 
-export const hard = {
+export const liquid = {
   newMsgMintDerivative,
   newMsgBurnDerivative,
 };

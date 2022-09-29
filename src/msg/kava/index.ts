@@ -251,6 +251,19 @@ function newMsgClaimSwapReward(sender: string, denomsToClaim: DenomToClaim[]) {
   };
 }
 
+function newMsgClaimSavingsReward(
+  sender: string,
+  denomsToClaim: DenomToClaim[]
+) {
+  return {
+    type: 'incentive/MsgClaimSwapReward',
+    value: {
+      sender: sender,
+      denoms_to_claim: denomsToClaim,
+    },
+  };
+}
+
 function newMsgClaimEarnReward(sender: string, denomsToClaim: DenomToClaim[]) {
   return {
     type: 'incentive/MsgClaimEarnReward',
@@ -361,6 +374,7 @@ export const kava = {
   newMsgClaimHardReward,
   newMsgClaimDelegatorReward,
   newMsgClaimSwapReward,
+  newMsgClaimSavingsReward,
   newMsgClaimEarnReward,
   newMsgIssueTokens,
   newMsgRedeemTokens,
