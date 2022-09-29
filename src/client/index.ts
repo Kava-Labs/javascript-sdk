@@ -197,11 +197,7 @@ export class KavaClient {
    * @param {String} sequence account sequence
    * @return {Promise}
    */
-  async sendTx(
-    msgs: any[],
-    fee: { amount: []; gas: string },
-    sequence: string | null
-  ) {
+  async sendTx(msgs: any[], fee: any, sequence: string | null) {
     const rawTx = msg.cosmos.newStdTx(msgs, fee);
     const signInfo = await this.prepareSignInfo(sequence);
     const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
