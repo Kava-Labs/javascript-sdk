@@ -2,7 +2,7 @@ ROOT_DIR := $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 BUILD_DIR := $(ROOT_DIR)/.build
 OUT_DIR := $(ROOT_DIR)/src/proto
 
-KAVA_TAG ?= dl-earn-eip712
+KAVA_TAG ?= master
 KAVA_PROTO_DIR = $(BUILD_DIR)/kava/proto
 KAVA_THIRD_PARTY_PROTO_DIR = $(BUILD_DIR)/kava/third_party/proto
 
