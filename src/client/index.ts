@@ -21,6 +21,7 @@ const DEFAULT_FEE = { amount: [], gas: String(300000) };
 const DEFAULT_CDP_FEE = { amount: [], gas: String(650000) };
 
 const POST_PRICE_MSG_URL = '/kava.pricefeed.v1beta1.MsgPostPrice';
+
 const api = {
   txs: '/cosmos/tx/v1beta1/txs',
   nodeInfo: '/cosmos/base/tendermint/v1beta1/node_info',
