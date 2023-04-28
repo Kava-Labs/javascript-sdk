@@ -184,7 +184,6 @@ export class KavaClient {
     // register type urls and create rpc client
     const registry = new Registry();
     registry.register(POST_PRICE_MSG_URL, MsgPostPrice);
-    registry.register(POST_PLACE_BIG_MSG_URL, MsgPlaceBid);
     this.rpcClient = await SigningStargateClient.connectWithSigner(
       this.rpcURI,
       this.newWallet,
