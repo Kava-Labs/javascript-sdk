@@ -1,10 +1,10 @@
-const sig = require('@kava-labs/sig');
 import axios, { AxiosError } from 'axios';
+import * as sig from '@kava-labs/sig';
 import { URL } from 'url';
 
 const api = {
-  getAccount: '/auth/accounts',
-  postTx: '/txs',
+  getAccount: '/cosmos/auth/v1beta1/accounts',
+  postTx: '/cosmos/tx/v1beta1/txs',
 };
 
 /**
@@ -16,18 +16,14 @@ const api = {
 async function getTx(path: string, base: string, timeout = 5000, args = {}) {
   const requestUrl = new URL(path, base).toString();
 
-  try {
-    return await retry(
-      axios.get,
-      axios,
-      [applyRequestArgs(requestUrl, args)],
-      Math.floor(timeout / 1000),
-      1000,
-      false
-    );
-  } catch (err) {
-    throw err;
-  }
+  return await retry(
+    axios.get,
+    axios,
+    [applyRequestArgs(requestUrl, args)],
+    Math.floor(timeout / 1000),
+    1000,
+    false
+  );
 }
 
 /**
@@ -38,14 +34,14 @@ async function getTx(path: string, base: string, timeout = 5000, args = {}) {
  */
 function applyRequestArgs(url: string, args: Record<string, string> = {}) {
   const search = [];
-  for (let k in args) {
+  for (const k in args) {
     search.push(`${k}=${args[k]}`);
   }
   return `${url}?${search.join('&')}`;
 }
 
 type RetryFunction = (
-  fn: Function,
+  fn: any,
   thisArg: any,
   args: string[],
   retriesLeft: number,
@@ -66,7 +62,7 @@ type RetryFunction = (
  * @return {Promise<*>}
  */
 const retry: RetryFunction = async (
-  fn: Function,
+  fn: any,
   thisArg: any,
   args: string[],
   retriesLeft = 5,
@@ -101,20 +97,15 @@ const retry: RetryFunction = async (
  * @return {Promise}
  */
 async function loadMetaData(address: string, base: string, timeout = 2000) {
-  const path = api.getAccount + '/' + address;
+  const path = `${api.getAccount}/${address}`;
   const res = await getTx(path, base, timeout);
-  let accNum: string;
-  let seqNum: string;
-  if (res?.data?.result?.type === 'cosmos-sdk/BaseAccount') {
-    accNum = res?.data?.result?.value?.account_number;
-    seqNum = res?.data?.result?.value?.sequence || '0';
-  } else {
-    accNum =
-      res?.data?.result?.value?.base_vesting_account?.base_account
-        ?.account_number;
-    seqNum =
-      res?.data?.result?.value?.base_vesting_account?.base_account?.sequence ||
-      '0';
+  const account = res?.data?.account;
+  let seqNum = account?.sequence || '0';
+  let accNum = account?.account_number;
+  const vestingBaseAcct = account?.base_vesting_account?.base_account;
+  if (vestingBaseAcct) {
+    seqNum = vestingBaseAcct?.sequence || '0';
+    accNum = vestingBaseAcct?.account_number;
   }
   if (!(accNum || seqNum)) {
     throw new Error(
@@ -164,15 +155,16 @@ async function broadcastTx(tx: any, base: string, mode: string) {
   }
 
   // Check for and handle any tendermint errors
+  const rsp = txRes?.data?.tx_response;
   try {
-    if (txRes?.data?.code) {
-      throw new Error(`tx not accepted by chain: ${txRes.data.raw_log}`);
+    if (rsp?.code) {
+      throw new Error(`tx not accepted by chain: ${rsp?.raw_log}`);
     }
   } catch (err) {
     return err;
   }
 
-  return txRes?.data?.txhash;
+  return rsp?.txhash;
 }
 
 /**
