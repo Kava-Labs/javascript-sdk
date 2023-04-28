@@ -1,5 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const sig = require('@kava-labs/sig');
 import axios, { AxiosError } from 'axios';
-import * as sig from '@kava-labs/sig';
 import { URL } from 'url';
 
 const api = {
