@@ -13,6 +13,7 @@ import { DirectSecp256k1HdWallet, Registry } from '@cosmjs/proto-signing';
 import { SigningStargateClient } from '@cosmjs/stargate';
 import { MsgPostPrice } from '../proto/kava/pricefeed/v1beta1/tx';
 import { Decimal } from '@cosmjs/math';
+import { MsgRefundAtomicSwap } from '../proto/kava/bep3/v1beta1/tx';
 
 const KAVA_PREFIX = 'kava';
 const DERIVATION_PATH = "m/44'/459'/0'/0/0";
@@ -21,6 +22,7 @@ const DEFAULT_FEE = { amount: [], gas: String(300000) };
 const DEFAULT_CDP_FEE = { amount: [], gas: String(650000) };
 
 const POST_PRICE_MSG_URL = '/kava.pricefeed.v1beta1.MsgPostPrice';
+const REFUND_SWAP_MSG_URL = '/kava.bep3.v1beta1.MsgRefundAtomicSwap';
 
 const api = {
   txs: '/cosmos/tx/v1beta1/txs',
@@ -44,7 +46,7 @@ const api = {
   getPrice: '/pricefeed/price',
   getRawPrices: '/kava/pricefeed/v1beta1/rawprices',
   getSwap: 'bep3/swap',
-  getSwaps: '/bep3/swaps',
+  getSwaps: 'kava/bep3/v1beta1/atomicswaps',
   getAssetSupply: 'bep3/supply',
   getAssetSupplies: 'bep3/supplies',
   getCDP: 'cdp/cdps/cdp',
@@ -185,6 +187,7 @@ export class KavaClient {
     // register type urls and create rpc client
     const registry = new Registry();
     registry.register(POST_PRICE_MSG_URL, MsgPostPrice);
+    registry.register(REFUND_SWAP_MSG_URL, MsgRefundAtomicSwap);
     this.rpcClient = await SigningStargateClient.connectWithSigner(
       this.rpcURI,
       this.newWallet,
@@ -900,7 +903,7 @@ export class KavaClient {
   async getSwaps(args = {}, timeout = 2000) {
     const res = await tx.getTx(api.getSwaps, this.baseURI, timeout, args);
     if (res && res.data) {
-      return res.data.result;
+      return res.data.atomic_swaps;
     }
   }
 
@@ -1003,14 +1006,18 @@ export class KavaClient {
    * @return {Promise}
    */
   async refundSwap(swapID: string, fee = DEFAULT_FEE, sequence = null) {
-    if (!this.wallet) {
-      throw Error('Wallet has not yet been initialized');
+    if (!this.newWallet) {
+      throw Error('New wallet has not yet been initialized');
     }
-    const msgRefundAtomicSwap = msg.kava.newMsgRefundAtomicSwap(
-      this.wallet.address,
-      swapID.toUpperCase()
-    );
-    return await this.sendTx([msgRefundAtomicSwap], fee, sequence);
+    const [account] = await this.newWallet.getAccounts();
+    const msgRefundSwap = {
+      typeUrl: REFUND_SWAP_MSG_URL,
+      value: MsgRefundAtomicSwap.create({
+        from: account.address,
+        swapId: swapID.toUpperCase(),
+      }),
+    };
+    return await this.sendTx([msgRefundSwap], fee, sequence);
   }
 
   /***************************************************
