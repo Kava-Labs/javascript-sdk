@@ -8,6 +8,11 @@ import { DenomToClaim } from '../types/DenomToClaim';
 import { VoteType } from '../types/VoteType';
 import { Wallet } from '../types/Wallet';
 import { Coin } from '../types/Coin';
+import { Slip10RawIndex, HdPath } from '@cosmjs/crypto';
+import { DirectSecp256k1HdWallet, Registry } from '@cosmjs/proto-signing';
+import { SigningStargateClient } from '@cosmjs/stargate';
+import { MsgPostPrice } from '../proto/kava/pricefeed/v1beta1/tx';
+import { Decimal } from '@cosmjs/math';
 
 const KAVA_PREFIX = 'kava';
 const DERIVATION_PATH = "m/44'/459'/0'/0/0";
@@ -15,9 +20,11 @@ const DERIVATION_PATH_LEGACY = "m/44'/118'/0'/0/0";
 const DEFAULT_FEE = { amount: [], gas: String(300000) };
 const DEFAULT_CDP_FEE = { amount: [], gas: String(650000) };
 
+const POST_PRICE_MSG_URL = '/kava.pricefeed.v1beta1.MsgPostPrice';
+
 const api = {
   txs: '/cosmos/tx/v1beta1/txs',
-  nodeInfo: '/node_info',
+  nodeInfo: '/cosmos/base/tendermint/v1beta1/node_info',
   getBlock: '/blocks',
   getLatestBlock: '/blocks/latest',
   getLatestValidatorSet: '/validatorsets/latest',
@@ -35,7 +42,7 @@ const api = {
   getMarkets: 'pricefeed/markets',
   getOracles: 'pricefeed/oracles',
   getPrice: '/pricefeed/price',
-  getRawPrices: '/pricefeed/rawprices',
+  getRawPrices: '/kava/pricefeed/v1beta1/rawprices',
   getSwap: 'bep3/swap',
   getSwaps: '/bep3/swaps',
   getAssetSupply: 'bep3/supply',
@@ -60,20 +67,24 @@ const api = {
  */
 export class KavaClient {
   public baseURI: string;
+  public rpcURI: string;
   public broadcastMode: string;
   public hard: Hard;
   public swap: Swap;
   public wallet?: Wallet;
   public chainID?: string;
   public accNum?: string;
+  public newWallet?: DirectSecp256k1HdWallet;
+  public rpcClient?: SigningStargateClient;
 
   /**
    * @param {String} server Kava public url
    */
-  constructor(server: string) {
+  constructor(server: string, rcpUri: string) {
     if (!server) {
       throw new Error('Kava server should not be null');
     }
+    this.rpcURI = rcpUri;
     this.baseURI = server;
     this.broadcastMode = 'sync'; // default broadcast mode
     this.hard = new Hard(this);
@@ -87,7 +98,7 @@ export class KavaClient {
   async initChain() {
     if (!this.chainID) {
       const res = await tx.getTx(api.nodeInfo, this.baseURI);
-      this.chainID = res?.data?.node_info?.network;
+      this.chainID = res?.data?.default_node_info?.network;
     }
     return this;
   }
@@ -158,6 +169,29 @@ export class KavaClient {
     return this;
   }
 
+  async setNewWallet(mnemonic: string, legacy = false) {
+    const hdPath: HdPath = [
+      Slip10RawIndex.hardened(44),
+      legacy ? Slip10RawIndex.hardened(118) : Slip10RawIndex.hardened(459),
+      Slip10RawIndex.hardened(0),
+      Slip10RawIndex.normal(0),
+      Slip10RawIndex.normal(0),
+    ];
+    this.newWallet = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
+      prefix: 'kava',
+      hdPaths: [hdPath],
+    });
+
+    // register type urls and create rpc client
+    const registry = new Registry();
+    registry.register(POST_PRICE_MSG_URL, MsgPostPrice);
+    this.rpcClient = await SigningStargateClient.connectWithSigner(
+      this.rpcURI,
+      this.newWallet,
+      { registry }
+    );
+  }
+
   /**
    * Load account number, sequence, and package with chain ID for signature
    * @param {String} sequence Kava address sequence
@@ -199,10 +233,20 @@ export class KavaClient {
    * @return {Promise}
    */
   async sendTx(msgs: any[], fee: any, sequence: string | null) {
-    const rawTx = msg.cosmos.newStdTx(msgs, fee);
-    const signInfo = await this.prepareSignInfo(sequence);
-    const signedTx = tx.signTx(rawTx, signInfo, this.wallet);
-    return await tx.broadcastTx(signedTx, this.baseURI, this.broadcastMode);
+    if (!this.newWallet) {
+      throw Error('new wallet is not initialized, it is required to send tx.');
+    }
+    if (!this.rpcClient) {
+      throw Error('rpc client is not initialized, it is required to send tx.');
+    }
+    const [firstAccount] = await this.newWallet.getAccounts();
+    const defaultFee = { amount: [], gas: '300000' };
+    const result = await this.rpcClient.signAndBroadcast(
+      firstAccount.address,
+      msgs,
+      fee ? fee : defaultFee
+    );
+    return result.transactionHash;
   }
 
   /***************************************************
@@ -442,7 +486,7 @@ export class KavaClient {
     const path = api.getRawPrices + '/' + market;
     const res = await tx.getTx(path, this.baseURI, timeout);
     if (res && res.data) {
-      return res.data.result;
+      return res.data.raw_prices;
     }
   }
 
@@ -484,19 +528,24 @@ export class KavaClient {
   async postPrice(
     marketID: string,
     price: string,
-    expiry: string,
+    expiry: Date,
     fee = DEFAULT_FEE,
     sequence = null
   ) {
-    if (!this.wallet) {
+    if (!this.newWallet) {
       throw Error('Wallet has not yet been initialized');
     }
-    const msgPostPrice = msg.kava.newMsgPostPrice(
-      this.wallet.address,
-      marketID,
-      price,
-      expiry
-    );
+    const [account] = await this.newWallet.getAccounts();
+    const parsed = Decimal.fromUserInput(price, 18);
+    const msgPostPrice = {
+      typeUrl: POST_PRICE_MSG_URL,
+      value: MsgPostPrice.create({
+        from: account.address,
+        marketId: marketID,
+        price: parsed.atomics,
+        expiry,
+      }),
+    };
     return await this.sendTx([msgPostPrice], fee, sequence);
   }
 
