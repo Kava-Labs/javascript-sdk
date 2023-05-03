@@ -148,7 +148,7 @@ async function broadcastTx(tx: any, base: string, mode: string) {
   let txRes;
   try {
     const url = new URL(api.postTx, base).toString();
-    txRes = await axios.post(url, sig.createBroadcastTx(tx.value, mode));
+    txRes = await axios.post(url, { tx_bytes: tx, mode: mode });
   } catch (err) {
     if (axios.isAxiosError(err)) {
       logErr(err);
