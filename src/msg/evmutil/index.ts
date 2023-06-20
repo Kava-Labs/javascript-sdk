@@ -32,11 +32,11 @@ function newMsgConvertCoinToERC20(
   };
 }
 
-const newMsgConvertCosmosCoinToERC20 = (
+function newMsgConvertCosmosCoinToERC20(
   initiator: InternalEVMAddress,
   receiver: string,
   amount: Coin
-) => {
+) {
   return {
     type: 'evmutil/MsgConvertCosmosCoinToERC20',
     value: {
@@ -45,13 +45,13 @@ const newMsgConvertCosmosCoinToERC20 = (
       amount,
     },
   };
-};
+}
 
-const newMsgConvertCosmosCoinFromERC20 = (
+function newMsgConvertCosmosCoinFromERC20(
   initiator: InternalEVMAddress,
   receiver: string,
   amount: Coin
-) => {
+) {
   return {
     type: 'evmutil/MsgConvertCosmosCoinFromERC20',
     value: {
@@ -60,7 +60,7 @@ const newMsgConvertCosmosCoinFromERC20 = (
       amount,
     },
   };
-};
+}
 
 export const evmutil = {
   newMsgConvertERC20ToCoin,
