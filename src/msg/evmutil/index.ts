@@ -53,7 +53,7 @@ const newMsgConvertCosmosCoinFromERC20 = (
   amount: Coin
 ) => {
   return {
-    type: 'evmutil/MsgConvertCosmosCoinToERC20',
+    type: 'evmutil/MsgConvertCosmosCoinFromERC20',
     value: {
       initiator,
       receiver,
