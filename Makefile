@@ -29,7 +29,7 @@ proto-gen:
 	protoc \
 		--plugin="protoc-gen-ts_proto=$(TS_PROTO_PLUGIN_PATH)" \
 		--ts_proto_out="$(OUT_DIR)" \
-		--ts_proto_opt="esModuleInterop=true,forceLong=long,useOptionals=messages" \
+		--ts_proto_opt="esModuleInterop=true,forceLong=long,useOptionals=messages,useExactTypes=false" \
 		--proto_path="$(KAVA_PROTO_DIR)" \
 		--proto_path="$(KAVA_THIRD_PARTY_PROTO_DIR)" \
 		$(shell find $(KAVA_PROTO_DIR) $(KAVA_THIRD_PARTY_PROTO_DIR) -path -prune -o -name '*.proto' -print0 | xargs -0)

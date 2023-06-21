@@ -13,8 +13,7 @@
     "outDir": "./lib",
     "skipLibCheck": true,
     "strict": true,
-    "typeRoots": ["./node_modules/@types/", "./src/@types"],
-    "declaration": false
+    "typeRoots": ["./node_modules/@types/", "./src/@types"]
   },
   "include": ["src"]
 }
