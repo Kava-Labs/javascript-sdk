@@ -176,7 +176,7 @@ const logErr = (err: AxiosError) => {
   // Load status, status text, and error
   const status = err.response?.status;
   const statusText = err.response?.statusText;
-  const error = err.response?.data.error;
+  const error = err.response?.data;
 
   // Log status, status text, and error, or if unidentified, log network error
   status ? console.log('Status:', status) : null;
