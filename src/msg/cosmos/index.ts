@@ -58,6 +58,23 @@ function newMsgVoteGovernance(
   };
 }
 
+export interface Msg<V = any, T = string> {
+  type: T;
+  value: V;
+}
+export type TransferMsg = Msg<
+  {
+    source_port: string;
+    source_channel: string;
+    token: Coin;
+    sender: string;
+    receiver: string;
+    timeout_height: {};
+    timeout_timestamp: string;
+  },
+  'cosmos-sdk/MsgTransfer'
+>;
+
 /**
  * Creates an IBC transfer
  * @param {String} sourcePort the port identifier, we would expect to always be "transfer" * @param {String} sourcePort the port identifier, we would expect to always be "transfer"
@@ -75,7 +92,7 @@ function newMsgTransfer(
   sender: string,
   receiver: string,
   timeoutTimestamp: number
-) {
+): TransferMsg {
   return {
     type: 'cosmos-sdk/MsgTransfer',
     value: {
